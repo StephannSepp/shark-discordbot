@@ -4,19 +4,19 @@ Must be loaded as a Disnake Cog via load_extension() function.
 
 :date: 09-21-2022
 """
+# Standard library imports
 import hashlib
 from datetime import datetime
 from datetime import timedelta
-
+# Third-party library imports
 from disnake import CmdInter
 from disnake import File
 from disnake.ext import commands
 from disnake.ext import tasks
-
+# Local imports
 from utils import embed_builder
 from utils import time_process
 from config import Config
-
 from . import FortuneResult
 from . import module
 
@@ -54,8 +54,9 @@ class Fortune(commands.Cog):
         date = int(datetime.utcnow().strftime("%Y%m%d"))
         reset_time = datetime.utcnow().date() + timedelta(days=1)
         reset_time_unix = time_process.to_unix(reset_time)
-        # The seed is a combination of Discord user ID and date in integer both in binary strings,
-        # and then hash the string with md5.
+        # The raw seed is a combination of Discord user ID and date in integer both in binary strings,
+        # and then hash the string with sha256.
+        # The seed for each fortune result is by dividing the raw seed into four strings.
         raw_seed = format(date, "b") + format(inter.author.id, "b")
         seed = hashlib.sha256(raw_seed.encode()).hexdigest()
         result = FortuneResult(uid=inter.author.id, draw_date=datetime.utcnow().date())
@@ -116,6 +117,12 @@ class Fortune(commands.Cog):
                 embed.add_field(name=row[0], value=value, inline=inline)
             await inter.response.send_message(embed=embed)
         else:
+            # The result of get_by_user is a tuple pairs
+            # Here we assign the result pairs to last_week_result and most_common_angel_result
+            #
+            # ..:example:
+            # last_week_result = (('大吉', <datetime object>), ('凶', <datetime object>), ...)
+            # most_common_angel_result = ('Ceres Fauna', 3)
             result = FortuneResult.get_by_user(inter.author.id)
             last_week_result, most_common_angel_result = result
             embed = embed_builder.embed_information(
@@ -162,6 +169,8 @@ class Fortune(commands.Cog):
     @tasks.loop(minutes=1.0)
     async def taskloop(self):
         await self.revoke_roles()
+        # Make sure it's always False unless
+        # the bot starts to revoke roles.
         self.pause = False
 
     @taskloop.before_loop

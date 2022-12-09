@@ -5,16 +5,14 @@ Must be loaded as a Disnake Cog via load_extension() function.
 
 :date: 09-19-2022
 """
-import os
-
+# Third-party library imports
 from disnake import CmdInter
 from disnake import TextChannel
 from disnake import User
 from disnake.ext import commands
-
+# Local imports
 from utils import embed_builder
 from utils import time_process
-
 from . import module
 
 

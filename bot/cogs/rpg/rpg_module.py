@@ -1,9 +1,9 @@
+# Standard library imports
 import math
 import random
-
+# Local imports
 from database import rpg_db_manager
 from utils import roll
-
 from .models import Player
 
 

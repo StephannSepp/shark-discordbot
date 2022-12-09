@@ -6,12 +6,11 @@ Some models for the RPGame.
 
 :Date:
 """
-
-
+# Standard library imports
 import random
 from dataclasses import dataclass
 from datetime import datetime
-
+# Local imports
 from static.rpg_boss import boss_count
 
 

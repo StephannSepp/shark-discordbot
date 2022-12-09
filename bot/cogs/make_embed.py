@@ -4,10 +4,11 @@ Must be loaded as a Disnake Cog via load_extension() function.
 
 :date: 10-07-2022
 """
+# Third-party library imports
 from disnake import CmdInter
 from disnake import TextChannel
 from disnake.ext import commands
-
+# Local imports
 from utils import embed_builder
 
 
@@ -24,7 +25,7 @@ class MakeEmbed(commands.Cog):
     @commands.default_member_permissions(manage_messages=True)
     async def make_embed(self, inter: CmdInter, title: str, description: str, content: str=None, embed_type: EMBED_OPT="Information", copy: TextChannel=None):
         """ This command allows user to make a Discord embed via Discord client. """
-        # Use double space to make a new line.
+        # Use double space to break a new line.
         description = description.replace("  ", "\n")
         match embed_type:
             case "Information":

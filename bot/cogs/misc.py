@@ -4,10 +4,11 @@ Must be loaded as a Disnake Cog via load_extension() function.
 
 :date: 09-19-2022
 """
+# Third-party library imports
 from disnake import CmdInter
 from disnake import File
 from disnake.ext import commands
-
+# Local imports
 from utils import embed_builder
 
 
@@ -18,17 +19,17 @@ class Misc(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(name="ping", description="Ping! Pong!")
-    async def ping(self, inter: CmdInter) -> None:
+    async def ping(self, inter: CmdInter):
         """ Ping the bot. """
         await inter.response.send_message(f"{round(self.bot.latency*1000)}ms", ephemeral=True)
 
     @commands.slash_command(name="donothing", description="This function does nothing.")
-    async def donothing(self, inter: CmdInter) -> None:
+    async def donothing(self, inter: CmdInter):
         """ This function does nothing. """
         await inter.response.send_message(file=File("data/donothing.png"))
 
     @commands.slash_command(name="botinfo", description="機器人資訊")
-    async def botinfo(self, inter: CmdInter) -> None:
+    async def botinfo(self, inter: CmdInter):
         """ Display bot information. """
         embed = embed_builder.embed_information(
             title = "機器人資訊",

@@ -37,6 +37,10 @@ class Bot(commands.InteractionBot):
         self._start_time = datetime.now()
 
     def load_all_extensions(self, folder: str):
+        """ Load all Disnake cogs as extensions under a specific folder.
+
+        :param folder: A pathlike string indicate the folder location.
+        """
         for filename in os.listdir(folder):
             path = os.path.join(folder, filename)
             if os.path.isdir(path):

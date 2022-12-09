@@ -6,8 +6,11 @@ A module for the fortune draw command use.
 
 Should be imported as a module.
 """
+# Standard library imports
 import random
+# Third-party library imports
 from disnake import Colour
+# Local imports
 from static import hololive_talent
 
 

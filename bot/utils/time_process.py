@@ -41,7 +41,19 @@ def to_unix(dt: datetime) -> int:
 
 
 def strftimedelta(td: timedelta) -> str:
-    """ Convert <datetime.timedelta> into a string format. """
+    """ Convert <datetime.timedelta> into a string format.
+
+    :param td: A timedelta object.
+
+    ..:example:
+        >> td = timedelta(days=1, minutes=24)
+        >> strftimedelta(td)
+        "1 天 0 小時 24 分 0 秒"
+
+        >> td = timedelta(seconds=50)
+        >> strftimedelta(td)
+        "50 秒"
+    """
 
     if not isinstance(td, timedelta):
         raise TypeError

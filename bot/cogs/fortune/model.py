@@ -1,8 +1,10 @@
+# Standard library imports
 from dataclasses import dataclass
 from datetime import datetime
-
+# Third-party library imports
 import psycopg2
 from psycopg2 import sql
+# Local imports
 from config import Config
 
 
@@ -69,7 +71,7 @@ class FortuneResult():
         return result
 
     @staticmethod
-    def get_by_user(user_id: int) -> tuple[tuple[str, datetime], tuple[str, int]]:
+    def get_by_user(user_id: int) -> tuple[tuple[tuple[str, datetime]], tuple[str, int]]:
         con = psycopg2.connect(Config.database_url)
         cursor = con.cursor()
 

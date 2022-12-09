@@ -6,9 +6,10 @@ This module creates Discord embeds.
 
 :Date: 10-07-2022
 """
+# Standard library imports
 from datetime import datetime
 from typing import Optional
-
+# Third-party library imports
 from disnake import Colour
 from disnake import Embed
 

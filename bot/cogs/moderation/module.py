@@ -1,5 +1,7 @@
 """ A set of functions for accessing database. """
+# Third-party library imports
 import psycopg2
+# Local imports
 from config import Config
 from utils import gen
 
