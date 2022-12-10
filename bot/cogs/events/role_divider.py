@@ -11,10 +11,11 @@ This feature is only for Atlantis.
 
 :Date: 11-27-2022
 """
+# Third-party library imports
 from disnake import Member
 from disnake import utils
 from disnake.ext import commands
-
+# Local imports
 from config import Config
 
 

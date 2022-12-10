@@ -6,8 +6,10 @@ A simple listener to catch the direct messages to the bot.
 
 :Date: 11-13-2022
 """
+# Third-party library imports
 import disnake
 from disnake.ext import commands
+# Local imports
 from config import Config
 
 

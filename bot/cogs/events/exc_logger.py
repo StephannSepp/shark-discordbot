@@ -6,11 +6,12 @@ A simple listener to catch any exception.
 
 :Date: 11-13-2022
 """
+# Standard library imports
 import traceback
-
+# Third-party library imports
 import disnake
 from disnake.ext import commands
-
+# Local imports
 from config import Config
 
 
