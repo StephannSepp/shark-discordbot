@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.7.0](https://img.shields.io/badge/disnake-2.7.0-informational?style=plastic)
-![Version 2.2.479](https://img.shields.io/badge/version-2.2.479-informational?style=plastic)
+![Version 2.2.480](https://img.shields.io/badge/version-2.2.480-informational?style=plastic)
 
 ## 關於我
 
@@ -73,6 +73,8 @@
 
 ## Changelog
 
+* 2.2.480
+	* 防止使用者在抽籤重置後至 Bot 移除運勢身分組期間或之前使用抽籤指令
 * 2.2.386
 	* 新增抽籤統計指令 `/fortune statistics`
 	* 將抽籤指令整合至 `/fortune` 類別內，現在指令為 `/fortune draw`

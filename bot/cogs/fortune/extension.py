@@ -6,8 +6,7 @@ Must be loaded as a Disnake Cog via load_extension() function.
 """
 # Standard library imports
 import hashlib
-from datetime import datetime
-from datetime import timedelta
+import datetime
 # Third-party library imports
 from disnake import CmdInter
 from disnake import File
@@ -28,6 +27,8 @@ ROLES = {
     "凶": 1043736582760439838,
     "大凶": 1043737502080581722,
 }
+ROLE_REVOKE_START = datetime.time() # 00:00:00
+ROLE_REVOKE_END = datetime.time(minute=2) # 00:01:00
 
 
 class Fortune(commands.Cog):
@@ -36,7 +37,7 @@ class Fortune(commands.Cog):
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
         self.pause = False
-        self.today = datetime.utcnow().date()
+        self.today = datetime.datetime.utcnow().date()
         self.taskloop.start()
 
     @commands.slash_command(name="fortune", description="抽籤")
@@ -47,19 +48,19 @@ class Fortune(commands.Cog):
     @fortune.sub_command(name="draw", description="抽籤！每日早上八點重置")
     async def fortune_draw(self, inter: CmdInter):
         """ This command will draw a fortune lot. Reset on 0:00 UTC time everyday. """
-        if self.pause:
+        if ROLE_REVOKE_START < datetime.datetime.now().time() < ROLE_REVOKE_END or self.pause:
             await inter.response.send_message("機器人正在移除身分組，請稍後再試")
             return
 
-        date = int(datetime.utcnow().strftime("%Y%m%d"))
-        reset_time = datetime.utcnow().date() + timedelta(days=1)
+        date = int(datetime.datetime.utcnow().strftime("%Y%m%d"))
+        reset_time = datetime.datetime.utcnow().date() + datetime.timedelta(days=1)
         reset_time_unix = time_process.to_unix(reset_time)
         # The raw seed is a combination of Discord user ID and date in integer both in binary strings,
         # and then hash the string with sha256.
         # The seed for each fortune result is by dividing the raw seed into four strings.
         raw_seed = format(date, "b") + format(inter.author.id, "b")
         seed = hashlib.sha256(raw_seed.encode()).hexdigest()
-        result = FortuneResult(uid=inter.author.id, draw_date=datetime.utcnow().date())
+        result = FortuneResult(uid=inter.author.id, draw_date=datetime.datetime.utcnow().date())
         result.luck = module.draw_fortune(seed[:16])
         result.colour = module.get_lucky_colour(seed[16:32])
         result.number = module.get_lucky_number(seed[32:48])
@@ -154,11 +155,11 @@ class Fortune(commands.Cog):
             await inter.response.send_message(embed=embed)
 
     async def revoke_roles(self):
-        if self.today == datetime.utcnow().date():
+        if self.today == datetime.datetime.utcnow().date():
             return
 
         self.pause = True
-        self.today = datetime.utcnow().date()
+        self.today = datetime.datetime.utcnow().date()
         guild = self.bot.get_guild(Config.atlantis_id) or await self.bot.fetch_guild(Config.atlantis_id)
         for _k, v in ROLES.items():
             role = guild.get_role(v)
@@ -166,7 +167,7 @@ class Fortune(commands.Cog):
                 for m in role.members:
                     await m.remove_roles(role)
 
-    @tasks.loop(minutes=1.0)
+    @tasks.loop(seconds=59)
     async def taskloop(self):
         await self.revoke_roles()
         # Make sure it's always False unless
