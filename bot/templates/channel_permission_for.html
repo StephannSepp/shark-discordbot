@@ -6,6 +6,7 @@
         {{role}} 於各頻道的權限
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <style>
         body {
             font-family: Arial;
@@ -47,22 +48,114 @@
             border: 1px solid #ccc;
             border-top: none;
         }
+
+        .selectcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="tab">
-        {% for channel in channels %}
-            <button class="tablinks" onclick="openTab(event, '{{ channel }}')">{{ channel }}</button>
+    <div class="nav nav-tabs">
+        {% for channel in uncategory_channel %}
+            <li class="nav-item">
+                <button class="nav-link tablinks" onclick="openTab(event, '{{ channel }}')">{{ channel }}</button>
+            </li>
+        {% endfor %}
+        {% for category in category_permissions %}
+            <li class="nav-item">
+                <button class="nav-link tablinks" onclick="openTab(event, '{{ category }}')">‹ {{ category }} ›</button>
+            </li>
         {% endfor %}
     </div>
 
-    {% for channel in channels %}
-        <div id='{{ channel }}' class="tabcontent">
-            {% for permission in permissions[loop.index0] %}
-                {{ permission[0] }} - {{ permission[1] }}<br>
-            {% endfor %}
+    {% for channel in uncategory_channel %}
+        <div id="{{ channel }}" class="tabcontent">
+            <h3>{{ channel }} does not belong to any category.</h3>
+            <hr>
+            <table class="table-responsive">
+                {% for permission in unsynced_channel_permissions[channel] %}
+                    <tr>
+                        <td class="text-start">
+                            {{ permission[0] }}
+                        </td>
+                        <td class="text-end">
+                            {% if permission[1] == True %}
+                                🔘
+                            {% else %}
+                                ❌
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endfor %}
+
+    {% for category in category_permissions %}
+        <div id="{{ category }}" class="tabcontent">
+            <div>
+                {% if category_channels[category] %}
+                    <h4>‹ {{ category }} › has following unsynced channel(s): </h4>
+                    {% for channel in category_channels[category] %}
+                        {{ channel }}<br>
+                    {% endfor %}
+                {% else %}
+                    <h3>All channels under ‹ {{ category }} › category are synced.</h3>
+                {% endif %}
+            </div>
+            <hr>
+
+            <div class="row">
+                <div class="col">
+                    <h5>{{role}} 在 ‹ {{ category }} › 的權限</h5>
+                    <table class="table-responsive">
+                        {% for permission in category_permissions[category] %}
+                            <tr>
+                                <td class="text-start">
+                                    {{ permission[0] }}
+                                </td>
+                                <td class="text-end">
+                                    {% if permission[1] == True %}
+                                        🔘
+                                    {% else %}
+                                        ❌
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                
+                {% if category_channels[category] %}
+                    {% for channel in category_channels[category] %}
+                    <div class="col">
+                        <h5>{{role}} 在 {{ channel }} 的權限</h5>
+                        <table class="table-responsive">
+                            {% for permission in unsynced_channel_permissions[channel] %}
+                                <tr>
+                                    <td class="text-start">
+                                        {{ permission[0] }}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if permission[1] == True %}
+                                            🔘
+                                        {% else %}
+                                            ❌
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
     {% endfor %}
 

@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.7.0](https://img.shields.io/badge/disnake-2.7.0-informational?style=plastic)
-![Version 2.2.480](https://img.shields.io/badge/version-2.2.480-informational?style=plastic)
+![Version 2.2.504](https://img.shields.io/badge/version-2.2.504-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,8 @@
 
 ## Changelog
 
+* 2.2.504
+	* 新增管理用指令，用於檢查身分組對應所有頻道、類別的權限
 * 2.2.480
 	* 防止使用者在抽籤重置後至 Bot 移除運勢身分組期間或之前使用抽籤指令
 * 2.2.386
