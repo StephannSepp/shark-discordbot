@@ -192,10 +192,10 @@ class Moderation(commands.Cog):
             await inter.response.send_message(embed=embed)
             return
 
-        if member.guild_permissions.administrator:
+        if member.guild_permissions.administrator or member.guild_permissions.moderate_members:
             embed = embed_builder.embed_error(
                 title = "無法執行",
-                description = "該成員有管理員權限"
+                description = "該成員有相同或更大的權限"
             )
             await inter.response.send_message(embed=embed)
             return
@@ -264,10 +264,10 @@ class Moderation(commands.Cog):
             await inter.response.send_message(embed=embed)
             return
 
-        if member.guild_permissions.administrator:
+        if member.guild_permissions.administrator or member.guild_permissions.moderate_members:
             embed = embed_builder.embed_error(
                 title = "無法執行",
-                description = "該成員有管理員權限"
+                description = "該成員有相同或更大的權限"
             )
             await inter.response.send_message(embed=embed)
             return
@@ -330,10 +330,10 @@ class Moderation(commands.Cog):
             await inter.response.send_message(embed=embed)
             return
 
-        if member.guild_permissions.administrator:
+        if member.guild_permissions.administrator or member.guild_permissions.kick_members:
             embed = embed_builder.embed_error(
                 title = "無法執行",
-                description = "該成員有管理員權限"
+                description = "該成員有相同或更大的權限"
             )
             await inter.response.send_message(embed=embed)
             return
@@ -396,10 +396,10 @@ class Moderation(commands.Cog):
             await inter.response.send_message(embed=embed)
             return
 
-        if member.guild_permissions.administrator:
+        if member.guild_permissions.administrator or member.guild_permissions.ban_members:
             embed = embed_builder.embed_error(
                 title = "無法執行",
-                description = "該成員有管理員權限"
+                description = "該成員有相同或更大的權限"
             )
             await inter.response.send_message(embed=embed)
             return
