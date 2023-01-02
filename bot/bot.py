@@ -14,7 +14,7 @@ from config import Config
 from utils.time_process import strftimedelta
 
 
-__version__ = "2.2.504"
+__version__ = "2.2.520"
 
 
 def init_db():

@@ -3,5 +3,5 @@ requests
 pytz
 pygsheets
 psycopg2
-flask
-gunicorn
+Jinja2
+pillow
