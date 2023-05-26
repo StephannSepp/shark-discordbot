@@ -1,0 +1,7 @@
+disnake
+requests
+pytz
+pygsheets
+psycopg2
+Jinja2
+pillow
