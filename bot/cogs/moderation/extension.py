@@ -175,18 +175,19 @@ class Moderation(commands.Cog):
             return
 
         try:
-            try:
-                message = (
-                    f"你在 {inter.guild.name} 被禁言\n"
-                    f"原因：{reason}\n"
-                    f"時長：{duration}\n"
-                )
-                if attachment is not None and attachment.content_type.startswith("image"):
-                    message += "附件：\n"
-                    file = await attachment.to_file()
-                await member.send(message, file=file)
-            except: # pylint: disable=bare-except
-                pass # Pass if failed to DM user.
+            message = (
+                f"你在 {inter.guild.name} 被禁言\n"
+                f"原因：{reason}\n"
+                f"時長：{duration}\n"
+            )
+            if attachment is not None and attachment.content_type.startswith("image"):
+                message += "附件：\n"
+                file = await attachment.to_file()
+            await member.send(message, file=file)
+        except: # pylint: disable=bare-except
+            pass # Pass if failed to DM user.
+
+        try:
             await member.timeout(duration=duration.total_seconds(), reason=reason)
         except: # pylint: disable=bare-except
             embed = embed_builder.embed_error(
@@ -196,23 +197,23 @@ class Moderation(commands.Cog):
             await inter.followup.send(embed=embed)
             return
 
-        else:
-            embed = embed_builder.embed_information(
-                title="懲處紀錄",
-                description=f"{member.mention} 被 {inter.author.mention} 禁言",
-                thumbnail=member.avatar.url
-            )
-            embed.add_field(name="理由", value=reason, inline=False)
-            embed.add_field(name="時長", value=duration, inline=False)
-            if attachment is not None and attachment.content_type.startswith("image"):
-                file = await attachment.to_file()
-                embed.set_image(file=file)
+        embed = embed_builder.embed_information(
+            title="懲處紀錄",
+            description=f"{member.mention} 被 {inter.author.mention} 禁言",
+            thumbnail=member.avatar.url
+        )
+        embed.add_field(name="理由", value=reason, inline=False)
+        embed.add_field(name="時長", value=duration, inline=False)
+        if attachment is not None and attachment.content_type.startswith("image"):
+            embed = await attach_to_embed(embed, attachment)
 
-            if copy:
-                await copy.send(embed=embed)
-                await inter.followup.send(embed=embed)
-            else:
-                await inter.followup.send(embed=embed)
+        if copy:
+            await copy.send(embed=embed)
+            if attachment is not None and attachment.content_type.startswith("image"):
+                embed = await attach_to_embed(embed, attachment)
+            await inter.followup.send(embed=embed)
+        else:
+            await inter.followup.send(embed=embed)
 
     @commands.slash_command(name="unmute", description="解除禁言成員")
     @commands.default_member_permissions(moderate_members=True)
@@ -252,13 +253,14 @@ class Moderation(commands.Cog):
             return
 
         try:
-            try:
-                await member.send(
-                    f"你在 {inter.guild.name} 被解除禁言\n"
-                    f"原因：{reason}\n"
-                )
-            except: # pylint: disable=bare-except
-                pass # Pass if failed to DM user.
+            await member.send(
+                f"你在 {inter.guild.name} 被解除禁言\n"
+                f"原因：{reason}\n"
+            )
+        except: # pylint: disable=bare-except
+            pass # Pass if failed to DM user.
+
+        try:
             await member.timeout(duration=None, reason=reason)
         except: # pylint: disable=bare-except
             embed = embed_builder.embed_error(
@@ -268,18 +270,17 @@ class Moderation(commands.Cog):
             await inter.followup.send(embed=embed)
             return
 
+        embed = embed_builder.embed_information(
+            title="成員被解除禁言",
+            description=f"{member.mention} 被 {inter.author.mention} 解除禁言",
+            thumbnail=member.avatar.url
+        )
+        embed.add_field(name="理由", value=reason, inline=False)
+        if copy:
+            await copy.send(embed=embed)
+            await inter.followup.send(embed=embed)
         else:
-            embed = embed_builder.embed_information(
-                title="成員被解除禁言",
-                description=f"{member.mention} 被 {inter.author.mention} 解除禁言",
-                thumbnail=member.avatar.url
-            )
-            embed.add_field(name="理由", value=reason, inline=False)
-            if copy:
-                await copy.send(embed=embed)
-                await inter.followup.send(embed=embed)
-            else:
-                await inter.followup.send(embed=embed)
+            await inter.followup.send(embed=embed)
 
     @commands.slash_command(name="kick", description="踢除成員")
     @commands.default_member_permissions(kick_members=True)
@@ -321,17 +322,18 @@ class Moderation(commands.Cog):
             return
 
         try:
-            try:
-                message = (
-                    f"你被踢出 {inter.guild.name}\n"
-                    f"原因：{reason}"
-                )
-                if attachment is not None and attachment.content_type.startswith("image"):
-                    message += "附件：\n"
-                    file = await attachment.to_file()
-                await member.send(message, file=file)
-            except: # pylint: disable=bare-except
-                pass # Pass if failed to DM user.
+            message = (
+                f"你被踢出 {inter.guild.name}\n"
+                f"原因：{reason}\n"
+            )
+            if attachment is not None and attachment.content_type.startswith("image"):
+                message += "附件：\n"
+                file = await attachment.to_file()
+            await member.send(message, file=file)
+        except: # pylint: disable=bare-except
+            pass # Pass if failed to DM user.
+
+        try:
             await member.kick(reason=reason)
         except: # pylint: disable=bare-except
             embed = embed_builder.embed_error(
@@ -341,22 +343,22 @@ class Moderation(commands.Cog):
             await inter.followup.send(embed=embed)
             return
 
-        else:
-            embed = embed_builder.embed_information(
-                title = "懲處紀錄",
-                description = f"{member.mention} 被 {inter.author.mention} 踢出伺服器",
-                thumbnail = member.avatar.url
-            )
-            embed.add_field(name="理由", value=reason, inline=False)
-            if attachment is not None and attachment.content_type.startswith("image"):
-                file = await attachment.to_file()
-                embed.set_image(file=file)
+        embed = embed_builder.embed_information(
+            title = "懲處紀錄",
+            description = f"{member.mention} 被 {inter.author.mention} 踢出伺服器",
+            thumbnail = member.avatar.url
+        )
+        embed.add_field(name="理由", value=reason, inline=False)
+        if attachment is not None and attachment.content_type.startswith("image"):
+            embed = await attach_to_embed(embed, attachment)
 
-            if copy:
-                await copy.send(embed=embed)
-                await inter.followup.send(embed=embed)
-            else:
-                await inter.followup.send(embed=embed)
+        if copy:
+            await copy.send(embed=embed)
+            if attachment is not None and attachment.content_type.startswith("image"):
+                embed = await attach_to_embed(embed, attachment)
+            await inter.followup.send(embed=embed)
+        else:
+            await inter.followup.send(embed=embed)
 
     @commands.slash_command(name="ban", description="停權成員")
     @commands.default_member_permissions(ban_members=True)
@@ -393,17 +395,18 @@ class Moderation(commands.Cog):
             member = user
 
         try:
-            try:
-                message = (
-                    f"你在 {inter.guild.name} 被停權\n"
-                    f"原因：{reason}"
-                )
-                if attachment is not None and attachment.content_type.startswith("image"):
-                    message += "附件：\n"
-                    file = await attachment.to_file()
-                await member.send(message, file=file)
-            except: # pylint: disable=bare-except
-                pass # Pass if failed to DM user.
+            message = (
+                f"你在 {inter.guild.name} 被停權\n"
+                f"原因：{reason}\n"
+            )
+            if attachment is not None and attachment.content_type.startswith("image"):
+                message += "附件：\n"
+                file = await attachment.to_file()
+            await member.send(message, file=file)
+        except: # pylint: disable=bare-except
+            pass # Pass if failed to DM user.
+
+        try:
             await inter.guild.ban(member, reason=reason)
         except: # pylint: disable=bare-except
             embed = embed_builder.embed_error(
@@ -413,23 +416,28 @@ class Moderation(commands.Cog):
             await inter.followup.send(embed=embed)
             return
 
-        else:
-            embed = embed_builder.embed_information(
-                title="懲處紀錄",
-                description=f"{member.mention} 被 {inter.author.mention} 從伺服器停權",
-                thumbnail=member.avatar.url
-            )
-            embed.add_field(name="理由", value=reason, inline=False)
+        embed = embed_builder.embed_information(
+            title="懲處紀錄",
+            description=f"{member.mention} 被 {inter.author.mention} 從伺服器停權",
+            thumbnail=member.avatar.url
+        )
+        embed.add_field(name="理由", value=reason, inline=False)
+        if attachment is not None and attachment.content_type.startswith("image"):
+            embed = await attach_to_embed(embed, attachment)
+
+        if copy:
+            await copy.send(embed=embed)
             if attachment is not None and attachment.content_type.startswith("image"):
-                file = await attachment.to_file()
-                embed.set_image(file=file)
+                embed = await attach_to_embed(embed, attachment)
+            await inter.followup.send(embed=embed)
+        else:
+            await inter.followup.send(embed=embed)
 
-            if copy:
-                await copy.send(embed=embed)
-                await inter.followup.send(embed=embed)
-            else:
-                await inter.followup.send(embed=embed)
 
+async def attach_to_embed(embed, attachment):
+    file = await attachment.to_file()
+    embed.set_image(file=file)
+    return embed
 
 def setup(bot: commands.InteractionBot):
     """ Called when this extension is loaded. """
