@@ -38,7 +38,7 @@ class VxTwitterHelper(commands.Cog):
         content = content.replace("twitter", "vxtwitter")
         content = (
             f"Hi, {message.author.mention}\n"
-            "**Twitter 正在透過收費 API 扼殺第三方應用程序**，無嵌入內容的 Twitter 網址會對管理方造成"
+            "**Twitter 正在透過收費 API 扼殺第三方應用程式**，無嵌入內容的 Twitter 網址會對管理方造成"
             "管理困難，因此由機器人幫您轉換為 vxtwitter 網址。\n\n"
             f"如果想顯示嵌入內容可以將網址中的 `twitter` 改為 `vxtwitter`。\n\n{content}"
         )
