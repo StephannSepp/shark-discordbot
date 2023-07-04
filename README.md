@@ -16,6 +16,8 @@
 
 ## Changelog
 
+* 2.2.571
+	* 將 Twitter 網址轉換為 vxtwitter
 * 2.2.532
 	* 增加乖乖
 * 2.2.531
