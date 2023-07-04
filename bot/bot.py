@@ -13,7 +13,7 @@ from pkg_resources import parse_version
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.2.532"
+__version__ = "2.2.571"
 
 
 def init_db():
