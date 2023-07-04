@@ -13,8 +13,6 @@ import disnake
 from disnake import AllowedMentions
 from disnake.ext import commands
 
-from utils import embed_builder
-
 
 class VxTwitterHelper(commands.Cog):
     """A Disnake Cog wraps commands as a Python class."""

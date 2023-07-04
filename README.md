@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.7.0](https://img.shields.io/badge/disnake-2.7.0-informational?style=plastic)
-![Version 2.2.532](https://img.shields.io/badge/version-2.2.532-informational?style=plastic)
+![Version 2.2.571](https://img.shields.io/badge/version-2.2.571-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,8 @@
 
 ## Changelog
 
+* 2.2.571
+	* 將 Twitter 網址轉換為 vxtwitter
 * 2.2.532
 	* 增加乖乖
 * 2.2.531
