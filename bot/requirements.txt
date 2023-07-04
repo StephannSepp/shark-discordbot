@@ -4,4 +4,4 @@ pytz
 pygsheets
 psycopg2
 Jinja2
-pillow
+Pillow==9.5.0
