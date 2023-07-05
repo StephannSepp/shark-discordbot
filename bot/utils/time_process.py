@@ -2,25 +2,20 @@
 utils.time_process
 ----------------
 
-A set of time processing functions.
-
-:Date: 09-19-2022
-:feat: 10-22-2022
-    New to_unix() function converts <datetime.datetime> to unix timestamp string.
-:feat: 11-28-2022
-    New strftimedelta() function converts a <datetime.timedelta> object into a stirng.
+Some time parsing functions.
 """
 import re
 import time
 from datetime import datetime
 from datetime import timedelta
 
-
-REGEX = re.compile(r'^((?P<days>[\.\d]+?)d)?((?P<hours>[\.\d]+?)h)?((?P<minutes>[\.\d]+?)m)?((?P<seconds>[\.\d]+?)s)?$')
+REGEX = re.compile(
+    r"^((?P<days>[\.\d]+?)d)?((?P<hours>[\.\d]+?)h)?((?P<minutes>[\.\d]+?)m)?((?P<seconds>[\.\d]+?)s)?$"
+)
 
 
 def parse_time(time_str: str) -> timedelta:
-    """ Parse a time string e.g. (2h13m) into a timedelta object.
+    """Parse a time string e.g. (2h13m) into a timedelta object.
 
     Modified from virhilo's answer at https://stackoverflow.com/a/4628148/851699
 
@@ -30,38 +25,49 @@ def parse_time(time_str: str) -> timedelta:
     :CREDIT: https://stackoverflow.com/a/51916936
     """
     parts = REGEX.match(time_str)
-    assert parts is not None, f"Could not parse any time information from '{time_str}'.  Examples of valid strings: '8h', '2d8h5m20s', '2m4s'"
+    if parts is None:
+        raise ValueError(
+            f"Could not parse any time information from '{time_str}'.  Examples of "
+            "valid strings: '8h', '2d8h5m20s', '2m4s'"
+        )
+
     time_params = {name: float(param) for name, param in parts.groupdict().items() if param}
     return timedelta(**time_params)
 
 
 def to_unix(dt: datetime) -> int:
-    """ Convert <datetime.datetime> to unix timestamp. """
+    """Convert <datetime.datetime> to unix timestamp."""
     return int(time.mktime(dt.timetuple()))
 
 
-def strftimedelta(td: timedelta) -> str:
-    """ Convert <datetime.timedelta> into a string format.
+def strftimedelta(td: timedelta | float | int) -> str:
+    """Convert `datetime.timedelta`, `float` or `int` into a `str` format.
 
-    :param td: A timedelta object.
+    :param td: A `datetime.timedelta` object
+    :return: Formatted time string
 
     ..:example:
-        >> td = timedelta(days=1, minutes=24)
-        >> strftimedelta(td)
-        "1 天 0 小時 24 分 0 秒"
-
-        >> td = timedelta(seconds=50)
-        >> strftimedelta(td)
+        >>> strftimedelta(timedelta(days=1, minutes=1))
+        "1 天 0 小時 1 分 0 秒"
+        >>> strftimedelta(timedelta(minutes=24))
+        "24 分 0 秒"
+        >>> strftimedelta(timedelta(seconds=50))
         "50 秒"
     """
-
-    if not isinstance(td, timedelta):
+    if not isinstance(td, (timedelta, float, int)):
         raise TypeError
 
-    fields = {"天": 86400, "小時": 3600, "分": 60, "秒": 1}
+    fields = {"日": 86400, "小時": 3600, "分": 60, "秒": 1}
     result = {}
-    remainder = td.total_seconds()
-    for field, _value in fields.items():
-        result[field], remainder = divmod(remainder, fields[field])
+    remainder = td.total_seconds() if isinstance(td, timedelta) else td
+    for field, value in fields.items():
+        result[field], remainder = divmod(remainder, value)
 
-    return " ".join(["%d %s" % (v, k) for k, v in result.items() if v != 0])
+    first_value = False
+    time_to_joined = []
+    for k, v in result.items():
+        if v != 0 or first_value:
+            first_value = True
+            time_to_joined.append(f"{int(v):,} {k}")
+
+    return " ".join(time_to_joined)
