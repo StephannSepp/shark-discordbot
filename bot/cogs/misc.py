@@ -36,7 +36,7 @@ class Misc(commands.Cog):
             description = "不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。",
             thumbnail = self.bot.user.avatar.url
         )
-        embed.add_field(name="擁有者", value="林昕渪#1202", inline=True)
+        embed.add_field(name="擁有者", value="林昕渪@stevesepp87", inline=True)
         embed.add_field(
             name="原始碼",
             value="[GitHub](https://github.com/StephannSepp/shark-discordbot)",
