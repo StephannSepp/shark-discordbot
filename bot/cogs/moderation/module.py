@@ -48,7 +48,7 @@ def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
     """
     query = (
         "SELECT reason FROM warns "
-        "WHERE id = %(id)s "
+        "WHERE warn_id = %(id)s "
         "AND user_id = %(user_id)s "
         "AND server_id = %(server_id)s"
     )
@@ -63,7 +63,7 @@ def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
     result = cursor.fetchone()[0]
     query = (
         "DELETE FROM warns "
-        "WHERE id = %(id)s "
+        "WHERE warn_id = %(id)s "
         "AND user_id = %(user_id)s "
         "AND server_id = %(server_id)s"
     )
@@ -92,7 +92,7 @@ def list_warns(server_id: int, user_id: int) -> list:
         5: warn issue time  <datetime.datetime>
     """
     query = (
-        "SELECT id, user_id, moderator_id, reason, created_at FROM warns "
+        "SELECT warn_id, user_id, moderator_id, reason, created_at FROM warns "
         "WHERE user_id = %(user_id)s "
         "AND server_id = %(server_id)s"
     )

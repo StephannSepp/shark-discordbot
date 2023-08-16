@@ -37,7 +37,7 @@ class FortuneResult():
         con = psycopg2.connect(Config.database_url)
         cursor = con.cursor()
         query = (
-            "INSERT INTO fortune_statistics "
+            "INSERT INTO fortune_records "
             "VALUES (%(user_id)s, %(luck)s, %(angel)s, %(number)s, %(colour)s, %(draw_date)s)"
         )
         cursor.execute(
@@ -60,7 +60,7 @@ class FortuneResult():
 
         query = sql.SQL(
             "SELECT {category}, COUNT(*) as count "
-            "FROM fortune_statistics "
+            "FROM fortune_records "
             "GROUP BY {category} "
             "ORDER BY count DESC "
         )
@@ -75,7 +75,7 @@ class FortuneResult():
         cursor = con.cursor()
 
         query = (
-            "SELECT luck, draw_date FROM fortune_statistics "
+            "SELECT luck, draw_date FROM fortune_records "
             "WHERE user_id = %s "
             "AND draw_date > current_date - interval '7 days' "
             "ORDER BY draw_date DESC"
@@ -85,7 +85,7 @@ class FortuneResult():
 
         query = (
             "SELECT angel, COUNT(*) as count "
-            "FROM fortune_statistics "
+            "FROM fortune_records "
             "WHERE user_id = %s "
             "AND draw_date > current_date - interval '30 days' "
             "GROUP BY angel "
