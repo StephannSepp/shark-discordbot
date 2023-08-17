@@ -73,13 +73,17 @@ class Reminder(commands.Cog):
     async def remind(self, inter: CmdInter):
         pass
 
-    @remind.sub_command(name="add", description="提醒我")
+    @remind.sub_command(name="add", description="提醒我，格式範例：2d8h5m20s")
     @commands.guild_only()
     async def remind_add(self, inter: CmdInter, remind_after: str, with_message: str):
         try:
             duration = time_process.parse_time(remind_after)
         except ValueError:
             await inter.response.send_message("時間格式不被接受")
+            return
+
+        if duration > datetime.timedelta(hours=2160):
+            await inter.response.send_message("不允許設定超過 3 個月的提醒")
             return
 
         time_to_remind = datetime.datetime.now() + duration
@@ -128,7 +132,7 @@ class Reminder(commands.Cog):
             result = cursor.fetchall()
 
         message = [
-            f"{reminder[5]} - {reminder[4]} <#{reminder[3]}>" for reminder in result
+            f"{reminder[5]} - {reminder[4]} in <#{reminder[3]}>" for reminder in result
         ]
         if not message:
             await inter.response.send_message("你沒有任何設定的提醒")
