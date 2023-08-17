@@ -1,8 +1,6 @@
 """ A set of functions for accessing database. """
 
-import psycopg2
-
-from config import Config
+from bot import get_cursor
 from utils import gen
 
 
@@ -17,23 +15,20 @@ def add_warning(user_id:int, server_id: int, moderator_id: int, reason: str) -> 
     :return warning_id: The ID of the warning.
     """
     warning_id = gen.snowflake()
-    query = """
-        INSERT INTO warns
-        VALUES (%(id)s, %(user_id)s, %(server_id)s, %(moderator_id)s, %(reason)s)
-    """
-    con = psycopg2.connect(Config.database_url)
-    cursor = con.cursor()
-    cursor.execute(
-        query, {
-            "id": warning_id,
-            "user_id": user_id,
-            "server_id": server_id,
-            "moderator_id": moderator_id,
-            "reason": reason,
-        }
-    )
-    con.commit()
-    con.close()
+    with get_cursor() as cursor:
+        query = (
+            "INSERT INTO warns"
+            "VALUES (%(id)s, %(user_id)s, %(server_id)s, %(moderator_id)s, %(reason)s)"
+        )
+        cursor.execute(
+            query, {
+                "id": warning_id,
+                "user_id": user_id,
+                "server_id": server_id,
+                "moderator_id": moderator_id,
+                "reason": reason,
+            }
+        )
     return warning_id
 
 
@@ -52,29 +47,26 @@ def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
         "AND user_id = %(user_id)s "
         "AND server_id = %(server_id)s"
     )
-    con = psycopg2.connect(Config.database_url)
-    cursor = con.cursor()
-    cursor.execute(query, {
-            "id": warning_id,
-            "user_id": user_id,
-            "server_id": server_id,
-        }
-    )
-    result = cursor.fetchone()[0]
-    query = (
-        "DELETE FROM warns "
-        "WHERE warn_id = %(id)s "
-        "AND user_id = %(user_id)s "
-        "AND server_id = %(server_id)s"
-    )
-    cursor.execute(query, {
-            "id": warning_id,
-            "user_id": user_id,
-            "server_id": server_id,
-        }
-    )
-    con.commit()
-    con.close()
+    with get_cursor() as cursor:
+        cursor.execute(query, {
+                "id": warning_id,
+                "user_id": user_id,
+                "server_id": server_id,
+            }
+        )
+        result = cursor.fetchone()[0]
+        query = (
+            "DELETE FROM warns "
+            "WHERE warn_id = %(id)s "
+            "AND user_id = %(user_id)s "
+            "AND server_id = %(server_id)s"
+        )
+        cursor.execute(query, {
+                "id": warning_id,
+                "user_id": user_id,
+                "server_id": server_id,
+            }
+        )
     return result
 
 
@@ -96,13 +88,11 @@ def list_warns(server_id: int, user_id: int) -> list:
         "WHERE user_id = %(user_id)s "
         "AND server_id = %(server_id)s"
     )
-    con = psycopg2.connect(Config.database_url)
-    cursor = con.cursor()
-    cursor.execute(query, {
-            "user_id": user_id,
-            "server_id": server_id,
-        }
-    )
-    result = cursor.fetchall()
-    con.close()
+    with get_cursor() as cursor:
+        cursor.execute(query, {
+                "user_id": user_id,
+                "server_id": server_id,
+            }
+        )
+        result = cursor.fetchall()
     return result

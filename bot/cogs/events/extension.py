@@ -11,4 +11,4 @@ def setup(bot):
     bot.add_cog(ExceptionHandler(bot))
     bot.add_cog(RoleDivider(bot))
     bot.add_cog(Statistics(bot))
-    bot.add_cog(VxTwitterHelper(bot))
+    # bot.add_cog(VxTwitterHelper(bot))

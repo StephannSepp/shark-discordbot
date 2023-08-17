@@ -2,11 +2,12 @@
 
 
 import os
-from contextlib import closing
+from contextlib import contextmanager
 from datetime import datetime
 
 import disnake
 import psycopg2
+import psycopg2.pool
 from disnake.ext import commands
 from pkg_resources import parse_version
 
@@ -17,26 +18,40 @@ __version__ = "2.2.571"
 
 
 def init_db():
-    with closing(connect_db()) as db:
-        with open("database/schema.sql", "r") as f:
-            db.cursor().execute(f.read())
-        db.commit()
+    with get_cursor() as cursor:
+        with open("database/schema.sql", "r", encoding="utf-8") as f:
+            cursor.execute(f.read())
 
 
-def connect_db():
-    return psycopg2.connect(Config.database_url, sslmode="allow")
+con_pool = psycopg2.pool.ThreadedConnectionPool(
+    minconn=0, maxconn=16, dsn=Config.database_url, sslmode="allow"
+)
+
+
+@contextmanager
+def get_cursor():
+    con = con_pool.getconn()
+    try:
+        with con.cursor() as cursor:
+            yield cursor
+            con.commit()
+    except:
+        con.rollback()
+        raise
+    finally:
+        con_pool.putconn(con)
 
 
 class Bot(commands.InteractionBot):
     def __init__(self):
         super().__init__(
             intents=disnake.Intents().all(),
-            command_sync_flags=commands.CommandSyncFlags.all()
+            command_sync_flags=commands.CommandSyncFlags.all(),
         )
-        self._start_time = datetime.now()
+        self._start_at = datetime.now()
 
     def load_all_extensions(self, folder: str):
-        """ Load all Disnake cogs as extensions under a specific folder.
+        """Load all Disnake cogs as extensions under a specific folder.
 
         :param folder: A pathlike string indicate the folder location.
         """
@@ -49,7 +64,7 @@ class Bot(commands.InteractionBot):
 
     @property
     def up_time(self):
-        return strftimedelta(datetime.now() - self._start_time)
+        return strftimedelta(datetime.now() - self._start_at)
 
     @property
     def version(self):
@@ -59,5 +74,5 @@ class Bot(commands.InteractionBot):
 if __name__ == "__main__":
     init_db()
     bot = Bot()
-    bot.load_all_extensions('cogs')
+    bot.load_all_extensions("cogs")
     bot.run(Config.token)
