@@ -6,7 +6,6 @@ from . import VxTwitterHelper
 
 
 def setup(bot):
-    """ Called when this extension is loaded. """
     bot.add_cog(DirectMessageLogger(bot))
     bot.add_cog(ExceptionHandler(bot))
     bot.add_cog(RoleDivider(bot))

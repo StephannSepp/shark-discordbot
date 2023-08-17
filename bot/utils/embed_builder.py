@@ -23,7 +23,7 @@ def __trim(text: str, limit: int) -> str:
     return text[: limit - 3].strip() + "..." if len(text) > limit else text
 
 
-def embed_information(
+def information(
         title: str,
         description: str = None,
         footer: Optional[str] = None,
@@ -35,7 +35,7 @@ def embed_information(
     return build_embed(title, description, footer, url, Colour.greyple(), image, thumbnail)
 
 
-def embed_error(
+def error(
         title: str,
         description: str = None,
         footer: Optional[str] = None,

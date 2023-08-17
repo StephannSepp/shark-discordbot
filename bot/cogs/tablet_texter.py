@@ -10,8 +10,6 @@ from PIL import ImageFont
 
 
 class TabletTexter(commands.Cog):
-    """ A Disnake Cog wraps commands as a Python class. """
-
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
 
@@ -72,5 +70,4 @@ class TabletTexter(commands.Cog):
 
 
 def setup(bot: commands.InteractionBot):
-    """ Called when this extension is loaded. """
     bot.add_cog(TabletTexter(bot))

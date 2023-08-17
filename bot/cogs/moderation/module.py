@@ -1,18 +1,18 @@
-""" A set of functions for accessing database. """
-
 from bot import get_cursor
 from utils import gen
 
 
-def add_warning(user_id:int, server_id: int, moderator_id: int, reason: str) -> int:
-    """ Insert a warning to the database.
+def add_warning(user_id: int, server_id: int, moderator_id: int, reason: str) -> int:
+    """Insert a warning to the database.
 
-    :param user_id: The ID of the user.
-    :param server_id: The ID of the server.
-    :param moderator_id: The ID of the user who give the warning.
-    :param reason: The reason for the warning.
+    Args:
+        user_id: The ID of the user.
+        server_id: The ID of the server.
+        moderator_id: The ID of the user who give the warning.
+        reason: The reason for the warning.
 
-    :return warning_id: The ID of the warning.
+    Returns:
+        The ID of the warning.
     """
     warning_id = gen.snowflake()
     with get_cursor() as cursor:
@@ -21,25 +21,28 @@ def add_warning(user_id:int, server_id: int, moderator_id: int, reason: str) -> 
             "VALUES (%(id)s, %(user_id)s, %(server_id)s, %(moderator_id)s, %(reason)s)"
         )
         cursor.execute(
-            query, {
+            query,
+            {
                 "id": warning_id,
                 "user_id": user_id,
                 "server_id": server_id,
                 "moderator_id": moderator_id,
                 "reason": reason,
-            }
+            },
         )
     return warning_id
 
 
 def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
-    """ Delete a warning from the database.
+    """Delete a warning from the database.
 
-    :param server_id: The ID of the server.
-    :param user_id: The ID of the user.
-    :param warning_id: The ID the warning.
+    Args:
+        server_id: The ID of the server.
+        user_id: The ID of the user.
+        warning_id: The ID the warning.
 
-    :return result: The reason of the warning.
+    Retruns:
+        The reason of the warning.
     """
     query = (
         "SELECT reason FROM warns "
@@ -48,11 +51,13 @@ def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
         "AND server_id = %(server_id)s"
     )
     with get_cursor() as cursor:
-        cursor.execute(query, {
+        cursor.execute(
+            query,
+            {
                 "id": warning_id,
                 "user_id": user_id,
                 "server_id": server_id,
-            }
+            },
         )
         result = cursor.fetchone()[0]
         query = (
@@ -61,27 +66,31 @@ def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
             "AND user_id = %(user_id)s "
             "AND server_id = %(server_id)s"
         )
-        cursor.execute(query, {
+        cursor.execute(
+            query,
+            {
                 "id": warning_id,
                 "user_id": user_id,
                 "server_id": server_id,
-            }
+            },
         )
     return result
 
 
 def list_warns(server_id: int, user_id: int) -> list:
-    """ Return a list of warnings on the user.
+    """Return a list of warnings on the user.
 
-    :param server_id: The ID of the server.
-    :param user_id: The ID of the user.
+    Args
+        server_id: The ID of the server.
+        user_id: The ID of the user.
 
-    :retrun result: A list composed of
-        1: warn ID          <int>
-        2: user ID          <int>
-        3: ID of moderator  <int>
-        4: reason           <str>
-        5: warn issue time  <datetime.datetime>
+    Returns:
+        A list composed contains as following:
+            1: warn ID          <int>
+            2: user ID          <int>
+            3: ID of moderator  <int>
+            4: reason           <str>
+            5: warn issue time  <datetime.datetime>
     """
     query = (
         "SELECT warn_id, user_id, moderator_id, reason, created_at FROM warns "
@@ -89,10 +98,12 @@ def list_warns(server_id: int, user_id: int) -> list:
         "AND server_id = %(server_id)s"
     )
     with get_cursor() as cursor:
-        cursor.execute(query, {
+        cursor.execute(
+            query,
+            {
                 "user_id": user_id,
                 "server_id": server_id,
-            }
+            },
         )
         result = cursor.fetchall()
     return result

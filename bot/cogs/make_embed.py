@@ -33,9 +33,9 @@ class MakeEmbed(commands.Cog):
         description = description.replace("  ", "\n")
         match embed_type:
             case "Information":
-                embed = embed_builder.embed_information(title=title, description=description)
+                embed = embed_builder.information(title=title, description=description)
             case "Error":
-                embed = embed_builder.embed_error(title=title, description=description)
+                embed = embed_builder.error(title=title, description=description)
             case _:
                 pass
 

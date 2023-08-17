@@ -8,19 +8,20 @@ from bot import get_cursor
 
 @dataclass
 class FortuneResult:
-    """A fortune draw result class.
+    """Store the fortune draw results.
 
-    :attr uid: An <int>, a discord user ID.
-    :attr luck: The result of the draw, <str>.
-    :attr angel: The guardian angel, <str>.
-    :attr number: The lucky number, <int>.
-    :attr colour: The lucky colour, <str>.
-    :attr draw_date: The date when the fortune drawed, <datetime.datetime>.
+    Attributes:
+        uid: Discord user ID.
+        luck: The result of the fortune draw.
+        angel: The guardian angel.
+        number: The lucky number.
+        colour: The lucky colour.
+        draw_date: The date when the fortune was drawed.
 
-    :meth record: Save the attributes into the database.
-    :meth get_stats_by: Get the fortune statistics from database with optional
-                        group by query.
-    :meth get_by_user: Get the specific fortune statistics of a user.
+    Methods:
+        record(): Save the result to the database.
+        get_stats_by: Get the fortune statistics by some optional parameters.
+        get_by_user: Get the fortune records of a specific user.
     """
 
     uid: int = None

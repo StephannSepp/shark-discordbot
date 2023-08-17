@@ -1,10 +1,3 @@
-""" A fortune draw slash command.
-
-Must be loaded as a Disnake Cog via load_extension() function.
-
-:date: 09-21-2022
-"""
-
 import datetime
 import hashlib
 
@@ -27,13 +20,11 @@ ROLES = {
     "凶": 1043736582760439838,
     "大凶": 1043737502080581722,
 }
-ROLE_REVOKE_START = datetime.time() # 00:00:00
-ROLE_REVOKE_END = datetime.time(minute=2) # 00:01:00
+ROLE_REVOKE_START = datetime.time()  # 00:00:00
+ROLE_REVOKE_END = datetime.time(minute=2)  # 00:01:00
 
 
 class Fortune(commands.Cog):
-    """ A Disnake Cog wraps commands as a Python class. """
-
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
         self.pause = False
@@ -43,17 +34,18 @@ class Fortune(commands.Cog):
     @commands.slash_command(name="fortune", description="抽籤")
     @commands.guild_only()
     async def fortune(self, inter: CmdInter):
-        """ Fortune command group. """
+        """Fortune command group."""
 
     @fortune.sub_command(name="draw", description="抽籤！每日早上八點重置")
     async def fortune_draw(self, inter: CmdInter):
-        """ This command will draw a fortune lot. Reset on 0:00 UTC time
-        everyday.
-        """
+        """This command draws a fortune lot. Reset on 0:00 UTC time everyday."""
         # Defer for avoiding interaction timeout.
         await inter.response.defer()
 
-        if ROLE_REVOKE_START < datetime.datetime.now().time() < ROLE_REVOKE_END or self.pause:
+        if (
+            ROLE_REVOKE_START < datetime.datetime.now().time() < ROLE_REVOKE_END
+            or self.pause
+        ):
             await inter.followup.send("機器人正在移除身分組，請稍後再試")
             return
 
@@ -66,7 +58,9 @@ class Fortune(commands.Cog):
         # four strings.
         raw_seed = format(date, "b") + format(inter.author.id, "b")
         seed = hashlib.sha256(raw_seed.encode()).hexdigest()
-        result = FortuneResult(uid=inter.author.id, draw_date=datetime.datetime.utcnow().date())
+        result = FortuneResult(
+            uid=inter.author.id, draw_date=datetime.datetime.utcnow().date()
+        )
         result.luck = module.draw_fortune(seed[:16])
         result.colour = module.get_lucky_colour(seed[16:32])
         result.number = module.get_lucky_number(seed[32:48])
@@ -75,7 +69,7 @@ class Fortune(commands.Cog):
         embed = embed_builder.build_embed(
             title=f"抽籤結果🌸{result.luck}",
             description=f"{inter.author.mention}的抽籤結果\n",
-            colour=module.to_colour_obj(result.colour)
+            colour=module.to_colour_obj(result.colour),
         )
         embed.add_field(name="幸運天使", value=result.angel, inline=False)
         embed.set_thumbnail(url=url)
@@ -90,12 +84,13 @@ class Fortune(commands.Cog):
 
         await inter.followup.send(
             content=f"下次抽籤重置時間：<t:{reset_time_unix}> <t:{reset_time_unix}:R>",
-            embed=embed
+            embed=embed,
         )
 
     GROUP_OPT = commands.option_enum(["運氣", "幸運天使"])
+
     @fortune.sub_command(name="statistics", description="抽籤統計")
-    async def fortune_statistics(self, inter: CmdInter, group_by: GROUP_OPT=None):
+    async def fortune_statistics(self, inter: CmdInter, group_by: GROUP_OPT = None):
         if group_by is not None:
             match group_by:
                 case "運氣":
@@ -111,7 +106,7 @@ class Fortune(commands.Cog):
 
             result_count = (row[1] for row in result)
             total = sum(result_count)
-            embed = embed_builder.embed_information(
+            embed = embed_builder.information(
                 title="全域抽籤統計📊",
                 description=f"截至目前為止已經抽出了 {total} 支籤\n",
             )
@@ -133,9 +128,8 @@ class Fortune(commands.Cog):
             # most_common_angel_result = ('Ceres Fauna', 3)
             result = FortuneResult.get_by_user(inter.author.id)
             last_week_result, most_common_angel_result = result
-            embed = embed_builder.embed_information(
-                title="個人抽籤統計📊",
-                description=f"以下是 {inter.author.mention} 的個人運勢統計"
+            embed = embed_builder.information(
+                title="個人抽籤統計📊", description=f"以下是 {inter.author.mention} 的個人運勢統計"
             )
             if last_week_result:
                 last_week_lucks = []
@@ -144,20 +138,12 @@ class Fortune(commands.Cog):
                     date_unix = time_process.to_unix(date)
                     last_week_lucks.append(f"<t:{date_unix}:D> - {luck}")
                 value = "\n".join(last_week_lucks)
-                embed.add_field(
-                    name="過去 7 日的運氣",
-                    value=value,
-                    inline=False
-                )
+                embed.add_field(name="過去 7 日的運氣", value=value, inline=False)
             if most_common_angel_result:
                 common_angel, count = most_common_angel_result
                 url = module.get_guardian_angel_image(common_angel)
                 value = f"{common_angel} - {count} 次"
-                embed.add_field(
-                    name="過去 30 日最常抽到的幸運天使",
-                    value=value,
-                    inline=False
-                )
+                embed.add_field(name="過去 30 日最常抽到的幸運天使", value=value, inline=False)
                 embed.set_thumbnail(url=url)
             await inter.response.send_message(embed=embed)
 
@@ -167,9 +153,8 @@ class Fortune(commands.Cog):
 
         self.pause = True
         self.today = datetime.datetime.utcnow().date()
-        guild = (
-            self.bot.get_guild(Config.atlantis_id)
-            or await self.bot.fetch_guild(Config.atlantis_id)
+        guild = self.bot.get_guild(Config.atlantis_id) or await self.bot.fetch_guild(
+            Config.atlantis_id
         )
         for _k, v in ROLES.items():
             role = guild.get_role(v)
@@ -190,5 +175,4 @@ class Fortune(commands.Cog):
 
 
 def setup(bot: commands.InteractionBot):
-    """ Called when this extension is loaded. """
     bot.add_cog(Fortune(bot))

@@ -1,12 +1,3 @@
-"""
-fortune.module
-----------------
-
-A module for the fortune draw command use.
-
-Should be imported as a module.
-"""
-
 import random
 
 from disnake import Colour
@@ -49,20 +40,32 @@ def get_guardian_angel_image(angel: str) -> str:
 
 def to_colour_obj(colour: str) -> Colour:
     match colour:
-        case "綠": return Colour.green()
-        case "藍": return Colour.blue()
-        case "紫": return Colour.purple()
-        case "金": return Colour.gold()
-        case "橘": return Colour.orange()
-        case "紅": return Colour.red()
-        case "黃": return Colour.yellow()
+        case "綠":
+            return Colour.green()
+        case "藍":
+            return Colour.blue()
+        case "紫":
+            return Colour.purple()
+        case "金":
+            return Colour.gold()
+        case "橘":
+            return Colour.orange()
+        case "紅":
+            return Colour.red()
+        case "黃":
+            return Colour.yellow()
 
 
 def get_image_url(luck: str, seed: int) -> str:
     random.seed(seed)
     match luck:
-        case "大凶": return "static/fortune/TL.png"
-        case "凶": return random.choice(BADLUCK_IMGS)
-        case "小吉": return "static/fortune/SB.png"
-        case "中吉": return "static/fortune/GF.png"
-        case "大吉": return "static/fortune/GGF.png"
+        case "大凶":
+            return "static/fortune/TL.png"
+        case "凶":
+            return random.choice(BADLUCK_IMGS)
+        case "小吉":
+            return "static/fortune/SB.png"
+        case "中吉":
+            return "static/fortune/GF.png"
+        case "大吉":
+            return "static/fortune/GGF.png"

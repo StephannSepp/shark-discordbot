@@ -1,9 +1,3 @@
-"""
-utils.time_process
-----------------
-
-Some time parsing functions.
-"""
 import re
 import time
 from datetime import datetime
@@ -19,10 +13,13 @@ def parse_time(time_str: str) -> timedelta:
 
     Modified from virhilo's answer at https://stackoverflow.com/a/4628148/851699
 
-    :param time_str: A string identifying a duration.  (eg. 2h13m)
-    :return datetime.timedelta: A datetime.timedelta object
+    Args:
+        time_str: A string identifying a duration.  (eg. 2h13m)
 
-    :CREDIT: https://stackoverflow.com/a/51916936
+    Returns:
+        A `datetime.timedelta` instance.
+
+    CREDIT: https://stackoverflow.com/a/51916936
     """
     parts = REGEX.match(time_str)
     if parts is None:
@@ -31,7 +28,9 @@ def parse_time(time_str: str) -> timedelta:
             "valid strings: '8h', '2d8h5m20s', '2m4s'"
         )
 
-    time_params = {name: float(param) for name, param in parts.groupdict().items() if param}
+    time_params = {
+        name: float(param) for name, param in parts.groupdict().items() if param
+    }
     return timedelta(**time_params)
 
 
@@ -43,16 +42,19 @@ def to_unix(dt: datetime) -> int:
 def strftimedelta(td: timedelta | float | int) -> str:
     """Convert `datetime.timedelta`, `float` or `int` into a `str` format.
 
-    :param td: A `datetime.timedelta` object
-    :return: Formatted time string
-
-    ..:example:
+    Example:
         >>> strftimedelta(timedelta(days=1, minutes=1))
         "1 天 0 小時 1 分 0 秒"
         >>> strftimedelta(timedelta(minutes=24))
         "24 分 0 秒"
         >>> strftimedelta(timedelta(seconds=50))
         "50 秒"
+
+    Args:
+        td: A `datetime.timedelta` instance.
+
+    Returns:
+        Formatted time string
     """
     if not isinstance(td, (timedelta, float, int)):
         raise TypeError
