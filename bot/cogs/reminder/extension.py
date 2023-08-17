@@ -75,9 +75,9 @@ class Reminder(commands.Cog):
 
     @remind.sub_command(name="add", description="提醒我，格式範例：2d8h5m20s")
     @commands.guild_only()
-    async def remind_add(self, inter: CmdInter, remind_after: str, with_message: str):
+    async def remind_add(self, inter: CmdInter, after: str, message: str):
         try:
-            duration = time_process.parse_time(remind_after)
+            duration = time_process.parse_time(after)
         except ValueError:
             await inter.response.send_message("時間格式不被接受")
             return
@@ -112,7 +112,7 @@ class Reminder(commands.Cog):
                     "user_id": user_id,
                     "server_id": server_id,
                     "channel_id": channel_id,
-                    "remind_text": with_message,
+                    "remind_text": message,
                     "remind_at": time_to_remind,
                     "created_at": datetime.datetime.now(),
                 },
@@ -120,7 +120,7 @@ class Reminder(commands.Cog):
 
         self._fetch_next_reminder()
         await inter.response.send_message(
-            f"我會在 **<t:{timestamp}>**（<t:{timestamp}:R>）提醒你\n提醒內容:\n**{with_message}**"
+            f"我會在 **<t:{timestamp}>**（<t:{timestamp}:R>）提醒你\n提醒內容:\n**{message}**"
         )
 
     @remind.sub_command("list")
