@@ -73,7 +73,7 @@ class Reminder(commands.Cog):
     async def remind(self, inter: CmdInter):
         pass
 
-    @remind.sub_command(name="add", description="提醒我，格式範例：2d8h5m20s")
+    @remind.sub_command(name="me", description="提醒我，格式範例：2d8h5m20s")
     @commands.guild_only()
     async def remind_add(self, inter: CmdInter, after: str, message: str):
         try:
