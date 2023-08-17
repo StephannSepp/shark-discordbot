@@ -4,12 +4,14 @@
 import os
 from contextlib import contextmanager
 from datetime import datetime
+from typing import Generator
 
 import disnake
 import psycopg2
 import psycopg2.pool
 from disnake.ext import commands
 from pkg_resources import parse_version
+from psycopg2.extensions import cursor
 
 from config import Config
 from utils.time_process import strftimedelta
@@ -18,9 +20,9 @@ __version__ = "2.2.571"
 
 
 def init_db():
-    with get_cursor() as cursor:
+    with get_cursor() as cur:
         with open("database/schema.sql", "r", encoding="utf-8") as f:
-            cursor.execute(f.read())
+            cur.execute(f.read())
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(
@@ -29,11 +31,11 @@ con_pool = psycopg2.pool.ThreadedConnectionPool(
 
 
 @contextmanager
-def get_cursor():
+def get_cursor() -> Generator[cursor, None, None]:
     con = con_pool.getconn()
     try:
-        with con.cursor() as cursor:
-            yield cursor
+        with con.cursor() as cur:
+            yield cur
             con.commit()
     except:
         con.rollback()
@@ -51,10 +53,6 @@ class Bot(commands.InteractionBot):
         self._start_at = datetime.now()
 
     def load_all_extensions(self, folder: str):
-        """Load all Disnake cogs as extensions under a specific folder.
-
-        :param folder: A pathlike string indicate the folder location.
-        """
         for filename in os.listdir(folder):
             path = os.path.join(folder, filename)
             if os.path.isdir(path):
