@@ -104,8 +104,7 @@ class Fortune(commands.Cog):
                     # result = [('Ayunda Risu', 5), ('Ceres Fauna', 4), ('戌神ころね', 4), ...]
                     inline = True
 
-            result_count = (row[1] for row in result)
-            total = sum(result_count)
+            total = FortuneResult.get_total_draws()
             embed = embed_builder.information(
                 title="全域抽籤統計📊",
                 description=f"截至目前為止已經抽出了 {total} 支籤\n",
@@ -153,6 +152,10 @@ class Fortune(commands.Cog):
 
         self.pause = True
         self.today = datetime.datetime.utcnow().date()
+
+        # Clear history data
+        FortuneResult.clear_history_data()
+        # Revoke roles
         guild = self.bot.get_guild(Config.atlantis_id) or await self.bot.fetch_guild(
             Config.atlantis_id
         )

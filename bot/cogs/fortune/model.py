@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from psycopg2 import sql
-
 from bot import get_cursor
 
 
@@ -49,18 +47,35 @@ class FortuneResult:
                     "draw_date": self.draw_date,
                 },
             )
+            query = (
+                "UPDATE fortune_statistics SET item_count = item_count + 1 WHERE item_type = 'general' AND item = 'total_draws';"
+                "UPDATE fortune_statistics SET item_count = item_count + 1 WHERE item_type = 'luck' AND item = %s;"
+                "UPDATE fortune_statistics SET item_count = item_count + 1 WHERE item_type = 'angel' AND item = %s;"
+            )
+            cursor.execute(query, (self.luck, self.angel))
 
     @staticmethod
     def get_stats_by(category: str) -> tuple[str, int]:
         with get_cursor() as cursor:
-            query = sql.SQL(
-                "SELECT {category}, COUNT(*) as count "
-                "FROM fortune_records "
-                "GROUP BY {category} "
-                "ORDER BY count DESC "
+            query = (
+                "SELECT item, item_count "
+                "FROM fortune_statistics "
+                "WHERE item_type = %s ORDER BY item_count DESC LIMIT 9"
             )
-            cursor.execute(query.format(category=sql.Identifier(category)))
+            cursor.execute(query, (category,))
             result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    def get_total_draws() -> int:
+        with get_cursor() as cursor:
+            query = (
+                "SELECT item_count "
+                "FROM fortune_statistics "
+                "WHERE item_type = 'general' AND item = 'total_draws'"
+            )
+            cursor.execute(query)
+            result = cursor.fetchone()[0]
         return result
 
     @staticmethod
@@ -90,3 +105,12 @@ class FortuneResult:
             most_common_angel_result = cursor.fetchone()
 
         return last_week_result, most_common_angel_result
+
+    @staticmethod
+    def clear_history_data():
+        with get_cursor() as cursor:
+            query = (
+                "DELETE FROM fortune_records "
+                "WHERE draw_date < current_date - interval '31 days'"
+            )
+            cursor.execute(query)
