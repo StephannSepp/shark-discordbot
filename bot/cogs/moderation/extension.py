@@ -5,6 +5,7 @@ from disnake import User
 from disnake.ext import commands
 
 from utils import embed_builder
+from utils import funcs
 from utils import time_process
 
 from . import module
@@ -29,14 +30,17 @@ class Moderation(commands.Cog):
         else:
             for warning in warning_list:
                 embed.add_field(
-                    name=f"#{warning[0]}｜<t:{int(warning[4].timestamp())}>",
-                    value=f"•{warning[3]}｜by <@{warning[2]}>",
+                    name=f"• {warning[0]}（短編號：{funcs.b64sf_encode(warning[0])}）",
+                    value=(
+                        f"{warning[3]}\n\n"
+                        f"<t:{int(warning[4].timestamp())}> by <@{warning[2]}>"
+                    ),
                     inline=False,
                 )
         embed.description = description
         await inter.response.send_message(embed=embed, ephemeral=True)
 
-    @commands.slash_command(name="warn")
+    @commands.slash_command(name="warn", description="警告系統")
     @commands.default_member_permissions(moderate_members=True)
     @commands.guild_only()
     async def warn(self, inter: CmdInter):
@@ -81,6 +85,7 @@ class Moderation(commands.Cog):
         )
         embed.add_field(name="理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
+        embed.add_field(name="短編號", value=funcs.b64sf_encode(warning_id), inline=False)
         if copy:
             await copy.send(embed=embed)
             await inter.followup.send(embed=embed)
@@ -92,7 +97,7 @@ class Moderation(commands.Cog):
         self,
         inter: CmdInter,
         user: User,
-        warning_id: commands.LargeInt,
+        warning_id: str,
         copy: TextChannel = None,
     ):
         """從成員移除警告
@@ -105,6 +110,14 @@ class Moderation(commands.Cog):
         copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
         """
         await inter.response.defer()
+
+        if len(warning_id) == 11:
+            warning_id = funcs.b64sf_decode(warning_id)
+        else:
+            try:
+                warning_id = int(warning_id)
+            except ValueError as exc:
+                raise commands.BadArgument from exc
 
         try:
             reason = module.remove_warn(inter.guild_id, user.id, warning_id)
@@ -122,6 +135,7 @@ class Moderation(commands.Cog):
         )
         embed.add_field(name="警告理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
+        embed.add_field(name="短編號", value=funcs.b64sf_encode(warning_id), inline=False)
         if copy:
             await copy.send(embed=embed)
             await inter.followup.send(embed=embed)
@@ -147,8 +161,11 @@ class Moderation(commands.Cog):
         else:
             for warning in warning_list:
                 embed.add_field(
-                    name=f"#{warning[0]}｜<t:{int(warning[4].timestamp())}>",
-                    value=f"•{warning[3]}｜by <@{warning[2]}>",
+                    name=f"• {warning[0]}（短編號：{funcs.b64sf_encode(warning[0])}）",
+                    value=(
+                        f"{warning[3]}\n\n"
+                        f"<t:{int(warning[4].timestamp())}> by <@{warning[2]}>"
+                    ),
                     inline=False,
                 )
         embed.description = description
@@ -174,7 +191,7 @@ class Moderation(commands.Cog):
         raw_duration: 時長，格式應如「1d2h34m56s」包含天數 d、小時 h、分鐘 m、秒數 \
             s 組成的字串，最長支援到 28 日
         reason: 理由
-        warning_id: 警告編號，應為一串 Snowflake 數字編碼
+        warning_id: 警告編號，應為一串 Snowflake 數字編碼或 11 字元的短字串
         copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
         attachment: 支援圖片格式作為附件
         """
