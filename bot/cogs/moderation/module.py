@@ -17,7 +17,7 @@ def add_warning(user_id: int, server_id: int, moderator_id: int, reason: str) ->
     warning_id = gen.snowflake()
     with get_cursor() as cursor:
         query = (
-            "INSERT INTO warns"
+            "INSERT INTO warns "
             "VALUES (%(id)s, %(user_id)s, %(server_id)s, %(moderator_id)s, %(reason)s)"
         )
         cursor.execute(

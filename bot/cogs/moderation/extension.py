@@ -16,6 +16,25 @@ class Moderation(commands.Cog):
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
 
+    @commands.slash_command(name="mywarn", description="查詢自身警告")
+    async def mywarn(self, inter: CmdInter):
+        warning_list = module.list_warns(inter.guild_id, inter.author.id)
+        embed = embed_builder.information(
+            title="警告紀錄", description="", thumbnail=inter.author.avatar.url
+        )
+        description = f"以下為{inter.author.mention}的警告紀錄"
+        if len(warning_list) == 0:
+            description = "該成員沒有任何警告"
+        else:
+            for warning in warning_list:
+                embed.add_field(
+                    name=f"#{warning[0]}｜<t:{int(warning[4].timestamp())}>",
+                    value=f"•{warning[3]}｜by <@{warning[2]}>",
+                    inline=False,
+                )
+        embed.description = description
+        await inter.response.send_message(embed=embed, ephemeral=True)
+
     @commands.slash_command(name="warn", description="警告系統")
     @commands.default_member_permissions(moderate_members=True)
     @commands.guild_only()
