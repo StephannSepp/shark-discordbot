@@ -16,8 +16,9 @@ class Moderation(commands.Cog):
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
 
-    @commands.slash_command(name="mywarn", description="查詢自身警告")
+    @commands.slash_command(name="mywarn")
     async def mywarn(self, inter: CmdInter):
+        """查詢警告紀錄"""
         warning_list = module.list_warns(inter.guild_id, inter.author.id)
         embed = embed_builder.information(
             title="警告紀錄", description="", thumbnail=inter.author.avatar.url
@@ -35,7 +36,7 @@ class Moderation(commands.Cog):
         embed.description = description
         await inter.response.send_message(embed=embed, ephemeral=True)
 
-    @commands.slash_command(name="warn", description="警告系統")
+    @commands.slash_command(name="warn")
     @commands.default_member_permissions(moderate_members=True)
     @commands.guild_only()
     async def warn(self, inter: CmdInter):
@@ -49,22 +50,21 @@ class Moderation(commands.Cog):
             list: List all of the warnings of a user.
         """
 
-    @warn.sub_command(name="add", description="對成員新增一個警告")
-    async def warning_add(
+    @warn.sub_command(name="issue")
+    async def warning_issue(
         self,
         inter: CmdInter,
         user: User,
         reason: str = "沒有提供理由",
         copy: TextChannel = None,
     ):
-        """Add a warning to a user.
+        """對成員新增一個警告
 
-        Args
-            inter: A disnake `ApplicationCommandInteraction`.
-            user: A disnake `User`.
-            reason: The reason for the warning, defaults to "沒有提供理由".
-            copy: If a `TextChannel` is provided, the bot will send a copy \
-                message to the specified channel.
+        Parameters
+        ----------
+        user: 對象成員
+        reason: 理由
+        copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
         """
         await inter.response.defer()
 
@@ -87,7 +87,7 @@ class Moderation(commands.Cog):
         else:
             await inter.followup.send(embed=embed)
 
-    @warn.sub_command(name="remove", description="對成員移除警告")
+    @warn.sub_command(name="remove")
     async def warning_remove(
         self,
         inter: CmdInter,
@@ -95,14 +95,14 @@ class Moderation(commands.Cog):
         warning_id: commands.LargeInt,
         copy: TextChannel = None,
     ):
-        """Remove a warning from a user.
+        """從成員移除警告
 
-        Args:
-            inter: A disnake `ApplicationCommandInteraction`.
-            user: A disnake `User`.
-            warning_id: The snowflake-like ID of the warning.
-            copy: If a `TextChannel` is provided, the bot will send a copy \
-                message to the specified channel.
+        Parameters
+        ----------
+        user: 對象成員
+        reason: 理由
+        warning_id: 警告編號，應為一串 Snowflake 數字編碼
+        copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
         """
         await inter.response.defer()
 
@@ -128,13 +128,13 @@ class Moderation(commands.Cog):
         else:
             await inter.followup.send(embed=embed)
 
-    @warn.sub_command(name="list", description="檢查成員的警告")
+    @warn.sub_command(name="list")
     async def warning_list(self, inter: CmdInter, user: User):
-        """List all of the warnings from a user.
+        """列出成員警告紀錄列表
 
-        Args:
-            inter: A disnake `ApplicationCommandInteraction`.
-            user: A disnake `User`.
+        Parameters
+        ----------
+        user: 對象成員
         """
 
         warning_list = module.list_warns(inter.guild_id, user.id)
@@ -154,7 +154,7 @@ class Moderation(commands.Cog):
         embed.description = description
         await inter.response.send_message(embed=embed)
 
-    @commands.slash_command(name="mute", description="禁言成員，範例格式：4d2h13m56s，時長支持到28d")
+    @commands.slash_command(name="mute")
     @commands.default_member_permissions(moderate_members=True)
     @commands.guild_only()
     async def mute(
@@ -166,17 +166,17 @@ class Moderation(commands.Cog):
         copy: TextChannel = None,
         attachment: Attachment = None,
     ):
-        """Times out a user, the member will not be able to interact with the
-        guild. A `moderate_members` permission is required.
+        """禁言成員
 
-        Args:
-            inter: A disnake `ApplicationCommandInteraction`.
-            user: A disnake `User`.
-            raw_duration: How many seconds for the timeout.
-            reason: The reason for the timeout, defaults to "沒有提供理由".
-            copy: If a `TextChannel` is provided, the bot will send a copy \
-                message to the specified channel.
-            attachment: Some file or image for the extra information.
+        Parameters
+        ----------
+        user: 對象成員
+        raw_duration: 時長，格式應如「1d2h34m56s」包含天數 d、小時 h、分鐘 m、秒數 \
+            s 組成的字串，最長支援到 28 日
+        reason: 理由
+        warning_id: 警告編號，應為一串 Snowflake 數字編碼
+        copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
+        attachment: 支援圖片格式作為附件
         """
         await inter.response.defer()
         file = None
@@ -233,7 +233,7 @@ class Moderation(commands.Cog):
         else:
             await inter.followup.send(embed=embed)
 
-    @commands.slash_command(name="unmute", description="解除禁言成員")
+    @commands.slash_command(name="unmute")
     @commands.default_member_permissions(moderate_members=True)
     @commands.guild_only()
     async def unmute(
@@ -243,14 +243,13 @@ class Moderation(commands.Cog):
         reason: str = "沒有提供理由",
         copy: TextChannel = None,
     ):
-        """Unmute a user. The `moderate_members` permission is required.
+        """取消禁言成員
 
-        Args:
-            inter: A disnake `ApplicationCommandInteraction`.
-            user: A disnake `User`.
-            reason: The reason for the unmute, defaults to "沒有提供理由".
-            copy: If a `TextChannel` is provided, the bot will send a copy \
-                message to the specified channel.
+        Parameters
+        ----------
+        user: 對象成員
+        reason: 理由
+        copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
         """
         await inter.response.defer()
         member = inter.guild.get_member(user.id)
@@ -295,7 +294,7 @@ class Moderation(commands.Cog):
         else:
             await inter.followup.send(embed=embed)
 
-    @commands.slash_command(name="kick", description="踢除成員")
+    @commands.slash_command(name="kick")
     @commands.default_member_permissions(kick_members=True)
     @commands.guild_only()
     async def kick(
@@ -306,16 +305,14 @@ class Moderation(commands.Cog):
         copy: TextChannel = None,
         attachment: Attachment = None,
     ):
-        """Kick a user's butt out of server.
-            A kick_member permission is required.
+        """踢出成員
 
-        Args:
-            inter: A disnake `ApplicationCommandInteraction`.
-            user: A disnake `User`.
-            reason: The reason for the kick, defaults to "沒有提供理由".
-            copy: If a `TextChannel` is provided, the bot will send a copy \
-                message to the specified channel.
-            attachment: Some file or image for the extra information.
+        Parameters
+        ----------
+        user: 對象成員
+        reason: 理由
+        copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
+        attachment: 支援圖片格式作為附件
         """
         file = None
         await inter.response.defer()
@@ -370,7 +367,7 @@ class Moderation(commands.Cog):
         else:
             await inter.followup.send(embed=embed)
 
-    @commands.slash_command(name="ban", description="停權成員")
+    @commands.slash_command(name="ban")
     @commands.default_member_permissions(ban_members=True)
     @commands.guild_only()
     async def ban(
@@ -381,17 +378,14 @@ class Moderation(commands.Cog):
         copy: TextChannel = None,
         attachment: Attachment = None,
     ):
-        """Ban a user from server.
-            A ban_member permission is required.
+        """停權成員
 
-        Args:
-            inter: A disnake `ApplicationCommandInteraction`.
-            user: A disnake `User`.
-            raw_duration: How many seconds for the timeout.
-            reason: The reason for the ban, defaults to "沒有提供理由".
-            copy: If a `TextChannel` is provided, the bot will send a copy \
-                message to the specified channel.
-            attachment: Some file or image for the extra information.
+        Parameters
+        ----------
+        user: 對象成員
+        reason: 理由
+        copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
+        attachment: 支援圖片格式作為附件
         """
         file = None
         await inter.response.defer()
