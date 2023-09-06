@@ -9,6 +9,7 @@ from typing import Generator
 import disnake
 import psycopg2
 import psycopg2.pool
+from disnake import AllowedMentions
 from disnake.ext import commands
 from pkg_resources import parse_version
 from psycopg2.extensions import cursor
@@ -16,7 +17,7 @@ from psycopg2.extensions import cursor
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.3.639"
+__version__ = "2.3.643"
 
 
 def init_db():
@@ -51,6 +52,7 @@ class Bot(commands.InteractionBot):
             command_sync_flags=commands.CommandSyncFlags.all(),
         )
         self._start_at = datetime.now()
+        self.allowed_mentions = AllowedMentions(everyone=False, roles=False)
 
     def load_all_extensions(self, folder: str):
         for filename in os.listdir(folder):
