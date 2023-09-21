@@ -82,7 +82,7 @@ class Fortune(commands.Cog):
             await inter.author.add_roles(role)
             result.record()
 
-        await inter.followup.send(
+        await inter.edit_original_response(
             content=f"下次抽籤重置時間：<t:{reset_time_unix}> <t:{reset_time_unix}:R>",
             embed=embed,
         )

@@ -43,7 +43,7 @@ class MakeEmbed(commands.Cog):
             await copy.send(content=content, embed=embed)
             await inter.followup.send(content=content, embed=embed)
         else:
-            await inter.followup.send(content=content, embed=embed)
+            await inter.edit_original_response(content=content, embed=embed)
 
 
 def setup(bot: commands.InteractionBot):

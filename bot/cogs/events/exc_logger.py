@@ -30,7 +30,10 @@ class ExceptionHandler(commands.Cog):
             case commands.CheckFailure():
                 pass
             case commands.BadArgument():
-                await inter.response.send_message("輸入的參數不符合要求的格式", ephemeral=True)
+                try:
+                    await inter.response.send_message("輸入的參數不符合要求的格式", ephemeral=True)
+                except disnake.errors.InteractionResponded:
+                    await inter.edit_original_response("輸入的參數不符合要求的格式", ephemeral=True)
             case _:
                 title = f"Slash command `{inter.data.name}` failed due to `{exc.__class__.__name__}`"
                 embed = disnake.Embed(

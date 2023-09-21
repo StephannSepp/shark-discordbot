@@ -66,7 +66,7 @@ class TabletTexter(commands.Cog):
         with io.BytesIO() as image_binary:
             base_image.save(image_binary, 'PNG')
             image_binary.seek(0)
-            await inter.followup.send(file=File(fp=image_binary, filename='output.png'))
+            await inter.edit_original_response(file=File(fp=image_binary, filename='output.png'))
 
 
 def setup(bot: commands.InteractionBot):
