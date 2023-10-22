@@ -34,7 +34,7 @@ def get_guardian_angel(seed: int) -> str:
 
 
 def get_guardian_angel_image(angel: str) -> str:
-    url = hololive_talent.talent.get(angel)
+    url = f"static/fortune/talents/{hololive_talent.talent.get(angel)}"
     return url
 
 

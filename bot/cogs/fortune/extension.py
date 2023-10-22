@@ -46,7 +46,7 @@ class Fortune(commands.Cog):
             ROLE_REVOKE_START < datetime.datetime.now().time() < ROLE_REVOKE_END
             or self.pause
         ):
-            await inter.followup.send("機器人正在移除身分組，請稍後再試")
+            await inter.edit_original_response(content="機器人正在移除身分組，請稍後再試")
             return
 
         date = int(datetime.datetime.utcnow().strftime("%Y%m%d"))
@@ -65,16 +65,18 @@ class Fortune(commands.Cog):
         result.colour = module.get_lucky_colour(seed[16:32])
         result.number = module.get_lucky_number(seed[32:48])
         result.angel, url = module.get_guardian_angel(seed[48:])
-        file = File(module.get_image_url(result.luck, seed), filename="fortune.png")
         embed = embed_builder.build_embed(
             title=f"抽籤結果🌸{result.luck}",
             description=f"{inter.author.mention}的抽籤結果\n",
             colour=module.to_colour_obj(result.colour),
         )
         embed.add_field(name="幸運天使", value=result.angel, inline=False)
-        embed.set_thumbnail(url=url)
         embed.add_field(name="開運數字", value=result.number)
         embed.add_field(name="幸運色", value=result.colour)
+        url = module.get_guardian_angel_image(result.angel)
+        thumbnail_file = File(url, filename="guardianangel.png")
+        embed.set_thumbnail(url="attachment://guardianangel.png")
+        file = File(module.get_image_url(result.luck, seed), filename="fortune.png")
         embed.set_image(file=file)
 
         role = inter.guild.get_role(ROLES[result.luck])
@@ -85,6 +87,7 @@ class Fortune(commands.Cog):
         await inter.edit_original_response(
             content=f"下次抽籤重置時間：<t:{reset_time_unix}> <t:{reset_time_unix}:R>",
             embed=embed,
+            file=thumbnail_file,
         )
 
     GROUP_OPT = commands.option_enum(["運氣", "幸運天使"])
@@ -140,11 +143,11 @@ class Fortune(commands.Cog):
                 embed.add_field(name="過去 7 日的運氣", value=value, inline=False)
             if most_common_angel_result:
                 common_angel, count = most_common_angel_result
-                url = module.get_guardian_angel_image(common_angel)
                 value = f"{common_angel} - {count} 次"
                 embed.add_field(name="過去 30 日最常抽到的幸運天使", value=value, inline=False)
-                embed.set_thumbnail(url=url)
-            await inter.response.send_message(embed=embed)
+                file = File(module.get_guardian_angel_image(common_angel), filename="common_angel.png")
+                embed.set_thumbnail(url="attachment://common_angel.png")
+            await inter.response.send_message(embed=embed, file=file)
 
     async def revoke_roles(self):
         if self.today == datetime.datetime.utcnow().date():
