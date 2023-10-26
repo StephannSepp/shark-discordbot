@@ -142,7 +142,6 @@ class Fortune(commands.Cog):
                     last_week_lucks.append(f"<t:{date_unix}:D> - {luck}")
                 value = "\n".join(last_week_lucks)
                 embed.add_field(name="過去 7 日的運氣", value=value, inline=False)
-                await inter.response.send_message(embed=embed)
 
             if most_common_angel_result:
                 common_angel, count = most_common_angel_result
@@ -150,7 +149,8 @@ class Fortune(commands.Cog):
                 embed.add_field(name="過去 30 日最常抽到的幸運天使", value=value, inline=False)
                 file = File(module.get_guardian_angel_image(common_angel), filename="common_angel.png")
                 embed.set_thumbnail(url="attachment://common_angel.png")
-                await inter.response.send_message(embed=embed, file=file)
+
+            await inter.response.send_message(embed=embed, file=file)
 
     async def revoke_roles(self):
         if self.today == datetime.datetime.utcnow().date():
