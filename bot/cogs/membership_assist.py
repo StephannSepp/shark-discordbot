@@ -2,10 +2,10 @@
 10/15/22 TODO: need to re-write the code
 """
 
+import asyncio
 import gc
 import json
 import os
-import time
 from datetime import datetime
 from datetime import time as datetime_time
 from datetime import timedelta
@@ -43,7 +43,7 @@ class MembershipAssist(commands.Cog):
 
         for _ in range(3):
             try:
-                time.sleep(5)
+                await asyncio.sleep(5)
                 gcredential = pygsheets.authorize(
                     custom_credentials=self.my_credentials
                 )
@@ -70,11 +70,17 @@ class MembershipAssist(commands.Cog):
         member_notif = []
 
         for index, item in enumerate(val):
+            if index % 50 == 0:
+                await asyncio.sleep(1)
+
             if item["Discord UID"] == "":
                 continue
 
             if item["到期多久"] == "" and item["是否已給予身分組"] != "Y":
                 member = guild.get_member(item["Discord UID"])
+                if member.get_role(846616775148044318):
+                    continue
+
                 try:
                     await member.add_roles(role)
                 except:  # pylint: disable=bare-except
@@ -112,6 +118,9 @@ class MembershipAssist(commands.Cog):
                 int(item["到期多久"]) > 3 and item["是否已給予身分組"] == "Y"
             ):
                 member = guild.get_member(item["Discord UID"])
+                if not member.get_role(846616775148044318):
+                    continue
+
                 try:
                     await member.remove_roles(role)
                 except Exception:

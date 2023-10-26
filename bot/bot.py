@@ -17,7 +17,7 @@ from psycopg2.extensions import cursor
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.3.685"
+__version__ = "2.3.689"
 
 
 def init_db():

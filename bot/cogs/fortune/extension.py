@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import hashlib
 
@@ -167,7 +168,9 @@ class Fortune(commands.Cog):
         for _k, v in ROLES.items():
             role = guild.get_role(v)
             if role.members:
-                for m in role.members:
+                for i, m in enumerate(role.members):
+                    if i % 50 == 0:
+                        await asyncio.sleep(1)
                     await m.remove_roles(role)
 
     @tasks.loop(seconds=59)
