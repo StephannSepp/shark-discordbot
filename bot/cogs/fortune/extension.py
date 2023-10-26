@@ -129,6 +129,7 @@ class Fortune(commands.Cog):
             # ..:example:
             # last_week_result = (('大吉', <datetime object>), ('凶', <datetime object>), ...)
             # most_common_angel_result = ('Ceres Fauna', 3)
+            file = None
             result = FortuneResult.get_by_user(inter.author.id)
             last_week_result, most_common_angel_result = result
             embed = embed_builder.information(
