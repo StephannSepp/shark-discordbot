@@ -142,7 +142,7 @@ class Reminder(commands.Cog):
 
         await inter.response.send_message("\n".join(message))
 
-    @tasks.loop(seconds=1)
+    @tasks.loop(seconds=10)
     async def taskloop(self):
         await self._do_remind()
 
