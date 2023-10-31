@@ -76,7 +76,7 @@ class MembershipAssist(commands.Cog):
                 continue
 
             if item["到期多久"] == "" and item["是否已給予身分組"] != "Y":
-                member = guild.getch_member(item["Discord UID"])
+                member = await guild.getch_member(item["Discord UID"])
                 if member.get_role(846616775148044318):
                     continue
 
@@ -116,7 +116,7 @@ class MembershipAssist(commands.Cog):
             elif item["到期多久"] != "" and (
                 int(item["到期多久"]) > 3 and item["是否已給予身分組"] == "Y"
             ):
-                member = guild.getch_member(item["Discord UID"])
+                member = await guild.getch_member(item["Discord UID"])
                 if not member.get_role(846616775148044318):
                     continue
 
