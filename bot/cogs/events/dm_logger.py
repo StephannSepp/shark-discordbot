@@ -29,9 +29,7 @@ class DirectMessageLogger(commands.Cog):
         )
         await message.author.send(embed=embed)
 
-        guild = self.bot.get_guild(Config.debug_guild) or await self.bot.fetch_guild(
-            Config.debug_guild
-        )
+        guild = self.bot.debug_guild
         channel = disnake.utils.get(guild.text_channels, id=Config.debug_channel)
         embed = disnake.Embed(
             title=f"DM by {str(message.author)}",

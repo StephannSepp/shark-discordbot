@@ -163,9 +163,7 @@ class Fortune(commands.Cog):
         # Clear history data
         FortuneResult.clear_history_data()
         # Revoke roles
-        guild = self.bot.get_guild(Config.atlantis_id) or await self.bot.fetch_guild(
-            Config.atlantis_id
-        )
+        guild = self.bot.main_guild
         for _k, v in ROLES.items():
             role = guild.get_role(v)
             if role.members:

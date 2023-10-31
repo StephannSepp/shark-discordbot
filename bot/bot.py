@@ -17,7 +17,7 @@ from psycopg2.extensions import cursor
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.3.689"
+__version__ = "2.3.691"
 
 
 def init_db():
@@ -61,6 +61,12 @@ class Bot(commands.InteractionBot):
                 self.load_extension(f"{folder}.{filename}.extension")
             else:
                 self.load_extension(f"{folder}.{filename[:-3]}")
+
+    async def on_ready(self):
+        main_guild_id = Config.atlantis_id
+        debug_guild_id = Config.debug_guild
+        self.main_guild = self.get_guild(main_guild_id) or await self.fetch_guild(main_guild_id)
+        self.debug_guild = self.get_guild(debug_guild_id) or await self.fetch_guild(debug_guild_id)
 
     @property
     def up_time(self):

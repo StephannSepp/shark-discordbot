@@ -19,9 +19,7 @@ class ExceptionHandler(commands.Cog):
 
     @commands.Cog.listener("on_slash_command_error")
     async def primary_error_handler(self, inter: CmdInter, exc: commands.CommandError):
-        guild = self.bot.get_guild(Config.debug_guild) or await self.bot.fetch_guild(
-            Config.debug_guild
-        )
+        guild = self.bot.debug_guild
         debug_channel = disnake.utils.get(guild.text_channels, id=Config.debug_channel)
 
         match exc:

@@ -37,8 +37,7 @@ class MembershipAssist(commands.Cog):
     )
 
     async def check_members(self):
-        Atlantis_ID = int(os.environ.get("Atlantis_ID"))
-        guild = self.bot.get_guild(Atlantis_ID)
+        guild = self.bot.main_guild
         role = guild.get_role(846616775148044318)
 
         for _ in range(3):
@@ -77,7 +76,7 @@ class MembershipAssist(commands.Cog):
                 continue
 
             if item["到期多久"] == "" and item["是否已給予身分組"] != "Y":
-                member = guild.get_member(item["Discord UID"])
+                member = guild.getch_member(item["Discord UID"])
                 if member.get_role(846616775148044318):
                     continue
 
@@ -117,7 +116,7 @@ class MembershipAssist(commands.Cog):
             elif item["到期多久"] != "" and (
                 int(item["到期多久"]) > 3 and item["是否已給予身分組"] == "Y"
             ):
-                member = guild.get_member(item["Discord UID"])
+                member = guild.getch_member(item["Discord UID"])
                 if not member.get_role(846616775148044318):
                     continue
 
