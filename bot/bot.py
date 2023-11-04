@@ -17,7 +17,7 @@ from psycopg2.extensions import cursor
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.3.691"
+__version__ = "2.3.716"
 
 
 def init_db():
@@ -46,6 +46,9 @@ def get_cursor() -> Generator[cursor, None, None]:
 
 
 class Bot(commands.InteractionBot):
+    main_guild = None
+    debug_guild = None
+
     def __init__(self):
         super().__init__(
             intents=disnake.Intents().all(),
@@ -62,11 +65,17 @@ class Bot(commands.InteractionBot):
             else:
                 self.load_extension(f"{folder}.{filename[:-3]}")
 
+    async def getch_guild(self, id: int):
+        guild = self.get_guild(id)
+        if guild is None:
+            guild = await self.fetch_guild(id)
+        return guild
+
     async def on_ready(self):
         main_guild_id = Config.atlantis_id
         debug_guild_id = Config.debug_guild
-        self.main_guild = self.get_guild(main_guild_id) or await self.fetch_guild(main_guild_id)
-        self.debug_guild = self.get_guild(debug_guild_id) or await self.fetch_guild(debug_guild_id)
+        self.main_guild = await self.getch_guild(main_guild_id)
+        self.debug_guild = await self.getch_guild(debug_guild_id)
 
     @property
     def up_time(self):

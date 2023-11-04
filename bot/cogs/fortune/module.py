@@ -6,7 +6,7 @@ from static import hololive_talent
 
 RESULTS = ["大凶", "凶", "小吉", "中吉", "大吉"]
 LUCKY_COLORS = ["綠", "藍", "紫", "金", "橘", "紅", "黃"]
-BADLUCK_IMGS = ["static/fortune/BL.png", "static/fortune/BL2.png"]
+BADLUCK_IMGS = ["https://i.imgur.com/ipi9ZhN.png", "https://i.imgur.com/liah3aW.png"]
 
 
 def draw_fortune(seed: int) -> str:
@@ -34,8 +34,7 @@ def get_guardian_angel(seed: int) -> str:
 
 
 def get_guardian_angel_image(angel: str) -> str:
-    url = f"static/fortune/talents/{hololive_talent.talent.get(angel)}"
-    return url
+    return hololive_talent.talent.get(angel)
 
 
 def to_colour_obj(colour: str) -> Colour:
@@ -60,12 +59,12 @@ def get_image_url(luck: str, seed: int) -> str:
     random.seed(seed)
     match luck:
         case "大凶":
-            return "static/fortune/TL.png"
+            return "https://i.imgur.com/cG1E38m.png"
         case "凶":
             return random.choice(BADLUCK_IMGS)
         case "小吉":
-            return "static/fortune/SB.png"
+            return "https://i.imgur.com/atoTZfT.png"
         case "中吉":
-            return "static/fortune/GF.png"
+            return "https://i.imgur.com/0rk6Fnr.png"
         case "大吉":
-            return "static/fortune/GGF.png"
+            return "https://i.imgur.com/dZHjqkh.png"

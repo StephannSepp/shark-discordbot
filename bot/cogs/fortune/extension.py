@@ -3,11 +3,9 @@ import datetime
 import hashlib
 
 from disnake import CmdInter
-from disnake import File
 from disnake.ext import commands
 from disnake.ext import tasks
 
-from config import Config
 from utils import embed_builder
 from utils import time_process
 
@@ -42,7 +40,6 @@ class Fortune(commands.Cog):
         """This command draws a fortune lot. Reset on 0:00 UTC time everyday."""
         # Defer for avoiding interaction timeout.
         await inter.response.defer()
-
         if (
             ROLE_REVOKE_START < datetime.datetime.now().time() < ROLE_REVOKE_END
             or self.pause
@@ -75,20 +72,16 @@ class Fortune(commands.Cog):
         embed.add_field(name="開運數字", value=result.number)
         embed.add_field(name="幸運色", value=result.colour)
         url = module.get_guardian_angel_image(result.angel)
-        thumbnail_file = File(url, filename="guardianangel.png")
-        embed.set_thumbnail(url="attachment://guardianangel.png")
-        file = File(module.get_image_url(result.luck, seed), filename="fortune.png")
-        embed.set_image(file=file)
-
+        embed.set_thumbnail(url=url)
+        url = module.get_image_url(result.luck, seed)
+        embed.set_image(url=url)
         role = inter.guild.get_role(ROLES[result.luck])
         if role is not None and role not in inter.author.roles:
             await inter.author.add_roles(role)
             result.record()
-
         await inter.edit_original_response(
             content=f"下次抽籤重置時間：<t:{reset_time_unix}> <t:{reset_time_unix}:R>",
             embed=embed,
-            file=thumbnail_file,
         )
 
     GROUP_OPT = commands.option_enum(["運氣", "幸運天使"])
@@ -105,9 +98,8 @@ class Fortune(commands.Cog):
                 case "幸運天使":
                     result = FortuneResult.get_stats_by("angel")
                     # ..:example:
-                    # result = [('Ayunda Risu', 5), ('Ceres Fauna', 4), ('戌神ころね', 4), ...]
+                    # result = [('Ayunda Risu', 5), ('Ceres Fauna', 4), ...]
                     inline = True
-
             total = FortuneResult.get_total_draws()
             embed = embed_builder.information(
                 title="全域抽籤統計📊",
@@ -127,7 +119,7 @@ class Fortune(commands.Cog):
             # and most_common_angel_result
             #
             # ..:example:
-            # last_week_result = (('大吉', <datetime object>), ('凶', <datetime object>), ...)
+            # last_week_result = (('大吉', <datetime object>), ...)
             # most_common_angel_result = ('Ceres Fauna', 3)
             file = None
             result = FortuneResult.get_by_user(inter.author.id)
@@ -143,15 +135,13 @@ class Fortune(commands.Cog):
                     last_week_lucks.append(f"<t:{date_unix}:D> - {luck}")
                 value = "\n".join(last_week_lucks)
                 embed.add_field(name="過去 7 日的運氣", value=value, inline=False)
-
             if most_common_angel_result:
                 common_angel, count = most_common_angel_result
                 value = f"{common_angel} - {count} 次"
                 embed.add_field(name="過去 30 日最常抽到的幸運天使", value=value, inline=False)
-                file = File(module.get_guardian_angel_image(common_angel), filename="common_angel.png")
-                embed.set_thumbnail(url="attachment://common_angel.png")
-
-            await inter.response.send_message(embed=embed, file=file)
+                url = module.get_guardian_angel_image(common_angel)
+                embed.set_thumbnail(url=url)
+            await inter.response.send_message(embed=embed)
 
     async def revoke_roles(self):
         if self.today == datetime.datetime.utcnow().date():

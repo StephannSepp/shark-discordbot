@@ -2,20 +2,22 @@
 ![鯊魚形象](/img/shark-discordbot.png "鯊魚形象")
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
-![Disnake 2.7.0](https://img.shields.io/badge/disnake-2.7.0-informational?style=plastic)
-![Version 2.3.613](https://img.shields.io/badge/version-2.3.613-informational?style=plastic)
+![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
+![Version 2.3.715](https://img.shields.io/badge/version-2.3.715-informational?style=plastic)
 
 ## 關於我
 
 ### A self-use Discord Bot  
 > 基於 Disnake 套件開發的 Discord Bot  
-> Disnake 版本: 2.7.0  
+> Disnake 版本: 2.9.0  
 > Python 版本 : 3.10 (不向下兼容)  
 
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
 
+* 2.3.715
+	* 抽籤圖片資源改用 URL 而非上傳本機檔案
 * 2.3.613
 	* Reminder
 	* 暫時停用 vxtwitter 轉換
