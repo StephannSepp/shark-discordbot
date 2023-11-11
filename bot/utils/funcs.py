@@ -1,17 +1,24 @@
-from textwrap import wrap
+import math
 
-VALID_CHAR = "_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-0123456789"
+VALID_CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
 
-def b64sf_encode(snowflake_id: int):
+def int_b64encode(to_encode: int):
     """Give a snowflake int and encode it into a modified base64 method."""
-    bsfid = format(snowflake_id, "b")
-    bsfid = bsfid.zfill(6 - len(bsfid) % 6 + len(bsfid))
-    group = wrap(bsfid, 6)
-    return "".join([VALID_CHAR[int(i, 2)] for i in group])
+    o = []
+    for t in range(math.floor(math.log(to_encode, 64)), -1, -1):
+        p = math.floor(math.pow(64, t))
+        a = math.floor((to_encode / p) % 64)
+        o.append(VALID_CHAR[a])
+        to_encode -= a * p
+    return "".join(o)
 
 
-def b64sf_decode(encoded_char: str):
+def int_b64decode(to_decode: str):
     """Give a encoded snowflake string and decode it back to a snowflake ID."""
-    decoded = [format(VALID_CHAR.index(c), "b").zfill(6) for c in encoded_char]
-    return int("".join(decoded), 2)
+    o = 0
+    l = len(to_decode) - 1
+    for t, c in enumerate(to_decode):
+        p = math.floor(math.pow(64, l -t))
+        o += VALID_CHAR.index(c) * p
+    return o

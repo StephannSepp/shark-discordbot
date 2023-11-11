@@ -30,7 +30,7 @@ class Moderation(commands.Cog):
         else:
             for warning in warning_list:
                 embed.add_field(
-                    name=f"• {warning[0]}（短編號：{funcs.b64sf_encode(warning[0])}）",
+                    name=f"• {warning[0]}（短編號：{funcs.int_b64encode(warning[0])}）",
                     value=(
                         f"{warning[3]}\n\n"
                         f"<t:{int(warning[4].timestamp())}> by <@{warning[2]}>"
@@ -85,7 +85,7 @@ class Moderation(commands.Cog):
         )
         embed.add_field(name="理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
-        embed.add_field(name="短編號", value=funcs.b64sf_encode(warning_id), inline=False)
+        embed.add_field(name="短編號", value=funcs.int_b64encode(warning_id), inline=False)
         if copy:
             await copy.send(embed=embed)
             await inter.followup.send(embed=embed)
@@ -113,7 +113,7 @@ class Moderation(commands.Cog):
         try:
             warning_id = int(warning_id)
         except ValueError as exc:
-            warning_id = funcs.b64sf_decode(warning_id)
+            warning_id = funcs.int_b64decode(warning_id)
 
         try:
             reason = module.remove_warn(inter.guild_id, user.id, warning_id)
@@ -131,7 +131,7 @@ class Moderation(commands.Cog):
         )
         embed.add_field(name="警告理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
-        embed.add_field(name="短編號", value=funcs.b64sf_encode(warning_id), inline=False)
+        embed.add_field(name="短編號", value=funcs.int_b64encode(warning_id), inline=False)
         if copy:
             await copy.send(embed=embed)
             await inter.followup.send(embed=embed)
@@ -157,7 +157,7 @@ class Moderation(commands.Cog):
         else:
             for warning in warning_list:
                 embed.add_field(
-                    name=f"• {warning[0]}（短編號：{funcs.b64sf_encode(warning[0])}）",
+                    name=f"• {warning[0]}（短編號：{funcs.int_b64encode(warning[0])}）",
                     value=(
                         f"{warning[3]}\n\n"
                         f"<t:{int(warning[4].timestamp())}> by <@{warning[2]}>"
