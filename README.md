@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.3.715](https://img.shields.io/badge/version-2.3.715-informational?style=plastic)
+![Version 2.4.4](https://img.shields.io/badge/version-2.4.4-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,8 @@
 
 ## Changelog
 
+* 2.4.4
+	* 沒什麼改變，只是換了個伺服器
 * 2.3.715
 	* 抽籤圖片資源改用 URL 而非上傳本機檔案
 * 2.3.613
