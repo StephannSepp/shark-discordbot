@@ -151,7 +151,7 @@ class Fortune(commands.Cog):
         self.today = datetime.datetime.utcnow().date()
 
         # Clear history data
-        FortuneResult.clear_history_data()
+        # FortuneResult.clear_history_data()
         # Revoke roles
         guild = self.bot.main_guild
         for _k, v in ROLES.items():

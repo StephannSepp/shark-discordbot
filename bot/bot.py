@@ -17,13 +17,7 @@ from psycopg2.extensions import cursor
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.3.716"
-
-
-def init_db():
-    with get_cursor() as cur:
-        with open("database/schema.sql", "r", encoding="utf-8") as f:
-            cur.execute(f.read())
+__version__ = "2.4.4"
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(
@@ -58,21 +52,23 @@ class Bot(commands.InteractionBot):
         self.allowed_mentions = AllowedMentions(everyone=False, roles=False)
 
     def load_all_extensions(self, folder: str):
-        for filename in os.listdir(folder):
-            path = os.path.join(folder, filename)
+        for ext_name in os.listdir(folder):
+            if ext_name.startswith("_"):
+                continue
+            path = os.path.join(folder, ext_name)
             if os.path.isdir(path):
-                self.load_extension(f"{folder}.{filename}.extension")
+                self.load_extension(f"{folder}.{ext_name}.extension")
             else:
-                self.load_extension(f"{folder}.{filename[:-3]}")
+                self.load_extension(f"{folder}.{ext_name[:-3]}")
 
-    async def getch_guild(self, id: int):
-        guild = self.get_guild(id)
+    async def getch_guild(self, id_: int):
+        guild = self.get_guild(id_)
         if guild is None:
-            guild = await self.fetch_guild(id)
+            guild = await self.fetch_guild(id_)
         return guild
 
     async def on_ready(self):
-        main_guild_id = Config.atlantis_id
+        main_guild_id = Config.home_guild
         debug_guild_id = Config.debug_guild
         self.main_guild = await self.getch_guild(main_guild_id)
         self.debug_guild = await self.getch_guild(debug_guild_id)
@@ -87,7 +83,6 @@ class Bot(commands.InteractionBot):
 
 
 if __name__ == "__main__":
-    init_db()
     bot = Bot()
     bot.load_all_extensions("cogs")
     bot.run(Config.token)

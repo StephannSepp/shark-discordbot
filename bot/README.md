@@ -7,6 +7,8 @@
 > 	* 一些監聽器
 > * fortune
 > 	* `/draw` - 抽籤指令
+> * reminder
+>   * 提醒功能
 > * rpg
 >	* RPGame
 > * make_embed.py
@@ -24,26 +26,13 @@
 > * temporary_voice.py
 > 	* 個人語音頻道管理
 
-### data
-*存放靜態資料的資料夾*
-
-### database
-*存放一些與資料庫有關的檔案*
-
-> * db_manager.py
-> 	* 包含一些操作資料庫的函式
-> * rpg_db_manager.py
-> 	* 供 RPGame 使用的資料庫操作函式庫
-> * rpg_destroy.sql
-> 	* 刪除RPGame資料庫的SQL語法
-> * schema.sql
-> 	* 用來初始化資料庫的資料表結構、SQL語法
-
 ### utils
 *存放一些簡單的函式庫*
 
 > * embed_builder.py
 > 	* 協助建立 Discord Embed 的函式
+> * funcs.py
+> 	* 實用函數?
 > * gen.py
 > 	* 一些字符生成器
 > * roll.py

@@ -13,7 +13,7 @@ from disnake.utils import get
 
 
 class TemporaryVoice(commands.Cog):
-    Atlantis_ID = int(os.environ.get("Atlantis_ID"))
+    home_guild_ID = int(os.environ.get("HOME_GUILD"))
     def __init__(self, bot):
         self.bot = bot
         self.taskloop.start() # pylint: disable=maybe-no-member
@@ -58,8 +58,8 @@ class TemporaryVoice(commands.Cog):
             await before.channel.delete()
 
     async def tvc_helper(self) -> None:
-        guild = self.bot.get_guild(self.Atlantis_ID)
-        for channel in self.bot.get_guild(self.Atlantis_ID).voice_channels:
+        guild = self.bot.get_guild(self.home_guild_ID)
+        for channel in self.bot.get_guild(self.home_guild_ID).voice_channels:
             if channel.category_id == 973743537994752000 and channel.id != 973743539089457223:
                 if not channel.members:
                     await channel.delete()
@@ -74,7 +74,7 @@ class TemporaryVoice(commands.Cog):
                         await channel.edit(name=f'{new_owner.name} 的頻道')
 
     async def creat_vc_cleaner(self) -> None:
-        guild = self.bot.get_guild(self.Atlantis_ID)
+        guild = self.bot.get_guild(self.home_guild_ID)
         channel = get(guild.voice_channels, id=973743539089457223)
         for member in channel.members:
             channel = get(member.guild.voice_channels, name=f'{member.name} 的頻道')

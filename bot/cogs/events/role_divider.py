@@ -15,7 +15,7 @@ class RoleDivider(commands.Cog):
 
     @commands.Cog.listener("on_member_update")
     async def divide_roles(self, before: Member, after: Member):
-        if after.guild.id != Config.atlantis_id:
+        if after.guild.id != Config.home_guild:
             return
 
         if len(after.roles) == len(before.roles):
