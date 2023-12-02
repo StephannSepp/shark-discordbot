@@ -17,7 +17,7 @@ from psycopg2.extensions import cursor
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.4.4"
+__version__ = "2.4.5"
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(
@@ -42,6 +42,7 @@ def get_cursor() -> Generator[cursor, None, None]:
 class Bot(commands.InteractionBot):
     main_guild = None
     debug_guild = None
+    owner_id = 387573599919276032
 
     def __init__(self):
         super().__init__(

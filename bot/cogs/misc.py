@@ -1,3 +1,5 @@
+import platform
+
 from disnake import CmdInter
 from disnake import File
 from disnake.ext import commands
@@ -29,14 +31,18 @@ class Misc(commands.Cog):
             description="不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。",
             thumbnail=self.bot.user.avatar.url,
         )
-        embed.add_field(name="擁有者", value="林昕渪@stevesepp87", inline=True)
+        owner = await self.bot.getch_user(self.bot.owner_id)
+        embed.add_field(
+            name="擁有者", value=f"{owner.display_name}@{owner.name}", inline=True
+        )
         embed.add_field(
             name="原始碼",
             value="[GitHub](https://github.com/StephannSepp/shark-discordbot)",
             inline=True,
         )
-        embed.add_field(name="版本", value=self.bot.version, inline=False)
+        embed.add_field(name="Bot 版本", value=self.bot.version, inline=False)
         embed.add_field(name="運行時間", value=self.bot.up_time, inline=False)
+        embed.add_field(name="運行平台", value=platform.platform(), inline=False)
         await inter.response.send_message(embed=embed, ephemeral=True)
 
     @commands.slash_command(name="kuaikuai", description="乖乖 - 數位板")
