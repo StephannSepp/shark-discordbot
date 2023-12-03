@@ -1,4 +1,4 @@
-import platform
+import platform as pf
 
 from disnake import CmdInter
 from disnake import File
@@ -40,9 +40,12 @@ class Misc(commands.Cog):
             value="[GitHub](https://github.com/StephannSepp/shark-discordbot)",
             inline=True,
         )
-        embed.add_field(name="Bot 版本", value=self.bot.version, inline=False)
-        embed.add_field(name="運行時間", value=self.bot.up_time, inline=False)
-        embed.add_field(name="運行平台", value=platform.platform(), inline=False)
+        version_info = f"{self.bot.version} with Python {pf.python_version()}"
+        system_info = f"{pf.system()}-{pf.release()}-{pf.machine()}"
+        up_time_info = f"{self.bot.up_time} on {system_info}"
+        embed.add_field(name="Bot 版本", value=version_info, inline=False)
+        embed.add_field(name="Bot 運行狀態", value=up_time_info, inline=False)
+        embed.add_field(name="DB 運行狀態", value=self.bot.db_up_time, inline=False)
         await inter.response.send_message(embed=embed, ephemeral=True)
 
     @commands.slash_command(name="kuaikuai", description="乖乖 - 數位板")

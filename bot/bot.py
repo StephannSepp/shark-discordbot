@@ -17,7 +17,7 @@ from psycopg2.extensions import cursor
 from config import Config
 from utils.time_process import strftimedelta
 
-__version__ = "2.4.5"
+__version__ = "2.4.6"
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(
@@ -73,6 +73,17 @@ class Bot(commands.InteractionBot):
         debug_guild_id = Config.debug_guild
         self.main_guild = await self.getch_guild(main_guild_id)
         self.debug_guild = await self.getch_guild(debug_guild_id)
+
+    @property
+    def db_up_time(self):
+        try:
+            with get_cursor() as cursor:
+                query = "SELECT now() - pg_postmaster_start_time()"
+                cursor.execute(query)
+                result = cursor.fetchone()[0]
+        except:
+            return "連線狀態不明"
+        return result
 
     @property
     def up_time(self):
