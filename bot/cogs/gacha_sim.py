@@ -21,7 +21,7 @@ class GachaSim(commands.Cog):
     @commands.slash_command(name="gacha")
     @commands.guild_only()
     async def gacha(self, inter: CmdInter):
-        """Gacha simulation command group."""
+        """Gacha simulation command group. {{GACHA}}"""
 
     @gacha.sub_command(name="pure_rate")
     async def pure_rate(self, inter: CmdInter, rate_percentage: float, spins: int = 10):
@@ -32,6 +32,9 @@ class GachaSim(commands.Cog):
         rate_percentage: Rate in percentage of the desired item.
         spins: How many times the gacha pulls.
         """
+        if spins > 100:
+            await inter.response.send_message("抽卡次數不可大於 100", ephemeral=True)
+            return
         real_rate = rate_percentage / 100
         result = [random.random() for _ in range(spins)]
         result_visual = [
@@ -40,15 +43,10 @@ class GachaSim(commands.Cog):
         ]
         won = result_visual.count(GachaResult.WON.value)
         user_rate = round(won / spins * 100, 4)
-        description = (
-            f"預期機率: {rate_percentage}%\n",
-            f"抽卡機率: {user_rate}%\n",
-        )
+        description = f"預期機率: {rate_percentage}%\n抽卡機率: {user_rate}%\n"
         embed = embed_builder.information(title="抽卡結果", description=description)
-        value = "\n".join(textwrap.wrap("".join(result_visual), 10))
-        embed.add_field(
-            name=f"抽卡結果: {won} / {spins}", value=value
-        )
+        value = "\n".join(textwrap.wrap(" ".join(result_visual), 20))
+        embed.add_field(name=f"抽卡結果: {won} / {spins}", value=value)
         await inter.response.send_message(embed=embed)
 
 

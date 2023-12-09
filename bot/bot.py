@@ -84,7 +84,7 @@ class Bot(commands.InteractionBot):
                 )
                 cursor.execute(query)
                 result = cursor.fetchone()[0]
-        except:
+        except Exception:
             return "連線狀態不明"
         return strftimedelta(parse_time(result))
 

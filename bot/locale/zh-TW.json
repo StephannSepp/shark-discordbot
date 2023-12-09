@@ -1,12 +1,16 @@
 {
-    "FORTUNE_DRAW_NAME": "每日抽籤",
+    "FORTUNE_NAME": "運勢",
+    "FORTUNE_DESCRIPTION": "運勢指令組",
+    "FORTUNE_DRAW_NAME": "抽籤",
     "FORTUNE_DRAW_DESCRIPTION": "每日早上 8:00 重置",
-    "FORTUNE_STATISTICS_NAME": "抽籤統計",
+    "FORTUNE_STATISTICS_NAME": "統計",
     "FORTUNE_STATISTICS_DESCRIPTION": "歷史抽籤結果統計",
     "BOTINFO_NAME": "機器人資訊",
     "BOTINFO_DESCRIPTION": "顯示機器人與系統資訊",
     "KUAIKUAI_NAME": "數位板乖乖",
     "KUAIKUAI_DESCRIPTION": "祈求 Bot 運作穩定",
-    "GACHA_PURE_RATE_NAME": "純機率抽卡",
+    "GACHA_NAME": "抽卡模擬",
+    "GACHA_DESCRIPTION": "抽卡模擬指令組",
+    "GACHA_PURE_RATE_NAME": "純機率",
     "GACHA_PURE_RATE_DESCRIPTION": "以純數字機率決定抽卡結果"
 }

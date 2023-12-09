@@ -33,7 +33,7 @@ class Fortune(commands.Cog):
     @commands.slash_command(name="fortune")
     @commands.guild_only()
     async def fortune(self, inter: CmdInter):
-        """Fortune command group."""
+        """Fortune command group. {{FORTUNE}}"""
 
     @fortune.sub_command(name="draw")
     async def fortune_draw(self, inter: CmdInter):
