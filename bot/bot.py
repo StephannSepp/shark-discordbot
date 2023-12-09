@@ -15,6 +15,7 @@ from pkg_resources import parse_version
 from psycopg2.extensions import cursor
 
 from config import Config
+from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
 __version__ = "2.4.6"
@@ -78,12 +79,14 @@ class Bot(commands.InteractionBot):
     def db_up_time(self):
         try:
             with get_cursor() as cursor:
-                query = "SELECT now() - pg_postmaster_start_time()"
+                query = (
+                    "SELECT TO_CHAR(now() - pg_postmaster_start_time(), 'HH24hMImSSs')"
+                )
                 cursor.execute(query)
                 result = cursor.fetchone()[0]
         except:
             return "連線狀態不明"
-        return result
+        return strftimedelta(parse_time(result))
 
     @property
     def up_time(self):
