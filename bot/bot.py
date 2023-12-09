@@ -18,7 +18,7 @@ from config import Config
 from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
-__version__ = "2.4.6"
+__version__ = "2.4.16"
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(
@@ -100,4 +100,5 @@ class Bot(commands.InteractionBot):
 if __name__ == "__main__":
     bot = Bot()
     bot.load_all_extensions("cogs")
+    bot.i18n.load("locale/")
     bot.run(Config.token)

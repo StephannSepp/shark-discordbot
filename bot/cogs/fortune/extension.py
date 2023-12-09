@@ -30,14 +30,14 @@ class Fortune(commands.Cog):
         self.today = datetime.datetime.utcnow().date()
         self.taskloop.start()
 
-    @commands.slash_command(name="fortune", description="抽籤")
+    @commands.slash_command(name="fortune")
     @commands.guild_only()
     async def fortune(self, inter: CmdInter):
         """Fortune command group."""
 
-    @fortune.sub_command(name="draw", description="抽籤！每日早上八點重置")
+    @fortune.sub_command(name="draw")
     async def fortune_draw(self, inter: CmdInter):
-        """This command draws a fortune lot. Reset on 0:00 UTC time everyday."""
+        """To draw a fortune lot. Reset on 0:00 UTC time everyday. {{FORTUNE_DRAW}}"""
         # Defer for avoiding interaction timeout.
         await inter.response.defer()
         if (
@@ -86,8 +86,9 @@ class Fortune(commands.Cog):
 
     GROUP_OPT = commands.option_enum(["運氣", "幸運天使"])
 
-    @fortune.sub_command(name="statistics", description="抽籤統計")
+    @fortune.sub_command(name="statistics")
     async def fortune_statistics(self, inter: CmdInter, group_by: GROUP_OPT = None):
+        """Historical fortune-draw results. {{FORTUNE_STATISTICS}}"""
         if group_by is not None:
             match group_by:
                 case "運氣":

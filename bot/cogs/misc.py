@@ -23,9 +23,9 @@ class Misc(commands.Cog):
         """This function does nothing."""
         await inter.response.send_message(file=File("static/donothing.png"))
 
-    @commands.slash_command(name="botinfo", description="機器人資訊")
+    @commands.slash_command(name="botinfo")
     async def botinfo(self, inter: CmdInter):
-        """Display bot information."""
+        """To show bot and system information. {{BOTINFO}}"""
         embed = embed_builder.information(
             title="機器人資訊",
             description="不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。",
@@ -48,8 +48,9 @@ class Misc(commands.Cog):
         embed.add_field(name="DB 運行狀態", value=self.bot.db_up_time, inline=False)
         await inter.response.send_message(embed=embed, ephemeral=True)
 
-    @commands.slash_command(name="kuaikuai", description="乖乖 - 數位板")
+    @commands.slash_command(name="kuaikuai")
     async def kuaikuai(self, inter: CmdInter):
+        """Digital Kuai Kaui makes the bot behave well. {{KUAIKUAI}}"""
         file = File(
             "static/kuaikuai_20231220A4.png", filename="kuaikuai_20231220A4.png"
         )
