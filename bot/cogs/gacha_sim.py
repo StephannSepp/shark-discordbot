@@ -32,8 +32,8 @@ class GachaSim(commands.Cog):
         rate_percentage: Rate in percentage of the desired item.
         spins: How many times the gacha pulls.
         """
-        if spins > 100:
-            await inter.response.send_message("抽卡次數不可大於 100", ephemeral=True)
+        if spins > 1000:
+            await inter.response.send_message("抽卡次數不可大於 1000", ephemeral=True)
             return
         real_rate = rate_percentage / 100
         result = [random.random() for _ in range(spins)]
@@ -45,8 +45,11 @@ class GachaSim(commands.Cog):
         user_rate = round(won / spins * 100, 4)
         description = f"預期機率: {rate_percentage}%\n抽卡機率: {user_rate}%\n"
         embed = embed_builder.information(title="抽卡結果", description=description)
-        value = "\n".join(textwrap.wrap(" ".join(result_visual), 20))
-        embed.add_field(name=f"抽卡結果: {won} / {spins}", value=value)
+        if spins > 100:
+            embed.add_field(name="抽卡結果", value=f"{won} / {spins}")
+        else:
+            value = "\n".join(textwrap.wrap(" ".join(result_visual), 20))
+            embed.add_field(name=f"抽卡結果: {won} / {spins}", value=value)
         await inter.response.send_message(embed=embed)
 
 
