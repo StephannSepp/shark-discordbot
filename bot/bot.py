@@ -18,7 +18,7 @@ from config import Config
 from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
-__version__ = "2.4.16"
+__version__ = "2.5.0"
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(

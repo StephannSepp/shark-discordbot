@@ -1,4 +1,5 @@
 import math
+import re
 
 VALID_CHAR = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
 
@@ -19,6 +20,14 @@ def int_b64decode(to_decode: str):
     o = 0
     l = len(to_decode) - 1
     for t, c in enumerate(to_decode):
-        p = math.floor(math.pow(64, l -t))
+        p = math.floor(math.pow(64, l - t))
         o += VALID_CHAR.index(c) * p
     return o
+
+
+def add_underscore_if_digit(s):
+    return "_" + s if s and s[0].isdigit() else s
+
+
+def filepath_santitize(text: str) -> str:
+    return re.sub(r"^[ .]|[/<>:\"\\|?*]+|[ .]$", "_", text)

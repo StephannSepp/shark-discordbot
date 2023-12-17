@@ -12,5 +12,13 @@
     "GACHA_NAME": "抽卡模擬",
     "GACHA_DESCRIPTION": "抽卡模擬指令組",
     "GACHA_PURE_RATE_NAME": "純機率",
-    "GACHA_PURE_RATE_DESCRIPTION": "以純數字機率決定抽卡結果"
+    "GACHA_PURE_RATE_DESCRIPTION": "以純數字機率決定抽卡結果",
+    "VCHIVE_ARCHIVE_NAME": "直播存檔列表",
+    "VCHIVE_ARCHIVE_DESCRIPTION": "列出已存檔的直播，使用 vid 參數來搜尋、下載",
+    "VCHIVE_CHANNEL_ALL_NAME": "備份頻道列表",
+    "VCHIVE_CHANNEL_ALL_DESCRIPTION": "列出已納入備份計畫的頻道",
+    "VCHIVE_CHANNEL_ADD_NAME": "新增備份頻道",
+    "VCHIVE_CHANNEL_ADD_DESCRIPTION": "新增備份頻道計畫，參數接受 YouTube 頻道 ID",
+    "VCHIVE_CHANNEL_REMOVE_NAME": "移除備份頻道",
+    "VCHIVE_CHANNEL_REMOVE_DESCRIPTION": "移除備份頻道計畫，參數接受 YouTube 頻道 ID"
 }
