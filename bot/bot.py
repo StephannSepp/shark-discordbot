@@ -43,12 +43,12 @@ def get_cursor() -> Generator[cursor, None, None]:
 class Bot(commands.InteractionBot):
     main_guild = None
     debug_guild = None
-    owner_id = 387573599919276032
 
     def __init__(self):
         super().__init__(
             intents=disnake.Intents().all(),
             command_sync_flags=commands.CommandSyncFlags.all(),
+            owner_ids=(387573599919276032, 482210938141802517),
         )
         self._start_at = datetime.now()
         self.allowed_mentions = AllowedMentions(everyone=False, roles=False)
