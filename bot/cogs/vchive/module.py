@@ -34,8 +34,8 @@ def get_archives(page: int = 0) -> list[dict]:
     with get_cursor() as cursor:
         offset = page * 5
         query = (
-            "SELECT vid, title, channel_name, channel_id, start_at, topic, status "
-            "FROM archives ORDER BY start_at DESC LIMIT 5 OFFSET %s"
+            "SELECT vid, title, channel_name, channel_id, start_at, end_at, duration, "
+            "topic, status FROM archives ORDER BY start_at DESC LIMIT 5 OFFSET %s"
         )
         cursor.execute(query, (offset,))
         result = cursor.fetchall()
@@ -48,8 +48,10 @@ def get_archives(page: int = 0) -> list[dict]:
                 "channel_name": archive[2],
                 "channel_id": archive[3],
                 "start_at": archive[4],
-                "topic": archive[5],
-                "status": archive[6],
+                "end_at": archive[5],
+                "duration": archive[6],
+                "topic": archive[7],
+                "status": archive[8],
             }
         )
     return archives
@@ -70,7 +72,7 @@ def lookup_archives(vid: str) -> list:
 def archive_detail(vid) -> dict:
     with get_cursor() as cursor:
         query = (
-            "SELECT vid, title, start_at, topic, status, "
+            "SELECT vid, title, start_at, end_at, duration, topic, status, "
             "channels.channel_name, channels.channel_id, v_org, v_group, photo "
             "FROM archives, channels "
             "WHERE archives.channel_id = channels.channel_id AND vid = %s"
@@ -81,13 +83,15 @@ def archive_detail(vid) -> dict:
         "vid": result[0],
         "title": result[1],
         "start_at": result[2],
-        "topic": funcs.add_underscore_if_digit(result[3].upper()),
-        "status": result[4],
-        "channel_name": result[5],
-        "channel_id": result[6],
-        "v_org": result[7],
-        "v_group": result[8],
-        "photo": result[9],
+        "end_at": result[3],
+        "duration": result[4],
+        "topic": funcs.add_underscore_if_digit(result[5].upper()),
+        "status": result[6],
+        "channel_name": result[7],
+        "channel_id": result[8],
+        "v_org": result[9],
+        "v_group": result[10],
+        "photo": result[11],
     }
 
 

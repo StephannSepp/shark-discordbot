@@ -1,3 +1,4 @@
+from datetime import timedelta
 from enum import Enum
 
 import disnake
@@ -17,6 +18,7 @@ class Status(Enum):
     WAIT = "等待中"
     PEDDING = "下載中"
     DONE = "已存檔"
+    FAILED = "失敗"
 
 
 class Topic(Enum):
@@ -45,8 +47,14 @@ class ArchiveMenu(View):
             value = (
                 archive["title"],
                 archive["channel_name"],
-                f"<t:{start_time}:F> <t:{start_time}:R>",
+                f"開始: <t:{start_time}:F> <t:{start_time}:R>",
             )
+            if (e := archive["end_at"]) is not None:
+                end_time = time_process.to_unix(e)
+                value += (f"結束: <t:{end_time}:F> <t:{end_time}:R>",)
+            if (d := archive["duration"] )is not None:
+                duration = time_process.strftimedelta(timedelta(seconds=d))
+                value += (duration,)
             embed.add_field(
                 f"VID: {archive['vid']} - {getattr(Status, archive['status']).value}",
                 "\n".join(value),
@@ -106,6 +114,14 @@ class ArchiveView(View):
         embed.add_field(
             "直播開始時間", f"<t:{start_time}:F> <t:{start_time}:R>", inline=False
         )
+        if (e := archive["end_at"]) is not None:
+            end_time = time_process.to_unix(e)
+            embed.add_field(
+                "直播結束時間", f"<t:{end_time}:F> <t:{end_time}:R>", inline=False
+            )
+        if (d := archive["duration"]) is not None:
+            duration = time_process.strftimedelta(timedelta(seconds=d))
+            embed.add_field("直播長度", duration, inline=False)
         embed.add_field("存檔狀態", getattr(Status, archive["status"]).value, inline=False)
         embed.set_thumbnail(url=archive["photo"])
         return embed

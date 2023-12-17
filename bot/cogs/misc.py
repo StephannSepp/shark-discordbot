@@ -47,7 +47,7 @@ class Misc(commands.Cog):
         embed.add_field(name="Bot 版本", value=version_info, inline=False)
         embed.add_field(name="Bot 運行狀態", value=up_time_info, inline=False)
         embed.add_field(name="DB 運行狀態", value=self.bot.db_up_time, inline=False)
-        await inter.response.send_message(embed=embed, ephemeral=True)
+        await inter.response.send_message(embed=embed)
 
     @commands.slash_command(name="kuaikuai")
     async def kuaikuai(self, inter: CmdInter):
