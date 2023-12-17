@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.4.16](https://img.shields.io/badge/version-2.4.16-informational?style=plastic)
+![Version 2.5.2](https://img.shields.io/badge/version-2.5.2-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,8 @@
 
 ## Changelog
 
+* 2.5.2
+	* Vchive 直播備份/存檔系統
 * 2.4.16
 	* 部分指令i18n在地化；增加 gacha 系列指令模擬抽卡機率
 * 2.4.4
