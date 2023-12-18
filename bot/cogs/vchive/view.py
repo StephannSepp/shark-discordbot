@@ -31,7 +31,7 @@ class Topic(Enum):
 
 class ArchiveMenu(View):
     def __init__(self, channel: str = None):
-        super().__init__(timeout=1800)
+        super().__init__(timeout=720)
         self.per_page = 5
         self.page = 0
         self.rowcount = module.get_archive_rowcount(channel)
@@ -45,9 +45,11 @@ class ArchiveMenu(View):
         archives = module.get_archives(page=self.page, channel=self.channel)
         for archive in archives:
             start_time = time_process.to_unix(archive["start_at"])
+            channel_name = archive["channel_name"]
+            channel_id = archive["channel_id"]
             value = (
-                archive["title"],
-                archive["channel_name"],
+                f"[{archive['title']}](<https://youtu.be/{archive['vid']}>)",
+                f"[{channel_name}](<https://www.youtube.com/channel/{channel_id}>)",
                 f"開始: <t:{start_time}:F> <t:{start_time}:R>",
             )
             if (e := archive["end_at"]) is not None:
@@ -97,7 +99,7 @@ class ArchiveMenu(View):
 
 class ArchiveView(View):
     def __init__(self, vid: str):
-        super().__init__(timeout=1800)
+        super().__init__(timeout=720)
         self.vid = vid
 
     def build_embed(self) -> Embed:
@@ -112,7 +114,11 @@ class ArchiveView(View):
             description=description,
         )
         start_time = time_process.to_unix(archive["start_at"])
-        embed.add_field("VID", archive["vid"], inline=False)
+        embed.add_field(
+            "VID",
+            f"[{archive['vid']}](<https://youtu.be/{archive['vid']}>)",
+            inline=False,
+        )
         embed.add_field(
             "直播開始時間", f"<t:{start_time}:F> <t:{start_time}:R>", inline=False
         )
@@ -136,13 +142,13 @@ class ArchiveView(View):
         else:
             url, password = result
             await inter.response.send_message(
-                f"下載連結: {url}\n下載密碼: {password}\n下載期限: 3 日", ephemeral=True
+                f"[下載密碼: {password}，期限 3 日](<{url}>)", ephemeral=True
             )
 
 
 class ChannelMenu(View):
     def __init__(self):
-        super().__init__(timeout=1800)
+        super().__init__(timeout=720)
         self.per_page = 7
         self.page = 0
         self.rowcount = module.get_channel_rowcount()

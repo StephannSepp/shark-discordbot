@@ -25,7 +25,7 @@ class Vchive(commands.Cog):
         else:
             view = ArchiveMenu(channel=channel)
             embed = view.build_embed()
-        await inter.response.send_message(embed=embed, view=view, delete_after=1800)
+        await inter.response.send_message(embed=embed, view=view, delete_after=720)
 
     @archive.autocomplete("vid")
     async def vid_autocomp(self, inter: CmdInter, vid: str):
@@ -44,7 +44,7 @@ class Vchive(commands.Cog):
         """Show all channels being monitored. {{VCHIVE_CHANNEL_ALL}}"""
         view = ChannelMenu()
         embed = view.build_embed()
-        await inter.response.send_message(embed=embed, view=view, delete_after=1800)
+        await inter.response.send_message(embed=embed, view=view, delete_after=720)
 
     @channel.sub_command(name="add")
     async def add_channel(self, inter: CmdInter, channel_id: str):
@@ -59,10 +59,16 @@ class Vchive(commands.Cog):
             )
             return
         result = module.insert_channel(**channel)
+        yt_handle = channel["yt_handle"][0]
+        channel_name = channel["name"]
         if result:
-            await inter.response.send_message(f"新增頻道 {channel['name']} 成功")
+            await inter.response.send_message(
+                f"新增頻道 [{channel_name}](https://www.youtube.com/{yt_handle}) 成功"
+            )
         else:
-            await inter.response.send_message(f"新增頻道 {channel['name']} 失敗")
+            await inter.response.send_message(
+                f"新增頻道 [{channel_name}](https://www.youtube.com/{yt_handle}) 失敗"
+            )
 
     @channel.sub_command(name="remove")
     async def remove_channel(self, inter: CmdInter, channel_id: str):
