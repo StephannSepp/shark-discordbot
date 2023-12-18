@@ -53,17 +53,15 @@ class Misc(commands.Cog):
     async def kuaikuai(self, inter: CmdInter):
         """Digital Kuai Kaui makes the bot behave well. {{KUAIKUAI}}"""
         file = File(
-            "static/kuaikuai_20231220A4.png", filename="kuaikuai_20231220A4.png"
+            "static/kuaikuai_20240901C3.png", filename="kuaikuai_20231220A4.png"
         )
         embed = embed_builder.information(
             title="數位板乖乖",
             description="祈求 BOT 運作穩定。",
         )
-        embed.add_field(name="品名", value="乖乖玉米脆條", inline=True)
-        embed.add_field(name="口味", value="奶油椰子", inline=True)
-        embed.add_field(name="保存期限", value="1年", inline=True)
-        embed.add_field(name="有效日期", value="20231220A4", inline=False)
-        embed.add_field(name="原產地", value="台灣", inline=False)
+        embed.add_field(
+            name="保存期限", value="<t:1725120000:D> <t:1725120000:R>", inline=False
+        )
         embed.set_image(file=file)
         await inter.response.send_message(embed=embed)
 

@@ -30,18 +30,19 @@ class Topic(Enum):
 
 
 class ArchiveMenu(View):
-    def __init__(self):
+    def __init__(self, channel: str = None):
         super().__init__(timeout=1800)
         self.per_page = 5
         self.page = 0
-        self.rowcount = module.get_archive_rowcount()
+        self.rowcount = module.get_archive_rowcount(channel)
+        self.channel = channel
 
     def build_embed(self) -> Embed:
         embed = embed_builder.information(
             title="直播存檔列表",
             description="請利用相同指令以 VID 參數搜尋、下載",
         )
-        archives = module.get_archives(page=self.page)
+        archives = module.get_archives(page=self.page, channel=self.channel)
         for archive in archives:
             start_time = time_process.to_unix(archive["start_at"])
             value = (
@@ -52,7 +53,7 @@ class ArchiveMenu(View):
             if (e := archive["end_at"]) is not None:
                 end_time = time_process.to_unix(e)
                 value += (f"結束: <t:{end_time}:F> <t:{end_time}:R>",)
-            if (d := archive["duration"] )is not None:
+            if (d := archive["duration"]) is not None:
                 duration = time_process.strftimedelta(timedelta(seconds=d))
                 value += (duration,)
             embed.add_field(
@@ -60,7 +61,8 @@ class ArchiveMenu(View):
                 "\n".join(value),
                 inline=False,
             )
-        embed.set_footer(text=f"Page {self.page + 1}")
+        max_page = (self.rowcount // self.per_page) + 1
+        embed.set_footer(text=f"Page {self.page + 1} / {max_page}")
         return embed
 
     @disnake.ui.button(emoji="⏮️", style=ButtonStyle.blurple)

@@ -30,14 +30,29 @@ def get_cursor() -> Generator[cursor, None, None]:
         con_pool.putconn(con)
 
 
-def get_archives(page: int = 0) -> list[dict]:
+def get_archives(page: int = 0, channel: str = None) -> list[dict]:
     with get_cursor() as cursor:
         offset = page * 5
-        query = (
-            "SELECT vid, title, channel_name, channel_id, start_at, end_at, duration, "
-            "topic, status FROM archives ORDER BY start_at DESC LIMIT 5 OFFSET %s"
-        )
-        cursor.execute(query, (offset,))
+        if channel is None:
+            query = (
+                "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
+                "duration, topic, status FROM archives "
+                "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
+            )
+            cursor.execute(query, (offset,))
+        else:
+            query = (
+                "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
+                "duration, topic, status FROM archives WHERE channel_name = %s "
+                "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
+            )
+            cursor.execute(
+                query,
+                (
+                    channel,
+                    offset,
+                ),
+            )
         result = cursor.fetchall()
     archives = []
     for archive in result:
@@ -69,6 +84,20 @@ def lookup_archives(vid: str) -> list:
     return [f"{archive[0]} - {archive[1]}" for archive in result]
 
 
+def lookup_channels(channel: str) -> list:
+    with get_cursor() as cursor:
+        channel = f"%{channel}%"
+        query = (
+            "SELECT channel_name FROM channels "
+            "WHERE LOWER(channel_name) LIKE LOWER(%s) "
+            "OR LOWER(english_name) LIKE LOWER(%s) "
+            "ORDER BY v_org, v_group, english_name"
+        )
+        cursor.execute(query, (channel, channel))
+        result = cursor.fetchall()
+    return [channel[0] for channel in result]
+
+
 def archive_detail(vid) -> dict:
     with get_cursor() as cursor:
         query = (
@@ -95,10 +124,14 @@ def archive_detail(vid) -> dict:
     }
 
 
-def get_archive_rowcount() -> int:
+def get_archive_rowcount(channel: str = None) -> int:
     with get_cursor() as cursor:
-        query = "SELECT COUNT(*) FROM archives"
-        cursor.execute(query)
+        if channel is None:
+            query = "SELECT COUNT(*) FROM archives"
+            cursor.execute(query)
+        else:
+            query = "SELECT COUNT(*) FROM archives WHERE channel_name = %s"
+            cursor.execute(query, (channel,))
         rowcount = cursor.fetchone()[0]
     return rowcount
 
