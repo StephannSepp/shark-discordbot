@@ -45,10 +45,13 @@ class ArchiveMenu(View):
         archives = module.get_archives(page=self.page, channel=self.channel)
         for archive in archives:
             start_time = time_process.to_unix(archive["start_at"])
+            title = (
+                f"(🔒) {archive['title']}" if archive["private"] else archive["title"]
+            )
             channel_name = archive["channel_name"]
             channel_id = archive["channel_id"]
             value = (
-                f"[{archive['title']}](<https://youtu.be/{archive['vid']}>)",
+                f"[{title}](<https://youtu.be/{archive['vid']}>)",
                 f"[{channel_name}](<https://www.youtube.com/channel/{channel_id}>)",
                 f"開始: <t:{start_time}:F> <t:{start_time}:R>",
             )
@@ -63,7 +66,7 @@ class ArchiveMenu(View):
                 "\n".join(value),
                 inline=False,
             )
-        max_page = (self.rowcount // self.per_page) + 1
+        max_page = (self.rowcount // self.per_page)
         embed.set_footer(text=f"Page {self.page + 1} / {max_page}")
         return embed
 
@@ -109,10 +112,8 @@ class ArchiveView(View):
         else:
             organization = f"{archive['v_org']} {archive['v_group']}"
         description = f"{archive['channel_name']}\n{organization}"
-        embed = embed_builder.information(
-            title=archive["title"],
-            description=description,
-        )
+        title = f"(🔒) {archive['title']}" if archive["private"] else archive["title"]
+        embed = embed_builder.information(title=title, description=description)
         start_time = time_process.to_unix(archive["start_at"])
         embed.add_field(
             "VID",
@@ -136,14 +137,16 @@ class ArchiveView(View):
 
     @disnake.ui.button(label="下載", emoji="🔗", style=ButtonStyle.secondary)
     async def last_page(self, button: Button, inter: CmdInter):
-        result = await module.get_share_link(self.vid)
-        if result is None:
-            await inter.response.send_message("該存檔尚未開放", ephemeral=True)
-        else:
-            url, password = result
-            await inter.response.send_message(
-                f"[下載密碼: {password}，期限 3 日](<{url}>)", ephemeral=True
-            )
+        try:
+            result = await module.get_share_link(inter.author.id, self.vid)
+        except Exception as exc:
+            await inter.response.send_message(exc, ephemeral=True)
+            return
+
+        filename, url, password = result
+        await inter.response.send_message(
+            f"{filename}\n[下載密碼: {password} (期限 3 日)](<{url}>)", ephemeral=True
+        )
 
 
 class ChannelMenu(View):

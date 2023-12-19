@@ -7,6 +7,7 @@ import aiohttp
 from psycopg2.extensions import cursor
 from psycopg2.pool import ThreadedConnectionPool
 
+from bot import OWNERS
 from config import Config
 from utils import funcs
 from utils import gen
@@ -36,7 +37,7 @@ def get_archives(page: int = 0, channel: str = None) -> list[dict]:
         if channel is None:
             query = (
                 "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
-                "duration, topic, status FROM archives "
+                "duration, topic, status, private FROM archives "
                 "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
             )
             cursor.execute(query, (offset,))
@@ -67,6 +68,7 @@ def get_archives(page: int = 0, channel: str = None) -> list[dict]:
                 "duration": archive[6],
                 "topic": archive[7],
                 "status": archive[8],
+                "private": archive[9],
             }
         )
     return archives
@@ -101,7 +103,7 @@ def lookup_channels(channel: str) -> list:
 def archive_detail(vid) -> dict:
     with get_cursor() as cursor:
         query = (
-            "SELECT vid, title, start_at, end_at, duration, topic, status, "
+            "SELECT vid, title, start_at, end_at, duration, topic, status, private, "
             "channels.channel_name, channels.channel_id, v_org, v_group, photo "
             "FROM archives, channels "
             "WHERE archives.channel_id = channels.channel_id AND vid = %s"
@@ -116,11 +118,12 @@ def archive_detail(vid) -> dict:
         "duration": result[4],
         "topic": funcs.add_underscore_if_digit(result[5].upper()),
         "status": result[6],
-        "channel_name": result[7],
-        "channel_id": result[8],
-        "v_org": result[9],
-        "v_group": result[10],
-        "photo": result[11],
+        "private": result[7],
+        "channel_name": result[8],
+        "channel_id": result[9],
+        "v_org": result[10],
+        "v_group": result[11],
+        "photo": result[12],
     }
 
 
@@ -220,16 +223,37 @@ def delete_channel(cid: str) -> bool:
     return True
 
 
-async def get_share_link(vid: str) -> tuple[str, str] | None:
+def private_archive(vid: str) -> bool:
+    with get_cursor() as cursor:
+        query = "SELECT private FROM archives WHERE vid = %s"
+        cursor.execute(query, (vid,))
+        private = cursor.fetchone()[0]
+        query = "UPDATE archives SET private = %s WHERE vid = %s"
+        cursor.execute(query, (not private, vid))
+    return not private
+
+
+def request_record(uid: int, vid: str, cid: str, url: str, pwd: str):
     with get_cursor() as cursor:
         query = (
-            "SELECT channels.channel_name, english_name, title "
-            "FROM archives, channels "
+            "INSERT INTO request_record (discord_uid, vid, channel_id, url, pwd) "
+            "VALUES (%s, %s, %s, %s, %s)"
+        )
+        cursor.execute(query, (uid, vid, cid, url, pwd))
+
+
+async def get_share_link(uid: int, vid: str) -> tuple[str, str, str]:
+    with get_cursor() as cursor:
+        query = (
+            "SELECT channels.channel_id, channels.channel_name, english_name, title, "
+            "private FROM archives, channels "
             "WHERE archives.channel_id = channels.channel_id AND vid = %s"
         )
         cursor.execute(query, (vid,))
         result = cursor.fetchone()
-    channel_name, english_name, title = result
+    channel_id, channel_name, english_name, title, private = result
+    if private and uid not in OWNERS:
+        raise PermissionError("該存檔為私人存檔")
     folder_name = english_name or funcs.filepath_santitize(channel_name)
     filename = funcs.filepath_santitize(f"【{channel_name}】{title} ({vid}).mp4")
     filepath = f"/video/vchive/{folder_name}/{filename}"
@@ -248,7 +272,7 @@ async def get_share_link(vid: str) -> tuple[str, str] | None:
         }
         async with session.post(url, data=data) as r:
             if r.status != 200:
-                return None
+                raise ConnectionError("請求認證失敗")
             jr = await r.json()
             sid = jr["data"]["sid"]
         date_expired = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
@@ -265,7 +289,7 @@ async def get_share_link(vid: str) -> tuple[str, str] | None:
         }
         async with session.post(url, data=data) as r:
             if r.status != 200:
-                return None
+                raise FileNotFoundError("請求檔案失敗")
             jr = await r.json()
             share_url = jr["data"]["links"][0]["url"]
         url = f"{Config.server_url}/webapi/auth.cgi"
@@ -278,5 +302,6 @@ async def get_share_link(vid: str) -> tuple[str, str] | None:
         }
         async with session.post(url, data=data) as r:
             if r.status != 200:
-                return None
-        return share_url, password
+                raise ConnectionError("請求認證失敗")
+        request_record(uid, vid, channel_id, share_url, password)
+        return filename, share_url, password

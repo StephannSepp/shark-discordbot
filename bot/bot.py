@@ -18,12 +18,14 @@ from config import Config
 from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
-__version__ = "2.5.4"
+__version__ = "2.5.6"
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(
     minconn=0, maxconn=16, dsn=Config.database_url, sslmode="allow"
 )
+
+OWNERS = (387573599919276032, 482210938141802517)
 
 
 @contextmanager
@@ -48,7 +50,7 @@ class Bot(commands.InteractionBot):
         super().__init__(
             intents=disnake.Intents().all(),
             command_sync_flags=commands.CommandSyncFlags.all(),
-            owner_ids=(387573599919276032, 482210938141802517),
+            owner_ids=OWNERS,
         )
         self._start_at = datetime.now()
         self.allowed_mentions = AllowedMentions(everyone=False, roles=False)
