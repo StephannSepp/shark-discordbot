@@ -1,3 +1,4 @@
+import math
 from datetime import timedelta
 from enum import Enum
 
@@ -66,7 +67,7 @@ class ArchiveMenu(View):
                 "\n".join(value),
                 inline=False,
             )
-        max_page = (self.rowcount // self.per_page)
+        max_page = math.ceil(self.rowcount / self.per_page)
         embed.set_footer(text=f"Page {self.page + 1} / {max_page}")
         return embed
 
@@ -89,13 +90,14 @@ class ArchiveMenu(View):
 
     @disnake.ui.button(emoji="▶️", style=ButtonStyle.secondary)
     async def next_page(self, button: Button, inter: CmdInter):
-        self.page = min(self.page + 1, self.rowcount // self.per_page)
+        max_page = math.ceil(self.rowcount / self.per_page)
+        self.page = min(self.page + 1, max_page)
         embed = self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="⏭️", style=ButtonStyle.blurple)
     async def last_page(self, button: Button, inter: CmdInter):
-        self.page = self.rowcount // self.per_page
+        self.page = math.ceil(self.rowcount / self.per_page) - 1
         embed = self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
@@ -164,8 +166,9 @@ class ChannelMenu(View):
                 organization = "個人勢"
             else:
                 organization = f"{channel['v_org']} {channel['v_group']}"
+            yt_handle = channel["yt_handle"]
             value = (
-                channel["yt_handle"],
+                f"[{yt_handle}](<https://www.youtube.com/{yt_handle}>)",
                 organization,
             )
             if channel["english_name"] is None:
@@ -177,7 +180,8 @@ class ChannelMenu(View):
                 "\n".join(value),
                 inline=False,
             )
-        embed.set_footer(text=f"Page {self.page + 1}")
+        max_page = math.ceil(self.rowcount / self.per_page)
+        embed.set_footer(text=f"Page {self.page + 1} / {max_page}")
         return embed
 
     @disnake.ui.button(emoji="⏮️", style=ButtonStyle.blurple)
@@ -194,12 +198,13 @@ class ChannelMenu(View):
 
     @disnake.ui.button(emoji="▶️", style=ButtonStyle.secondary)
     async def next_page(self, button: Button, inter: CmdInter):
-        self.page = min(self.page + 1, self.rowcount // self.per_page)
+        max_page = math.ceil(self.rowcount / self.per_page)
+        self.page = min(self.page + 1, max_page)
         embed = self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="⏭️", style=ButtonStyle.blurple)
     async def last_page(self, button: Button, inter: CmdInter):
-        self.page = self.rowcount // self.per_page
+        self.page = math.ceil(self.rowcount / self.per_page) - 1
         embed = self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
