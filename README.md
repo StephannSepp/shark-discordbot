@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.5.2](https://img.shields.io/badge/version-2.5.2-informational?style=plastic)
+![Version 2.5.8](https://img.shields.io/badge/version-2.5.8-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,8 @@
 
 ## Changelog
 
+* 2.5.8
+	* 增加 Help 指令
 * 2.5.2
 	* Vchive 直播備份/存檔系統
 * 2.4.16
