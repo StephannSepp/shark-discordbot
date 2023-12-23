@@ -44,7 +44,7 @@ def get_archives(page: int = 0, channel: str = None) -> list[dict]:
         else:
             query = (
                 "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
-                "duration, topic, status FROM archives WHERE channel_name = %s "
+                "duration, topic, status, private FROM archives WHERE channel_name = %s "
                 "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
             )
             cursor.execute(
@@ -292,6 +292,9 @@ async def get_share_link(uid: int, vid: str) -> tuple[str, str, str]:
                 raise FileNotFoundError("請求檔案失敗")
             jr = await r.json()
             share_url = jr["data"]["links"][0]["url"]
+            share_url = share_url.replace(
+                "jesushaventpanzeriv.viewdns.net", "file.atlantiscord.net"
+            )
         url = f"{Config.server_url}/webapi/auth.cgi"
         data = {
             "api": "SYNO.API.Auth",
