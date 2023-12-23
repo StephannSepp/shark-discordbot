@@ -9,16 +9,15 @@ from typing import Generator
 import disnake
 import psycopg2
 import psycopg2.pool
+from config import Config
 from disnake import AllowedMentions
 from disnake.ext import commands
 from pkg_resources import parse_version
 from psycopg2.extensions import cursor
-
-from config import Config
 from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
-__version__ = "2.5.6"
+__version__ = "2.5.8"
 
 
 con_pool = psycopg2.pool.ThreadedConnectionPool(
