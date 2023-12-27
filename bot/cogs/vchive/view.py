@@ -8,7 +8,6 @@ from disnake import CmdInter
 from disnake import Embed
 from disnake.ui import Button
 from disnake.ui import View
-
 from utils import embed_builder
 from utils import time_process
 
@@ -31,19 +30,22 @@ class Topic(Enum):
 
 
 class ArchiveMenu(View):
-    def __init__(self, channel: str = None):
+    def __init__(self, channel: str = None, exclude_failed: bool = True):
         super().__init__(timeout=720)
         self.per_page = 5
         self.page = 0
         self.rowcount = module.get_archive_rowcount(channel)
         self.channel = channel
+        self.exclude_failed = exclude_failed
 
     def build_embed(self) -> Embed:
         embed = embed_builder.information(
             title="直播存檔列表",
             description="請利用相同指令以 VID 參數搜尋、下載",
         )
-        archives = module.get_archives(page=self.page, channel=self.channel)
+        archives = module.get_archives(
+            page=self.page, channel=self.channel, exclude_failed=self.exclude_failed
+        )
         for archive in archives:
             start_time = time_process.to_unix(archive["start_at"])
             title = (
@@ -139,6 +141,8 @@ class ArchiveView(View):
 
     @disnake.ui.button(label="下載", emoji="🔗", style=ButtonStyle.secondary)
     async def last_page(self, button: Button, inter: CmdInter):
+        await inter.response.defer()
+        m = await inter.followup.send("請求下載連結中...", ephemeral=True, wait=True)
         try:
             result = await module.get_share_link(inter.author.id, self.vid)
         except Exception as exc:
@@ -146,9 +150,7 @@ class ArchiveView(View):
             return
 
         filename, url, password = result
-        await inter.response.send_message(
-            f"{filename}\n[下載密碼: {password} (期限 3 日)](<{url}>)", ephemeral=True
-        )
+        await m.edit(f"{filename}\n[下載密碼: {password} (期限 3 日)](<{url}>)")
 
 
 class ChannelMenu(View):

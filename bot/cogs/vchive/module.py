@@ -4,13 +4,13 @@ from datetime import timedelta
 from typing import Generator
 
 import aiohttp
+from config import Config
 from psycopg2.extensions import cursor
 from psycopg2.pool import ThreadedConnectionPool
-
-from bot import OWNERS
-from config import Config
 from utils import funcs
 from utils import gen
+
+from bot import OWNERS
 
 con_pool = ThreadedConnectionPool(
     minconn=0, maxconn=16, dsn=Config.vchive_db_url, sslmode="allow"
@@ -31,22 +31,39 @@ def get_cursor() -> Generator[cursor, None, None]:
         con_pool.putconn(con)
 
 
-def get_archives(page: int = 0, channel: str = None) -> list[dict]:
+def get_archives(
+    page: int = 0, channel: str = None, exclude_failed: bool = True
+) -> list[dict]:
     with get_cursor() as cursor:
         offset = page * 5
         if channel is None:
-            query = (
-                "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
-                "duration, topic, status, private FROM archives "
-                "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
-            )
+            if exclude_failed:
+                query = (
+                    "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
+                    "duration, topic, status, private FROM archives "
+                    "WHERE status != 'FAILED' ORDER BY start_at DESC LIMIT 5 OFFSET %s"
+                )
+            else:
+                query = (
+                    "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
+                    "duration, topic, status, private FROM archives "
+                    "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
+                )
             cursor.execute(query, (offset,))
         else:
-            query = (
-                "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
-                "duration, topic, status, private FROM archives WHERE channel_name = %s "
-                "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
-            )
+            if exclude_failed:
+                query = (
+                    "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
+                    "duration, topic, status, private FROM archives "
+                    "WHERE channel_name = %s AND status != 'FAILED' "
+                    "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
+                )
+            else:
+                query = (
+                    "SELECT vid, title, channel_name, channel_id, start_at, end_at, "
+                    "duration, topic, status, private FROM archives "
+                    "WHERE channel_name = %s ORDER BY start_at DESC LIMIT 5 OFFSET %s"
+                )
             cursor.execute(
                 query,
                 (
@@ -79,7 +96,7 @@ def lookup_archives(vid: str) -> list:
         vid = f"{vid}%"
         query = (
             "SELECT vid, title FROM archives "
-            "WHERE LOWER(vid) LIKE LOWER(%s) ORDER BY start_at DESC"
+            "WHERE LOWER(vid) LIKE LOWER(%s) ORDER BY start_at DESC LIMIT 25"
         )
         cursor.execute(query, (vid,))
         result = cursor.fetchall()
@@ -93,7 +110,7 @@ def lookup_channels(channel: str) -> list:
             "SELECT channel_name FROM channels "
             "WHERE LOWER(channel_name) LIKE LOWER(%s) "
             "OR LOWER(english_name) LIKE LOWER(%s) "
-            "ORDER BY v_org, v_group, english_name"
+            "ORDER BY v_org, v_group, english_name LIMIT 25"
         )
         cursor.execute(query, (channel, channel))
         result = cursor.fetchall()

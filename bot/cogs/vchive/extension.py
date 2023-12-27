@@ -16,14 +16,20 @@ class Vchive(commands.Cog):
         """Vchive group commands."""
 
     @vchive.sub_command(name="archive")
-    async def archive(self, inter: CmdInter, vid: str = None, channel: str = None):
+    async def archive(
+        self,
+        inter: CmdInter,
+        vid: str = None,
+        channel: str = None,
+        exclude_failed: bool = True,
+    ):
         """Show all stream archives or a specific archive. {{VCHIVE_ARCHIVE}}"""
         if vid is not None:
             vid = vid.split(" - ")[0]
             view = ArchiveView(vid)
             embed = view.build_embed()
         else:
-            view = ArchiveMenu(channel=channel)
+            view = ArchiveMenu(channel=channel, exclude_failed=exclude_failed)
             embed = view.build_embed()
         await inter.response.send_message(embed=embed, view=view, delete_after=720)
 
