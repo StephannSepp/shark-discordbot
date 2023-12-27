@@ -53,6 +53,10 @@ class Bot(commands.InteractionBot):
         )
         self._start_at = datetime.now()
         self.allowed_mentions = AllowedMentions(everyone=False, roles=False)
+        self.activity = disnake.Activity(
+            name="シリウスの心臓",
+            type=disnake.ActivityType.listening,
+        )
 
     def load_all_extensions(self, folder: str):
         for ext_name in os.listdir(folder):
