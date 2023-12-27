@@ -3,7 +3,8 @@
 """
 
 import asyncio
-import gc
+
+# import gc
 import json
 import os
 from datetime import datetime
@@ -16,56 +17,51 @@ from disnake.ext import commands
 from disnake.ext import tasks
 from google.oauth2 import service_account
 
-gc.enable()
+# gc.enable()
 
 
 class MembershipAssist(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        self.taskloop.start()  # pylint: disable=maybe-no-member
-
     last_message = None
-
     service_account_info = json.load(open("service_account.json", encoding="utf-8"))
-    url = os.getenv("GSHEET_URL")
+    GS_URL = os.getenv("GSHEET_URL")
     SCOPES = (
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
     )
-    my_credentials = service_account.Credentials.from_service_account_info(
+    CRED = service_account.Credentials.from_service_account_info(
         service_account_info, scopes=SCOPES
     )
 
+    def __init__(self, bot):
+        self.bot = bot
+        self.taskloop.start()  # pylint: disable=maybe-no-member
+
     async def check_members(self):
+        ws = None
         guild = self.bot.main_guild
         role = guild.get_role(846616775148044318)
 
         for _ in range(3):
             try:
                 await asyncio.sleep(5)
-                gcredential = pygsheets.authorize(
-                    custom_credentials=self.my_credentials
-                )
-                sh = gcredential.open_by_url(self.url)
+                gcredential = pygsheets.authorize(custom_credentials=self.CRED)
+                sh = gcredential.open_by_url(self.GS_URL)
                 ws = sh.worksheet_by_title("工作表2")
                 break
             except Exception:
                 continue
-
-        # print(ws)
+        if ws is None:
+            return
 
         val = ws.get_all_records(head=1)
-
-        now = datetime.utcnow().replace(tzinfo=pytz.timezone("UTC"))
-        now_nst = now.astimezone(pytz.timezone("Asia/Taipei"))
-        if now_nst.hour == 20 and now_nst.minute <= 15:
+        now = datetime.utcnow()
+        if now.hour == 12:
             m = (
                 await self.bot.get_channel(847459494253690930)
                 .history(limit=1)
                 .flatten()
             )
             self.last_message = m[0]
-            # print(self.last_message.created_at, now)
         member_notif = []
 
         for index, item in enumerate(val):
@@ -161,9 +157,10 @@ class MembershipAssist(commands.Cog):
                 f"若已使用自動審核請無視這次通知\n{notif_str}"
             )
 
-        ws.update_value("M2", now_nst.strftime("%Y-%m-%d %H:%M:%S"))
-        del sh, ws, val, now, now_nst, member_notif
-        gc.collect()
+        now = now.astimezone(pytz.timezone("Asia/Taipei"))
+        ws.update_value("M2", now.strftime("%Y-%m-%d %H:%M:%S"))
+        # del sh, ws, val, now, now_nst, member_notif
+        # gc.collect()
 
     def time_diff(self, start, end) -> timedelta:
         """This function will retrun the duration between two given time."""
