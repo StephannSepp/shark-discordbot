@@ -54,7 +54,7 @@ class MembershipAssist(commands.Cog):
             return
 
         val = ws.get_all_records(head=1)
-        now = datetime.utcnow()
+        now = datetime.now(pytz.utc)
         if now.hour == 12:
             m = (
                 await self.bot.get_channel(847459494253690930)
