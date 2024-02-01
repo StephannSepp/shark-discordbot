@@ -84,9 +84,7 @@ class Bot(commands.InteractionBot):
     def db_up_time(self):
         try:
             with get_cursor() as cursor:
-                query = (
-                    "SELECT TO_CHAR(now() - pg_postmaster_start_time(), 'HH24hMImSSs')"
-                )
+                query = "SELECT TO_CHAR(now() - pg_postmaster_start_time(), 'DD\"d\"HH24hMImSSs')"
                 cursor.execute(query)
                 result = cursor.fetchone()[0]
         except Exception:
