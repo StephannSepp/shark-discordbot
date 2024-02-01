@@ -1,10 +1,28 @@
 import platform as pf
+from enum import Enum
 
+from disnake import AllowedMentions
 from disnake import CmdInter
 from disnake import File
 from disnake.ext import commands
-
 from utils import embed_builder
+
+MahjongSoulGameMode = commands.option_enum(
+    {
+        "三人": "三人",
+        "四人": "四人",
+        "赤羽之戰": "四人(赤羽)",
+        "暗夜之戰": "四人(暗夜)",
+        "修羅之戰": "四人(修羅)",
+    }
+)
+MahjongSoulGameLength = commands.option_enum(
+    {
+        "一局": "一局",
+        "東風場": "東",
+        "半莊": "南",
+    }
+)
 
 
 class Misc(commands.Cog):
@@ -64,6 +82,35 @@ class Misc(commands.Cog):
         )
         embed.set_image(file=file)
         await inter.response.send_message(embed=embed)
+
+    @commands.slash_command(name="mahjongsoul")
+    @commands.cooldown(1, 1800)
+    async def mahjongsoul(
+        self,
+        inter: CmdInter,
+        game_mode: MahjongSoulGameMode,
+        game_length: MahjongSoulGameLength,
+        room: str,
+        description: str = "",
+    ):
+        """Ping other Janshis. {{MAHJONGSOUL}}"""
+        if len(room) != 5 or not room.isdigit():
+            await inter.response.send_message("房號無效", ephemeral=True)
+            return
+        url = f"https://game.maj-soul.com/1/?room={room}"
+        jp_url = f"https://game.mahjongsoul.com/?room={room}"
+        embed = embed_builder.information(
+            title=f"雀魂友人場 {room} {game_mode}{game_length}",
+            description=f"{description}\n\n[國際版快速入口]({url})\n[日版快速入口]({jp_url})",
+        )
+        embed.add_field("發起人", inter.author.mention)
+        await inter.response.send_message(
+            "<@&1202555563226177536>",
+            embed=embed,
+            allowed_mentions=AllowedMentions(
+                roles=[self.bot.main_guild.get_role(1202555563226177536)]
+            ),
+        )
 
 
 def setup(bot: commands.InteractionBot):
