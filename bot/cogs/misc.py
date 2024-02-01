@@ -1,5 +1,4 @@
 import platform as pf
-from enum import Enum
 
 from disnake import AllowedMentions
 from disnake import CmdInter
