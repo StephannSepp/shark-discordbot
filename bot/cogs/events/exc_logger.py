@@ -1,10 +1,9 @@
 import traceback
 
 import disnake
+from config import Config
 from disnake import CmdInter
 from disnake.ext import commands
-
-from config import Config
 
 
 class ExceptionHandler(commands.Cog):
@@ -24,16 +23,22 @@ class ExceptionHandler(commands.Cog):
 
         match exc:
             case commands.CommandOnCooldown():
-                pass
+                message = f"你太快了, 請 {exc.retry_after:2f} 秒後再試"
+                await inter.response.send_message(message, ephemeral=True)
             case commands.CheckFailure():
-                pass
+                message = exc or "你未達到指令要求的條件"
+                await inter.response.send_message(exc, ephemeral=True)
             case commands.BadArgument():
+                message = "輸入的參數不符合要求的格式"
                 try:
-                    await inter.response.send_message("輸入的參數不符合要求的格式", ephemeral=True)
+                    await inter.response.send_message(message, ephemeral=True)
                 except disnake.errors.InteractionResponded:
-                    await inter.edit_original_response("輸入的參數不符合要求的格式", ephemeral=True)
+                    await inter.edit_original_response(message, ephemeral=True)
             case _:
-                title = f"Slash command `{inter.data.name}` failed due to `{exc.__class__.__name__}`"
+                title = (
+                    f"Slash command `{inter.data.name}` failed "
+                    f"due to `{exc.__class__.__name__}`"
+                )
                 embed = disnake.Embed(
                     title=title,
                     description=self.fancy_traceback(exc),
