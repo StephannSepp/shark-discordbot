@@ -1,5 +1,4 @@
 from bot import get_cursor
-from utils import gen
 
 
 def add_warning(user_id: int, server_id: int, moderator_id: int, reason: str) -> int:
@@ -14,22 +13,22 @@ def add_warning(user_id: int, server_id: int, moderator_id: int, reason: str) ->
     Returns:
         The ID of the warning.
     """
-    warning_id = gen.snowflake()
     with get_cursor() as cursor:
         query = (
-            "INSERT INTO warns "
-            "VALUES (%(id)s, %(user_id)s, %(server_id)s, %(moderator_id)s, %(reason)s)"
+            "INSERT INTO warns (user_id, server_id, moderator_id, reason) "
+            "VALUES (%(user_id)s, %(server_id)s, %(moderator_id)s, %(reason)s) "
+            "RETURNING warn_id"
         )
         cursor.execute(
             query,
             {
-                "id": warning_id,
                 "user_id": user_id,
                 "server_id": server_id,
                 "moderator_id": moderator_id,
                 "reason": reason,
             },
         )
+        warning_id = cursor.fetchone()[0]
     return warning_id
 
 
