@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.5.8](https://img.shields.io/badge/version-2.5.8-informational?style=plastic)
+![Version 2.6.0](https://img.shields.io/badge/version-2.6.0-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,12 @@
 
 ## Changelog
 
+* 2.6.0
+	* 增加行動、銀行、賭場、彩票系統
+	* 行動指令為賺取黃金、金幣主要來源，且行動時不可操作某些特定指令
+	* 銀行控制黃金、金幣匯率，並提供販賣黃金的功能
+	* 賭場使用金幣作為籌碼，目前有 21 點、惡魔賭輪盤
+	* 彩券每張 100 金幣，選擇任意 4 位數字並在每周三、日準時開獎
 * 2.5.8
 	* 增加 Help 指令
 * 2.5.2

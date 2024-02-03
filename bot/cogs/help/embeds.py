@@ -6,6 +6,9 @@ __all__ = [
     "vchive_embed",
     "gacha_embed",
     "misc_embed",
+    "action_embed",
+    "banking_embed",
+    "casino_embed",
     "embeds",
 ]
 
@@ -64,4 +67,31 @@ misc_embed.add_field("/donothing", "這個指令不會做任何事", inline=Fals
 misc_embed.add_field("/botinfo", "機器人、系統資訊", inline=False)
 misc_embed.add_field("/kuaikuai", "數位化乖乖", inline=False)
 
-embeds = [fortune_embed, remind_embed, vchive_embed, gacha_embed, misc_embed]
+action_embed = embed_builder.information("行動指令")
+action_embed.add_field("/action mining", "挖礦, CD 8 小時並獲得黃金")
+action_embed.add_field("/action fishing", "釣魚, CD 4 小時並獲得金幣")
+
+banking_embed = embed_builder.information("銀行指令")
+banking_embed.add_field("/banking profile", "檢視自己的資產")
+banking_embed.add_field("/banking atlantean_coin", "檢視亞特蘭提斯金幣相關資訊")
+banking_embed.add_field("/banking sell_gold", "向銀行販賣黃金")
+
+casino_embed = embed_builder.information("賭場指令")
+casino_embed.add_field("/casino help", "賭場指令說明")
+casino_embed.add_field("/casino blackjack", "二十一點遊戲")
+casino_embed.add_field("/casino roulette", "惡魔賭輪盤遊戲")
+
+lottery_embed = embed_builder.information("彩券指令")
+lottery_embed.add_field("/lottery buy", "購買價值 100 金幣的彩券, 選擇任意 4 位數字, 每周三、日開獎")
+lottery_embed.add_field("/lottery winning_number", "顯示上期頭獎號碼, 並兌換獎勵")
+
+embeds = [
+    fortune_embed,
+    remind_embed,
+    vchive_embed,
+    gacha_embed,
+    action_embed,
+    banking_embed,
+    casino_embed,
+    misc_embed,
+]

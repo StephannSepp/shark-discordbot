@@ -2,3 +2,4 @@ disnake==2.9.0
 pytz
 pygsheets
 psycopg2-binary
+matplotlib
