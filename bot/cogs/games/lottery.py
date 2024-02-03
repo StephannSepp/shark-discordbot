@@ -6,8 +6,8 @@ from disnake.ext import tasks
 from utils import embed_builder
 
 from . import DOLLAR_SIGN
+from .helpers import GameUser
 from .helpers import Lottery
-from .helpers import Player
 
 
 class LotteryGame(commands.Cog):
@@ -25,15 +25,15 @@ class LotteryGame(commands.Cog):
     async def buy(self, inter: CmdInter, number: commands.Range[int, 0, 9999]):
         """Buy a lottery ticket for 100 coins, choose 4-digit number. {{LOTTERY_BUY}}"""
         tickets = Lottery(inter.author.id)
-        player = Player(inter.author.id)
+        user = GameUser(inter.author.id)
         if len(tickets.tickets) >= 3:
             await inter.response.send_message("最多只能購買 3 張彩券", ephemeral=True)
             return
-        if player.coin < 0:
-            message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(player.coin):,}"
+        if user.coin < 0:
+            message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(user.coin):,}"
             await inter.response.send_message(message, ephemeral=True)
             return
-        if player.coin < 100:
+        if user.coin < 100:
             message = "你沒有足夠的金幣購買彩券"
             await inter.response.send_message(message, ephemeral=True)
             return
@@ -44,7 +44,7 @@ class LotteryGame(commands.Cog):
     @lottery.sub_command("winning_number")
     async def winning_number(self, inter: CmdInter):
         """Check last winning number and claim the reward. {{LOTTERY_WINNING_NUMBER}}"""
-        player = Player(inter.author.id)
+        user = GameUser(inter.author.id)
         lottery = Lottery(inter.author.id)
         description = f"第 {lottery.no - 1} 期彩票號碼: {lottery.winning_number}"
         embed = embed_builder.information("亞特蘭提斯彩票", description)
@@ -56,7 +56,7 @@ class LotteryGame(commands.Cog):
                 embed.add_field(f"第 {ticket.lottery_no} 期彩券", ticket.pick_number)
             rewards = lottery.claim()
             if rewards > 0:
-                player.bank_transaction(coin_change_to_player=rewards)
+                user.bank_transaction(coin_change_to_player=rewards)
             embed.add_field("共贏得獎金", f"{DOLLAR_SIGN}{rewards:,}", inline=False)
         await inter.response.send_message(embed=embed)
 

@@ -8,8 +8,8 @@ from utils import time_process
 
 from . import DOLLAR_SIGN
 from .helpers import Fishing
+from .helpers import GameUser
 from .helpers import Mining
-from .helpers import Player
 
 GOLD_NUGGET = "<:minecraft_gold_nugget:1199002510942294026>"
 PICKAXE = "<:minecraft_pickaxe:1199002509302308905>"
@@ -62,13 +62,13 @@ class Action(commands.Cog):
     @action.sub_command(name="mining")
     async def mining(self, inter: CmdInter):
         """Go mining gold for 7 hours. {{ACTION_MINING}}"""
-        player = Player(inter.author.id)
-        if player.is_fishing or player.is_farming:
+        user = GameUser(inter.author.id)
+        if user.is_fishing or user.is_farming:
             await inter.response.send_message("你正在其他行動中", ephemeral=True)
             return
         action = Mining(inter.author.id)
         now = datetime.datetime.utcnow()
-        if not player.is_mining:
+        if not user.is_mining:
             action.start_action()
             end_time = now + datetime.timedelta(hours=7)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
@@ -88,19 +88,19 @@ class Action(commands.Cog):
         profit = action.end_action()
         description = f"本次行動中獲得了黃金 {profit:,.1f} AU"
         embed = embed_builder.information("挖礦行動結束", description)
-        embed.add_field("黃金餘額", f"{player.gold + profit:,.1f} AU")
+        embed.add_field("黃金餘額", f"{user.gold + profit:,.1f} AU")
         await inter.response.send_message(embed=embed)
 
     @action.sub_command(name="fishing")
     async def fishing(self, inter: CmdInter):
         """Go fishing and earning coins for 2 hours. {{ACTION_FISHING}}"""
-        player = Player(inter.author.id)
-        if player.is_mining or player.is_farming:
+        user = GameUser(inter.author.id)
+        if user.is_mining or user.is_farming:
             await inter.response.send_message("你正在其他行動中", ephemeral=True)
             return
         action = Fishing(inter.author.id)
         now = datetime.datetime.utcnow()
-        if not player.is_fishing:
+        if not user.is_fishing:
             action.start_action()
             end_time = now + datetime.timedelta(hours=2)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
@@ -120,5 +120,5 @@ class Action(commands.Cog):
         profit = action.end_action()
         description = f"本次行動中獲得了金幣 {DOLLAR_SIGN}{profit:,}"
         embed = embed_builder.information("釣魚行動結束", description)
-        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{player.coin + profit:,}")
+        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{user.coin + profit:,}")
         await inter.response.send_message(embed=embed)

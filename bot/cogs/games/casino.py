@@ -2,7 +2,7 @@ from disnake import CmdInter
 from disnake.ext import commands
 
 from . import DOLLAR_SIGN
-from .helpers import Player
+from .helpers import GameUser
 from .views import BlackjackView
 from .views import HelpView
 from .views import RouletteDealer
@@ -30,8 +30,8 @@ class Casino(commands.Cog):
     @casino.sub_command(name="blackjack")
     async def blackjack(self, inter: CmdInter, bet: int):
         """Play blackjack game. {{CASINO_BLACKJACK}}"""
-        player = Player(inter.author.id)
-        if player.is_busy:
+        user = GameUser(inter.author.id)
+        if user.is_busy:
             message = "你正在行動中, 不能進行此操作"
             await inter.response.send_message(message, ephemeral=True)
             return
@@ -43,37 +43,37 @@ class Casino(commands.Cog):
             message = f"賭注不可大於 {DOLLAR_SIGN}250"
             await inter.response.send_message(message, ephemeral=True)
             return
-        if player.coin < 0:
-            message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(player.coin):,}"
+        if user.coin < 0:
+            message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(user.coin):,}"
             await inter.response.send_message(message, ephemeral=True)
             return
-        if player.coin < bet:
+        if user.coin < bet:
             message = "你沒有足夠的金幣下賭注"
             await inter.response.send_message(message, ephemeral=True)
             return
-        player.bank_transaction(coin_change_to_player=-bet)
-        view = BlackjackView(inter.author, bet)
+        user.bank_transaction(coin_change_to_player=-bet)
+        view = BlackjackView(user, bet)
         embed = view.build_embed()
         await inter.response.send_message(embed=embed, view=view)
 
     @casino.sub_command(name="roulette")
     async def roulette(self, inter: CmdInter):
         """Play shotgun roulette. {{CASINO_ROULETTE}}"""
-        player = Player(inter.author.id)
-        if player.is_busy:
+        user = GameUser(inter.author.id)
+        if user.is_busy:
             message = "你正在行動中, 不能進行此操作"
             await inter.response.send_message(message, ephemeral=True)
             return
-        if player.coin < 0:
-            message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(player.coin):,}"
+        if user.coin < 0:
+            message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(user.coin):,}"
             await inter.response.send_message(message, ephemeral=True)
             return
-        if player.coin == 0:
+        if user.coin == 0:
             message = "你沒有足夠的金幣遊玩"
             await inter.response.send_message(message, ephemeral=True)
             return
         dealer = RouletteDealer()
         player = RoulettePlayer()
-        view = RouletteView(inter.author.id, player, dealer)
+        view = RouletteView(user, player, dealer)
         embed = view.build_embed()
         await inter.response.send_message(embed=embed, view=view)

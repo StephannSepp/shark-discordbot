@@ -1,7 +1,7 @@
 from bot import get_cursor
 
 
-class Player:
+class GameUser:
     uid: int
     gold: float
     coin: int

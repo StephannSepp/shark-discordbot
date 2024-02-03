@@ -13,7 +13,7 @@ from utils import embed_builder
 from . import DOLLAR_SIGN
 from .helpers import Bank
 from .helpers import ExchangeRate
-from .helpers import Player
+from .helpers import GameUser
 
 
 def generate_line_chart(data: dict) -> io.BytesIO:
@@ -45,11 +45,11 @@ class Banking(commands.Cog):
     @banking.sub_command("profile")
     async def profile(self, inter: CmdInter):
         """Show bank account. {{BANKING_PROFILE}}"""
-        player = Player(inter.author.id)
+        user = GameUser(inter.author.id)
         embed = embed_builder.information("資產查詢")
-        embed.add_field("UID", player.uid, inline=False)
-        embed.add_field("黃金餘額", f"{player.gold:,.1f} AU", inline=False)
-        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{player.coin:,}", inline=False)
+        embed.add_field("UID", user.uid, inline=False)
+        embed.add_field("黃金餘額", f"{user.gold:,.1f} AU", inline=False)
+        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{user.coin:,}", inline=False)
         await inter.response.send_message(embed=embed)
 
     @banking.sub_command("atlantean_coin")
@@ -89,23 +89,23 @@ class Banking(commands.Cog):
     @banking.sub_command("sell_gold")
     async def sell_gold(self, inter: CmdInter, sell_gold: float = commands.Param(gt=0)):
         """Sell gold to the bank. {{BANKING_SELL_GOLD}}"""
-        player = Player(inter.author.id)
+        user = GameUser(inter.author.id)
         sell = round(sell_gold, 3)
         if sell <= 0:
             await inter.response.send_message("數量不可小於等於 0", ephemeral=True)
             return
-        if sell > player.gold:
+        if sell > user.gold:
             await inter.response.send_message("你沒有足夠的黃金", ephemeral=True)
             return
         exr = ExchangeRate()
         coin = math.floor(exr.exchange_rate * sell * 0.98)
-        player.bank_transaction(-sell, coin)
+        user.bank_transaction(-sell, coin)
         embed = embed_builder.information(
             "交易成功", f"{sell:,.1f} AU ⇛ {DOLLAR_SIGN}{coin:,}"
         )
         embed.add_field("參考匯率", f"{exr.exchange_rate:.3f}", inline=False)
-        embed.add_field("黃金餘額", f"{player.gold - sell:,.1f} AU", inline=False)
-        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{player.coin + coin:,}", inline=False)
+        embed.add_field("黃金餘額", f"{user.gold:,.1f} AU", inline=False)
+        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{user.coin:,}", inline=False)
         await inter.response.send_message(embed=embed)
 
     @tasks.loop(time=datetime.time())

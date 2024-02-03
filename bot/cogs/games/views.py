@@ -7,7 +7,6 @@ from disnake import ButtonStyle
 from disnake import CmdInter
 from disnake import Colour
 from disnake import Embed
-from disnake import Member
 from disnake.ui import Button
 from disnake.ui import View
 from utils import embed_builder
@@ -18,7 +17,7 @@ from . import RoulettePlayer
 from . import RouletteShot
 from . import create_cards_pool
 from .helpembeds import embeds
-from .helpers import Player
+from .helpers import GameUser
 
 
 class HelpView(View):
@@ -61,9 +60,9 @@ class HelpView(View):
 class BlackjackView(View):
     first_hand = True
 
-    def __init__(self, player: Member, bet: int):
+    def __init__(self, user: GameUser, bet: int):
         super().__init__(timeout=1440)
-        self.player = player
+        self.user = user
         self.bet = bet
         self.cards: list[Card] = create_cards_pool()
         random.shuffle(self.cards)
@@ -85,8 +84,7 @@ class BlackjackView(View):
         if self.first_hand and player_value == 21:
             # Player got the Blackjack, disable all button.
             self._disable_all_child()
-            player = Player(self.player.id)
-            player.bank_transaction(coin_change_to_player=math.floor(self.bet * 1.5))
+            self.user.bank_transaction(coin_change_to_player=math.floor(self.bet * 1.5))
             embed.color = Colour.green()
             embed.add_field("結果", "二十一點", inline=False)
             embed.add_field(
@@ -103,12 +101,13 @@ class BlackjackView(View):
             return embed
         if end_of_game:
             # Game ends, determine winner.
-            player = Player(self.player.id)
             for child in self.children:
                 if child.label == "雙倍下注":
                     child.disabled = True
             if dealer_value > 21 or player_value > dealer_value:
-                player.bank_transaction(coin_change_to_player=math.floor(self.bet * 2))
+                self.user.bank_transaction(
+                    coin_change_to_player=math.floor(self.bet * 2)
+                )
                 embed.color = Colour.green()
                 embed.add_field("結果", "閒家(你)勝", inline=False)
                 embed.add_field("贏回金幣", f"A€{self.bet * 2:,}", inline=False)
@@ -118,7 +117,9 @@ class BlackjackView(View):
                 embed.add_field("結果", "莊家勝", inline=False)
                 self.stop()
             elif player_value == dealer_value:
-                player.bank_transaction(coin_change_to_player=math.floor(self.bet * 1))
+                self.user.bank_transaction(
+                    coin_change_to_player=math.floor(self.bet * 1)
+                )
                 embed.color = Colour.yellow()
                 embed.add_field("結果", "平局", inline=False)
                 embed.add_field("贏回金幣", f"A€{self.bet:,}", inline=False)
@@ -149,7 +150,7 @@ class BlackjackView(View):
 
     @disnake.ui.button(label="要牌", emoji="🔼", style=ButtonStyle.green)
     async def player_hit(self, button: Button, inter: CmdInter):
-        if inter.author != self.player:
+        if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
         self.first_hand = False
         # Disable double bet
@@ -169,7 +170,7 @@ class BlackjackView(View):
 
     @disnake.ui.button(label="停牌", emoji="⏸️", style=ButtonStyle.gray)
     async def player_stop(self, button: Button, inter: CmdInter):
-        if inter.author != self.player:
+        if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
         self.first_hand = False
         self._disable_all_child()
@@ -178,10 +179,9 @@ class BlackjackView(View):
 
     @disnake.ui.button(label="雙倍下注", emoji="⏫", style=ButtonStyle.blurple)
     async def player_double(self, button: Button, inter: CmdInter):
-        if inter.author != self.player:
+        if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
-        player = Player(self.player.id)
-        player.bank_transaction(coin_change_to_player=-self.bet)
+        self.user.bank_transaction(coin_change_to_player=-self.bet)
         self.bet *= 2
         self.first_hand = False
         self._disable_all_child()
@@ -198,15 +198,15 @@ class BlackjackView(View):
 class RouletteView(View):
     def __init__(
         self,
-        uid: int,
+        user: GameUser,
         player: RoulettePlayer,
         dealer: RouletteDealer,
     ):
         super().__init__(timeout=1440)
         self.game_logs = deque(maxlen=10)
-        self.uid = uid
         self.player = player
         self.dealer = dealer
+        self.user = user
         self.game_round = 0
         self._start_round()
 
@@ -286,17 +286,16 @@ class RouletteView(View):
         description = "\n".join(self.game_logs) + result
         embed = embed_builder.information("惡魔輪盤賭", description)
         if self.player.life == 0 or self.dealer.life == 0:
-            player_account = Player(self.uid)
-            player_account.bank_transaction(coin_change_to_player=reward)
+            self.user.bank_transaction(coin_change_to_player=reward)
             field_name = "勝利獎金" if win else "失敗罰金"
             if reward >= 0:
                 embed.add_field(field_name, f"A€{reward:,}")
             else:
                 embed.add_field(field_name, f"-A€{abs(reward):,}")
-            if player_account.coin >= 0:
-                embed.add_field("金幣餘額", f"A€{player_account.coin:,}")
+            if self.user.coin >= 0:
+                embed.add_field("金幣餘額", f"A€{self.user.coin:,}")
             else:
-                embed.add_field("金幣餘額", f"-A€{abs(player_account.coin):,}")
+                embed.add_field("金幣餘額", f"-A€{abs(self.user.coin):,}")
         else:
             embed.add_field("玩家生命", self.player.lives)
             embed.add_field("荷官生命", self.dealer.lives)
@@ -304,7 +303,7 @@ class RouletteView(View):
 
     @disnake.ui.button(label="對荷官開槍", style=ButtonStyle.green)
     async def shoot_at_dealer(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.uid:
+        if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
         self.player.shoot_dealer_attampt += 1
         if self._fire_once():
@@ -321,7 +320,7 @@ class RouletteView(View):
 
     @disnake.ui.button(label="對自己開槍", style=ButtonStyle.blurple)
     async def shoot_at_self(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.uid:
+        if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
         self.player.shoot_self_attampt += 1
         if self._fire_once():
