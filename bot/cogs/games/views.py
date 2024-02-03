@@ -337,7 +337,7 @@ class RouletteView(View):
 
     @disnake.ui.button(label="退出一發彈藥", style=ButtonStyle.blurple)
     async def pop_one_shot(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.uid:
+        if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
         shot = self.bullets.pop()
         if shot == RouletteShot.BLANK:
