@@ -50,8 +50,7 @@ def snowflake() -> int:
     """
     epoch = datetime.datetime(2020, 9, 12, 22, 12, 32)
     now = datetime.datetime.utcnow()
-    ts = format(int((now - epoch).total_seconds() * 1000), "b").zfill(42)
-    pid = format(int(os.getpid()), "b").zfill(17)
-    r = format(random.randint(0, 31), "b").zfill(5)
-    snowflake_id = int((ts + pid + r), 2)
-    return snowflake_id
+    ts = int((now - epoch).total_seconds() * 1000)
+    pid = os.getpid()
+    r = random.randint(0, 31)
+    return ts << 22 | pid << 5 | r
