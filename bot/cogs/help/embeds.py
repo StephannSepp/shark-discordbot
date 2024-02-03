@@ -68,22 +68,22 @@ misc_embed.add_field("/botinfo", "機器人、系統資訊", inline=False)
 misc_embed.add_field("/kuaikuai", "數位化乖乖", inline=False)
 
 action_embed = embed_builder.information("行動指令")
-action_embed.add_field("/action mining", "挖礦, CD 8 小時並獲得黃金")
-action_embed.add_field("/action fishing", "釣魚, CD 4 小時並獲得金幣")
+action_embed.add_field("/action mining", "挖礦, CD 8 小時並獲得黃金", inline=False)
+action_embed.add_field("/action fishing", "釣魚, CD 4 小時並獲得金幣", inline=False)
 
 banking_embed = embed_builder.information("銀行指令")
-banking_embed.add_field("/banking profile", "檢視自己的資產")
-banking_embed.add_field("/banking atlantean_coin", "檢視亞特蘭提斯金幣相關資訊")
-banking_embed.add_field("/banking sell_gold", "向銀行販賣黃金")
+banking_embed.add_field("/banking profile", "檢視自己的資產", inline=False)
+banking_embed.add_field("/banking atlantean_coin", "檢視亞特蘭提斯金幣相關資訊", inline=False)
+banking_embed.add_field("/banking sell_gold", "向銀行販賣黃金", inline=False)
 
 casino_embed = embed_builder.information("賭場指令")
-casino_embed.add_field("/casino help", "賭場指令說明")
-casino_embed.add_field("/casino blackjack", "二十一點遊戲")
-casino_embed.add_field("/casino roulette", "惡魔賭輪盤遊戲")
+casino_embed.add_field("/casino help", "賭場指令說明", inline=False)
+casino_embed.add_field("/casino blackjack", "二十一點遊戲", inline=False)
+casino_embed.add_field("/casino roulette", "惡魔賭輪盤遊戲", inline=False)
 
 lottery_embed = embed_builder.information("彩券指令")
-lottery_embed.add_field("/lottery buy", "購買價值 100 金幣的彩券, 選擇任意 4 位數字, 每周三、日開獎")
-lottery_embed.add_field("/lottery winning_number", "顯示上期頭獎號碼, 並兌換獎勵")
+lottery_embed.add_field("/lottery buy", "購買價值 100 金幣的彩券, 選擇任意 4 位數字, 每周三、日開獎", inline=False)
+lottery_embed.add_field("/lottery winning_number", "顯示上期頭獎號碼, 並兌換獎勵", inline=False)
 
 embeds = [
     fortune_embed,
