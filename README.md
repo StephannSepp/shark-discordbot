@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.6.0](https://img.shields.io/badge/version-2.6.0-informational?style=plastic)
+![Version 2.6.1](https://img.shields.io/badge/version-2.6.1-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,10 @@
 
 ## Changelog
 
+* 2.6.1
+	* 增加釣魚行動遺漏的翻譯
+	* 修正販賣黃金時金額數量雙倍顯示的問題
+	* 重構關於使用者物件的架構，避免資料庫的多次存取減慢執行速度
 * 2.6.0
 	* 增加行動、銀行、賭場、彩票系統
 	* 行動指令為賺取黃金、金幣主要來源，且行動時不可操作某些特定指令
