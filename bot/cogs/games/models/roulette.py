@@ -50,7 +50,7 @@ class RouletteDealer(BaseRoulettePlayer):
     sanity = 0
 
     def aim_at_player(self, bullets: list[RouletteShot]) -> bool:
-        ratio = int(countOf(bullets, RouletteShot.LIVE) / len(bullets) * 100)
+        ratio = 100 - int(countOf(bullets, RouletteShot.BLANK) / len(bullets) * 100)
         sanity = min(max(math.floor(self.sanity**2 / 250), 0), 100)
         sanity = sanity * math.copysign(1, self.sanity)
         weight = min(max(ratio + sanity, 0), 100)
