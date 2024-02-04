@@ -20,7 +20,8 @@ class Mining:
     PB_FINISHED = "<:minecraft_gold_nugget:1199002510942294026>"
     PB_CURRENT = "<:minecraft_pickaxe:1199002509302308905>"
     PB_UNFINISH = "<:minecraft_stone:1199002505699409940>"
-    BASE_TIME = 7 * 60 * 60
+    BASE_HOUR = 7
+    BASE_TIME = BASE_HOUR * 60 * 60
 
     def __init__(self, uid: int):
         self.uid = uid
@@ -90,7 +91,8 @@ class Fishing:
     PB_FINISHED = "<:minecraft_raw_cod:1200101327548723340>"
     PB_CURRENT = "<:minecraft_fishing_rod:1200101325799698522>"
     PB_UNFINISH = "<:minecraft_water:1200101330887393290>"
-    BASE_TIME = 4 * 60 * 60
+    BASE_HOUR = 2
+    BASE_TIME = BASE_HOUR * 60 * 60
 
     def __init__(self, uid: int):
         self.uid = uid
@@ -120,7 +122,7 @@ class Fishing:
             cursor.execute(query, {"uid": self.uid})
 
     def end_action(self) -> float:
-        profit = max(round(random.normalvariate(527, 16)), 0)
+        profit = max(round(random.normalvariate(384, 24)), 0)
         with get_cursor() as cursor:
             query = (
                 "UPDATE game.action SET profit = %(profit)s, "

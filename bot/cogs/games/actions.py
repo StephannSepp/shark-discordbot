@@ -70,16 +70,16 @@ class Action(commands.Cog):
         now = datetime.datetime.utcnow()
         if not user.is_mining:
             action.start_action()
-            end_time = now + datetime.timedelta(hours=7)
+            end_time = now + datetime.timedelta(hours=action.BASE_HOUR)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             progress = action.draw_progress()
             embed = embed_builder.information("挖礦行動開始", progress)
             embed.add_field("預計完成時間", timestamp)
             await inter.response.send_message(embed=embed)
             return
-        if now <= action.start_at + datetime.timedelta(hours=7):
+        if now <= action.start_at + datetime.timedelta(hours=action.BASE_HOUR):
             progress = action.draw_progress()
-            end_time = action.start_at + datetime.timedelta(hours=7)
+            end_time = action.start_at + datetime.timedelta(hours=action.BASE_HOUR)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             embed = embed_builder.information("挖礦行動中", progress)
             embed.add_field("預計完成時間", timestamp)
@@ -102,16 +102,16 @@ class Action(commands.Cog):
         now = datetime.datetime.utcnow()
         if not user.is_fishing:
             action.start_action()
-            end_time = now + datetime.timedelta(hours=2)
+            end_time = now + datetime.timedelta(hours=action.BASE_HOUR)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             progress = action.draw_progress()
             embed = embed_builder.information("釣魚行動開始", progress)
             embed.add_field("預計完成時間", timestamp)
             await inter.response.send_message(embed=embed)
             return
-        if now <= action.start_at + datetime.timedelta(hours=2):
+        if now <= action.start_at + datetime.timedelta(hours=action.BASE_HOUR):
             progress = action.draw_progress()
-            end_time = action.start_at + datetime.timedelta(hours=2)
+            end_time = action.start_at + datetime.timedelta(hours=action.BASE_HOUR)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             embed = embed_builder.information("釣魚行動中", progress)
             embed.add_field("預計完成時間", timestamp)
