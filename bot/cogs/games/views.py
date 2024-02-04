@@ -347,10 +347,10 @@ class RouletteView(View):
         await inter.response.edit_message(embed=embed, view=self)
 
     def dealers_turn(self) -> bool:
+        if self.player.life == 0 or self.dealer.life == 0:
+            return
         if self.empty:
             self._start_round()
-            return
-        if self.player.life == 0 or self.dealer.life == 0:
             return
         if self.dealer.aim_at_player(self.bullets):
             damage = self._fire_once()
