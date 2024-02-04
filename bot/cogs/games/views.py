@@ -284,7 +284,7 @@ class RouletteView(View):
         elif self.empty:
             self._start_round()
         description = "\n".join(self.game_logs) + result
-        embed = embed_builder.information("惡魔輪盤賭", description)
+        embed = embed_builder.information("霰彈槍輪盤", description)
         if self.player.life == 0 or self.dealer.life == 0:
             self.user.bank_transaction(coin_change_to_player=reward)
             field_name = "勝利獎金" if win else "失敗罰金"
