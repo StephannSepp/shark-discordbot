@@ -202,38 +202,40 @@ class RouletteView(View):
         shot_pop = self.player.pop_shot
         reward = 0
         reward += (game_round - 1) * 50
-        reward += remaining_life * 100
-        reward += shot_dealer * 250
+        reward += remaining_life * 50
+        reward += shot_dealer * 200
         reward += self_blank * 400
         if remaining_life == 0:
+            reward -= self.dealer.life * 50
             reward -= shot_taken * 600
-            reward -= self_shot * 1200
-            reward -= shot_pop * 200
+            reward -= self_shot * 1600
+            reward -= shot_pop * 450
             reward = min(reward, 0)
             win = False
         else:
             reward -= shot_taken * 100
             reward -= self_shot * 800
-            reward -= shot_pop * 50
+            reward -= shot_pop * 225
             reward = max(reward, 0)
             win = True
         text = (
             f"活過 {game_round - 1} 回合 x 50 = {(game_round - 1) * 50:,}\n"
-            f"{remaining_life} 剩餘生命 x 100 = {remaining_life * 100:,}\n"
-            f"{shot_dealer} 次向荷官開槍 x 250 = {shot_dealer * 250:,}\n"
+            f"{remaining_life} 剩餘生命 x 50 = {remaining_life * 50:,}\n"
+            f"{shot_dealer} 次向荷官開槍 x 200 = {shot_dealer * 200:,}\n"
             f"{self_blank} 次向自射擊安然無恙 x 400 = {self_blank * 400:,}\n"
         )
         if remaining_life == 0:
             text += (
+                f"{self.dealer.life} 荷官剩餘生命 x -50 = {self.dealer.life * -50:,}\n"
                 f"{shot_taken} 次被荷官開槍 x -600 = {shot_taken * -600:,}\n"
-                f"{self_shot} 次向自己開槍 x -1200 = {self_shot * -1200:,}\n"
-                f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n"
+                f"{self_shot} 次向自己開槍 x -1600 = {self_shot * -1600:,}\n"
+                f"{shot_pop} 次退出彈藥 x -450 = {shot_pop * -450:,}\n"
             )
         else:
             text += (
                 f"{shot_taken} 次被荷官開槍 x -100 = {shot_taken * -100:,}\n"
                 f"{self_shot} 次向自己開槍 x -800 = {self_shot * -800:,}\n"
-                f"{shot_pop} 次退出彈藥 x -50 = {shot_pop * -50:,}\n"
+                f"{shot_pop} 次退出彈藥 x -225 = {shot_pop * -225:,}\n"
             )
         return reward, text, win
 
