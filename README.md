@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.6.1](https://img.shields.io/badge/version-2.6.1-informational?style=plastic)
+![Version 2.6.2](https://img.shields.io/badge/version-2.6.2-informational?style=plastic)
 
 ## 關於我
 
@@ -16,6 +16,10 @@
 
 ## Changelog
 
+* 2.6.2
+	* 補足說明文本, 移除`/casino help`賭場說明指令, 合併至`/help`中
+	* 惡魔賭輪盤改為霰彈槍輪盤, 並增加獨彈頭, 美化文本顯示
+	* 降低釣魚行動獎勵
 * 2.6.1
 	* 增加釣魚行動遺漏的翻譯
 	* 修正販賣黃金時金額數量雙倍顯示的問題

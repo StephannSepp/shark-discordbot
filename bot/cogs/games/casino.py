@@ -4,7 +4,6 @@ from disnake.ext import commands
 from . import DOLLAR_SIGN
 from .helpers import GameUser
 from .views import BlackjackView
-from .views import HelpView
 from .views import RouletteDealer
 from .views import RoulettePlayer
 from .views import RouletteView
@@ -19,13 +18,6 @@ class Casino(commands.Cog):
     @commands.cooldown(1, 3)
     async def casino(self, inter: CmdInter):
         """Casino group commands. {{CASINO_GROUP}}"""
-
-    @casino.sub_command(name="help")
-    async def help(self, inter: CmdInter):
-        """Casino help command. {{CASINO_HELP}}"""
-        view = HelpView()
-        embed = view.get_embed()
-        await inter.response.send_message(view=view, embed=embed)
 
     @casino.sub_command(name="blackjack")
     async def blackjack(self, inter: CmdInter, bet: int):

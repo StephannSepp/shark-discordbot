@@ -3,20 +3,27 @@ import random
 from enum import Enum
 from operator import countOf
 
-BASE_LIFE = 4
+BASE_LIFE = 5
 
 
 class RouletteShot(Enum):
     BLANK = "<:Shotgun_Shell_Green:1202947686911844433>"
     LIVE = "<:Shotgun_Shell:1202947684877471774>"
+    SLUG = "<:Shotgun_Shell_Black:1203509902782369792>"
+
+    def __lt__(self, other: "RouletteShot"):
+        return self.name < other.name
+
+    def __gt__(self, other: "RouletteShot"):
+        return self.name > other.name
 
 
 class BaseRoulettePlayer:
     def __init__(self, life: int = BASE_LIFE):
         self.life = life
 
-    def take_shot(self):
-        self.life = max(self.life - 1, 0)
+    def take_shot(self, damage: int):
+        self.life = max(self.life - damage, 0)
 
     @property
     def lives(self):
@@ -50,9 +57,9 @@ class RouletteDealer(BaseRoulettePlayer):
         weights = (100 - weight, weight)
         return random.choices((False, True), weights)[0]
 
-    def take_shot(self):
-        self.life = max(self.life - 1, 0)
-        self.sanity = self.sanity + 21
+    def take_shot(self, damage: int):
+        self.life = max(self.life - damage, 0)
+        self.sanity = self.sanity + (15 * damage)
 
     def sanitize(self):
         self.sanity = self.sanity + 6 * (-math.copysign(1, self.sanity))
