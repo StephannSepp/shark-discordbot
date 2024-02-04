@@ -368,7 +368,7 @@ class RouletteView(View):
                 self.dealer.sanitize()
                 self.player.shot_taken_from_dealer += 1
                 self.game_logs.append(
-                    f"* 荷官朝你的臉上開了一槍{RouletteShot.LIVE.value}"
+                    f"* 荷官朝你的臉上開了一槍實彈{RouletteShot.LIVE.value}"
                 )
             else:
                 self.game_logs.append(
