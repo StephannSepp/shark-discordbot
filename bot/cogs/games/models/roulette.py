@@ -10,6 +10,7 @@ class RouletteShot(Enum):
     BLANK = "<:Shotgun_Shell_Green:1202947686911844433>"
     LIVE = "<:Shotgun_Shell:1202947684877471774>"
     SLUG = "<:Shotgun_Shell_Black:1203509902782369792>"
+    RANDOM = "<:Shotgun_Shell_White:1203990875135287317>"
 
     def __lt__(self, other: "RouletteShot"):
         return self.name < other.name
@@ -50,13 +51,20 @@ class RouletteDealer(BaseRoulettePlayer):
     sanity = 0
 
     def aim_at_player(self, bullets: list[RouletteShot]) -> bool:
-        ratio = 100 - int(countOf(bullets, RouletteShot.BLANK) / len(bullets) * 100)
-        if 3 < ratio:
+        if len(bullets) == 1 and bullets[0] == RouletteShot.RANDOM:
+            ratio = 50
+        elif RouletteShot.RANDOM in bullets:
+            ratio = 100 - int(
+                countOf(bullets, RouletteShot.BLANK) / (len(bullets) - 1) * 100
+            )
+        else:
+            ratio = 100 - int(countOf(bullets, RouletteShot.BLANK) / len(bullets) * 100)
+        if ratio < 3:
             ratio = 0
         elif ratio > 97:
             ratio = 100
         else:
-            ratio = round(100 / (1 + math.exp(-ratio + 50)**0.08))
+            ratio = round(100 / (1 + math.exp(-ratio + 50) ** 0.08))
         sanity = min(max(math.floor(self.sanity**2 / 250), 0), 100)
         sanity = sanity * math.copysign(1, self.sanity)
         weight = min(max(ratio + sanity, 0), 100)

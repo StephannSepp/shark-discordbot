@@ -20,6 +20,7 @@ class Casino(commands.Cog):
         """Casino group commands. {{CASINO_GROUP}}"""
 
     @casino.sub_command(name="blackjack")
+    @commands.cooldown(60, 3600)
     async def blackjack(self, inter: CmdInter, bet: int):
         """Play blackjack game. {{CASINO_BLACKJACK}}"""
         user = GameUser(inter.author.id)
@@ -49,6 +50,7 @@ class Casino(commands.Cog):
         await inter.response.send_message(embed=embed, view=view)
 
     @casino.sub_command(name="roulette")
+    @commands.cooldown(60, 3600)
     async def roulette(self, inter: CmdInter):
         """Play shotgun roulette. {{CASINO_ROULETTE}}"""
         user = GameUser(inter.author.id)
@@ -60,10 +62,11 @@ class Casino(commands.Cog):
             message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(user.coin):,}"
             await inter.response.send_message(message, ephemeral=True)
             return
-        if user.coin == 0:
-            message = "你沒有足夠的金幣遊玩"
+        if user.coin < 2250:
+            message = f"你至少需要 {DOLLAR_SIGN}2,250 才能遊玩"
             await inter.response.send_message(message, ephemeral=True)
             return
+        user.bank_transaction(coin_change_to_player=-2250)
         dealer = RouletteDealer()
         player = RoulettePlayer()
         view = RouletteView(user, player, dealer)

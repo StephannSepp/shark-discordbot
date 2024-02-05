@@ -23,7 +23,7 @@ class ExceptionHandler(commands.Cog):
 
         match exc:
             case commands.CommandOnCooldown():
-                message = f"你太快了, 請 {exc.retry_after:.2f} 秒後再試"
+                message = f"該指令正在冷卻中, 請 {exc.retry_after:.2f} 秒後再試"
                 await inter.response.send_message(message, ephemeral=True)
             case commands.CheckFailure():
                 message = exc or "你未達到指令要求的條件"
