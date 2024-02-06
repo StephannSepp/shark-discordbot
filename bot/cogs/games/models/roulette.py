@@ -64,7 +64,7 @@ class RouletteDealer(BaseRoulettePlayer):
         elif ratio > 97:
             ratio = 100
         else:
-            ratio = round(100 / (1 + math.exp(-ratio + 50) ** 0.08))
+            ratio = round(100 / (1 + math.exp(-ratio + 50) ** 0.01))
         sanity = min(max(math.floor(self.sanity**2 / 250), 0), 100)
         sanity = sanity * math.copysign(1, self.sanity)
         weight = min(max(ratio + sanity, 0), 100)
