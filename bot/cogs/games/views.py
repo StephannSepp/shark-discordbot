@@ -181,8 +181,11 @@ class RouletteView(View):
         self.bullets = deque(maxlen=8)
         bullets: list[RouletteShot] = []
         k = random.randint(2, 8)
-        if random.random() < 0.01 * self.game_round:
+        white_round_chance = (1 - (math.exp(1 - self.game_round) ** 0.1) / 1 + 1) * 0.01
+        if random.random() < white_round_chance:
             bullets.append(RouletteShot.RANDOM)
+            if self.game_round >= 4 and k > 3:
+                bullets.append(RouletteShot.RANDOM)
         if k >= 6:
             bullets.extend(
                 [
