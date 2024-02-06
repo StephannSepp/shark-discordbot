@@ -235,6 +235,8 @@ class RouletteView(View):
         total_shot = self.total_shot
         reward = 0
         if remaining_life == 0:
+            if self.dealer.life == 5:
+                reward -= 500
             reward += shot_dealer * 100
             reward += self_blank * 200
             reward -= self.dealer.life * 50
@@ -245,7 +247,9 @@ class RouletteView(View):
             reward = min(reward, 0)
             win = False
         else:
-            reward += 2500
+            if remaining_life == 5:
+                reward += 1000
+            reward += 2400
             reward += (game_round - 1) * 50
             reward += remaining_life * 100
             reward += shot_dealer * 200
@@ -264,11 +268,13 @@ class RouletteView(View):
                 f"{self_shot} 次向自己開槍 x -1,200 = {self_shot * -1200:,}\n"
                 f"{shot_pop} 次退出彈藥 x -450 = {shot_pop * -450:,}\n"
                 f"{total_shot} 彈藥費用 x -50 = {total_shot * -50:,}\n"
-                f"善後費用 = -2,500\n"
+                f"善後費用 = -2,400\n"
             )
+            if self.dealer.life == 5:
+                text = "滿身瘡痍 = -500\n" + text
         else:
             text = (
-                f"押金返還 = 2,500\n"
+                f"押金返還 = 2,400\n"
                 f"活過 {game_round - 1} 回合 x 50 = {(game_round - 1) * 50:,}\n"
                 f"{remaining_life} 剩餘生命 x 100 = {remaining_life * 100:,}\n"
                 f"{shot_dealer} 次向荷官開槍 x 200 = {shot_dealer * 200:,}\n"
@@ -277,6 +283,8 @@ class RouletteView(View):
                 f"{self_shot} 次向自己開槍 x -800 = {self_shot * -800:,}\n"
                 f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n"
             )
+            if remaining_life == 5:
+                text = "全身而退 = 1,000\n" + text
         return reward, text, win
 
     def _disable_all_child(self):
@@ -380,23 +388,27 @@ class RouletteView(View):
             self.game_logs.pop()
             self.round_start = True
         shot = self.bullets.pop()
+        self.player.pop_shot += 1
         if shot == RouletteShot.RANDOM:
             self.game_logs.append(
                 f"* {inter.author.mention}退出了一發彈藥, 是枚隨機彈{shot.value}"
+                f"(剩餘 {2 - self.player.pop_shot} 次)"
             )
         elif shot == RouletteShot.SLUG:
             self.game_logs.append(
                 f"* {inter.author.mention}退出了一發彈藥, 是枚獨彈頭{shot.value}"
+                f"(剩餘 {2 - self.player.pop_shot} 次)"
             )
         elif shot == RouletteShot.LIVE:
             self.game_logs.append(
                 f"* {inter.author.mention}退出了一發彈藥, 是枚實彈{shot.value}"
+                f"(剩餘 {2 - self.player.pop_shot} 次)"
             )
         else:
             self.game_logs.append(
                 f"* {inter.author.mention}退出了一發彈藥, 是枚假彈{shot.value}"
+                f"(剩餘 {2 - self.player.pop_shot} 次)"
             )
-        self.player.pop_shot += 1
         if self.player.pop_shot >= 2:
             for child in self.children:
                 if child.label == "退出一發彈藥":
@@ -410,16 +422,26 @@ class RouletteView(View):
         if self.empty:
             self._start_round()
             return
-        if self.dealer.aim_at_player(self.bullets):
+        if (next_shot := self.dealer.check_next_shot(self.bullets)) is not None:
+            self.game_logs.append(
+                f"* 荷官檢查了槍膛裡的彈藥(剩餘 {2 - self.dealer.next_shot_checked} 次)"
+            )
+            if next_shot == RouletteShot.BLANK:
+                aim_at_player = False
+            elif next_shot == RouletteShot.RANDOM:
+                aim_at_player = random.random() < 0.5
+            else:
+                aim_at_player = True
+        else:
+            aim_at_player = self.dealer.aim_at_player(self.bullets)
+        if aim_at_player:
             damage, shot = self._fire_once()
             if damage == 2:
                 self.player.take_shot(damage)
-                self.dealer.sanitize()
                 self.player.shot_taken_from_dealer += 1
                 self.game_logs.append(f"* 荷官將獨彈頭{shot.value}送進了你的頭顱")
             elif damage == 1:
                 self.player.take_shot(damage)
-                self.dealer.sanitize()
                 self.player.shot_taken_from_dealer += 1
                 self.game_logs.append(f"* 荷官朝你的臉上開了一槍實彈{shot.value}")
             else:
@@ -436,7 +458,6 @@ class RouletteView(View):
                 self.dealer.take_shot(damage)
             else:
                 self.game_logs.append(f"* 荷官朝自己扣了扳機, 是枚假彈{shot.value}")
-                self.dealer.sanitize()
                 self.dealers_turn()
 
     @property

@@ -62,11 +62,11 @@ class Casino(commands.Cog):
             message = f"請先還債, 您的債務還有 {DOLLAR_SIGN}{abs(user.coin):,}"
             await inter.response.send_message(message, ephemeral=True)
             return
-        if user.coin < 2500:
-            message = f"你至少需要 {DOLLAR_SIGN}2,500 才能遊玩"
+        if user.coin < 2400:
+            message = f"你至少需要 {DOLLAR_SIGN}2,400 才能遊玩"
             await inter.response.send_message(message, ephemeral=True)
             return
-        user.bank_transaction(coin_change_to_player=-2500)
+        user.bank_transaction(coin_change_to_player=-2400)
         dealer = RouletteDealer()
         player = RoulettePlayer()
         view = RouletteView(user, player, dealer)

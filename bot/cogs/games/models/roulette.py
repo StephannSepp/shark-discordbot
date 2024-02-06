@@ -48,32 +48,39 @@ class RoulettePlayer(BaseRoulettePlayer):
 
 
 class RouletteDealer(BaseRoulettePlayer):
-    sanity = 0
+    next_shot_checked = 0
+
+    def check_next_shot(self, bullets: list[RouletteShot]) -> RouletteShot | None:
+        bullets_count = len(bullets)
+        blank_count = countOf(bullets, RouletteShot.BLANK)
+        if (
+            4 > bullets_count > 1
+            and blank_count != 0
+            and blank_count != bullets_count
+            and self.life < 3
+            and self.next_shot_checked < 2
+        ):
+            if random.random() >= 1 - (bullets_count**1.5 * 0.1):
+                return None
+            self.next_shot_checked += 1
+            return bullets[-1]
+        return None
 
     def aim_at_player(self, bullets: list[RouletteShot]) -> bool:
         if len(bullets) == 1 and bullets[0] == RouletteShot.RANDOM:
             ratio = 50
         elif RouletteShot.RANDOM in bullets:
-            ratio = 100 - int(
-                countOf(bullets, RouletteShot.BLANK) / (len(bullets) - 1) * 100
-            )
+            ratio = int(countOf(bullets, RouletteShot.BLANK) / (len(bullets) - 1) * 100)
         else:
-            ratio = 100 - int(countOf(bullets, RouletteShot.BLANK) / len(bullets) * 100)
+            ratio = int(countOf(bullets, RouletteShot.BLANK) / len(bullets) * 100)
         if ratio < 3:
-            ratio = 0
+            confidence = 0
         elif ratio > 97:
-            ratio = 100
+            confidence = 100
         else:
-            ratio = round(100 / (1 + math.exp(-ratio + 50) ** 0.01))
-        sanity = min(max(math.floor(self.sanity**2 / 250), 0), 100)
-        sanity = sanity * math.copysign(1, self.sanity)
-        weight = min(max(ratio + sanity, 0), 100)
-        weights = (100 - weight, weight)
-        return random.choices((False, True), weights)[0]
+            confidence = round(100 / (1 + math.exp(-ratio + 50) ** 0.01))
+        confidence = min(max(confidence, 0), 100)
+        return random.uniform(0, 100) > confidence
 
     def take_shot(self, damage: int):
         self.life = max(self.life - damage, 0)
-        self.sanity = self.sanity + (15 * damage)
-
-    def sanitize(self):
-        self.sanity = self.sanity + 6 * (-math.copysign(1, self.sanity))
