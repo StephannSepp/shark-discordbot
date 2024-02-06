@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.6.3](https://img.shields.io/badge/version-2.6.3-informational?style=plastic)
+![Version 2.6.5](https://img.shields.io/badge/version-2.6.5-informational?style=plastic)
 
 ## 關於我
 
@@ -15,7 +15,20 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
-
+* 2.6.5
+	* 霰彈槍輪盤
+		* 新增兩種結算獎勵與懲罰
+		* 荷官現在能檢查槍膛 2 次
+		* 白色彈藥機率隨回合數上升, 且第 4 回合以後若子彈數大於 3 則會有 2 顆白色彈藥
+* 2.6.4
+	* 霰彈槍輪盤
+		* 回合開始行動後, 本回合裝填的彈藥將不再顯示
+		* 新增隨機彈:Shotgun_Shell_White:, 在扣下板機前都是未知數, 出現機率為 1%
+		* 開始遊戲時須支付 2,250 押金, 僅在勝利時返還
+		* 新增落敗時須支付彈藥費用, 每發 50
+		* 3 發以上的回合不會再出現全部為同一種彈藥的情形
+		* 賭場指令每個增加冷卻限制, 每小時 60 次
+	* 修正指令冷卻例外訊息的排版錯誤
 * 2.6.3
 	* 修正霰彈槍輪盤荷官邏輯
 	* 修正最後一動作荷官死亡時會觸發下一回合的錯誤
