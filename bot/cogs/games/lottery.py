@@ -17,7 +17,7 @@ class LotteryGame(commands.Cog):
 
     @commands.slash_command(name="lottery")
     @commands.guild_only()
-    @commands.cooldown(1, 3)
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def lottery(self, inter: CmdInter):
         """Lottery group commands. {{LOTTERY_GROUP}}"""
 

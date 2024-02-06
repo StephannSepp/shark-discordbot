@@ -83,7 +83,7 @@ class Misc(commands.Cog):
         await inter.response.send_message(embed=embed)
 
     @commands.slash_command(name="mahjongsoul")
-    @commands.cooldown(1, 1800)
+    @commands.cooldown(1, 900, commands.BucketType.user)
     async def mahjongsoul(
         self,
         inter: CmdInter,

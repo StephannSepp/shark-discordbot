@@ -242,7 +242,7 @@ class RouletteView(View):
             reward = min(reward, 0)
             win = False
         else:
-            reward += 2250
+            reward += 2500
             reward += (game_round - 1) * 50
             reward += remaining_life * 100
             reward += shot_dealer * 200
@@ -261,11 +261,11 @@ class RouletteView(View):
                 f"{self_shot} 次向自己開槍 x -1,200 = {self_shot * -1200:,}\n"
                 f"{shot_pop} 次退出彈藥 x -450 = {shot_pop * -450:,}\n"
                 f"{total_shot} 彈藥費用 x -50 = {total_shot * -50:,}\n"
-                f"善後費用 = -2,250\n"
+                f"善後費用 = -2,500\n"
             )
         else:
             text = (
-                f"押金返還 = 2,250\n"
+                f"押金返還 = 2,500\n"
                 f"活過 {game_round - 1} 回合 x 50 = {(game_round - 1) * 50:,}\n"
                 f"{remaining_life} 剩餘生命 x 100 = {remaining_life * 100:,}\n"
                 f"{shot_dealer} 次向荷官開槍 x 200 = {shot_dealer * 200:,}\n"
@@ -300,7 +300,7 @@ class RouletteView(View):
                 if win:
                     embed.add_field(field_name, f"-A€{abs(reward):,}")
                 else:
-                    embed.add_field(field_name, f"-A€{abs(reward - 2250):,}")
+                    embed.add_field(field_name, f"-A€{abs(reward - 2500):,}")
             if self.user.coin >= 0:
                 embed.add_field("金幣餘額", f"A€{self.user.coin:,}")
             else:

@@ -38,7 +38,7 @@ class Banking(commands.Cog):
 
     @commands.slash_command(name="banking")
     @commands.guild_only()
-    @commands.cooldown(1, 3)
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def banking(self, inter: CmdInter):
         """Banking group commands. {{BANKING_GROUP}}"""
 
