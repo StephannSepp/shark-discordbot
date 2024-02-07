@@ -111,6 +111,24 @@ class Misc(commands.Cog):
             ),
         )
 
+    @commands.slash_command(name="changelog")
+    async def changelog(self, inter: CmdInter):
+        """Ping other Janshis. {{MISC_CHANGELOG}}"""
+        text = (
+            "# 2.6.6\n"
+            "## 霰彈槍輪盤\n"
+            "* 增加了兩種獎勵\n"
+            "* 些微調整荷官選擇射擊對象邏輯\n"
+            "\n"
+            "## 銀行\n"
+            "* 些微調整匯率算法\n"
+            "\n"
+            "## 其他\n"
+            "* 增加`/changelog`指令, 用於發布更新日誌\n"
+            "* 在`/help`指令中的霰彈槍輪盤說明補上入場押金\n"
+        )
+        await inter.response.send_message(text)
+
 
 def setup(bot: commands.InteractionBot):
     bot.add_cog(Misc(bot))

@@ -52,5 +52,7 @@
     "LOTTERY_BUY_NAME": "購買",
     "LOTTERY_BUY_DESCRIPTION": "購買 100 金幣彩券, 選擇四位數數字, 每周三、日開獎",
     "LOTTERY_WINNING_NUMBER_NAME": "頭獎號碼",
-    "LOTTERY_WINNING_NUMBER_DESCRIPTION": "顯示上期頭獎號碼並兌換獎勵"
+    "LOTTERY_WINNING_NUMBER_DESCRIPTION": "顯示上期頭獎號碼並兌換獎勵",
+    "MISC_CHANGELOG_NAME": "更新日誌",
+    "MISC_CHANGELOG_DESCRIPTION": "Bot 現版本更新日誌"
 }

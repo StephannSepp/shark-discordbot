@@ -66,6 +66,8 @@ misc_embed.add_field("/ping", "顯示機器人連線延遲", inline=False)
 misc_embed.add_field("/donothing", "這個指令不會做任何事", inline=False)
 misc_embed.add_field("/botinfo", "機器人、系統資訊", inline=False)
 misc_embed.add_field("/kuaikuai", "數位化乖乖", inline=False)
+misc_embed.add_field("/mahjongsoul", "一個雀魂揪團指令", inline=False)
+misc_embed.add_field("/changelog", "Bot 現版本更新日誌", inline=False)
 
 action_embed = embed_builder.information("行動指令")
 action_embed.add_field(
