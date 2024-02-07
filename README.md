@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.6.5](https://img.shields.io/badge/version-2.6.5-informational?style=plastic)
+![Version 2.6.6](https://img.shields.io/badge/version-2.6.6-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,15 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+*2.6.6
+	* 霰彈槍輪盤\
+		* 增加了兩種獎勵
+			* 些微調整荷官選擇射擊對象邏輯
+        * 銀行
+            * 些微調整匯率算法
+		* 其他
+            * 增加`/changelog`指令, 用於發布更新日誌
+            * 在`/help`指令中的霰彈槍輪盤說明補上入場押金
 * 2.6.5
 	* 霰彈槍輪盤
 		* 新增兩種結算獎勵與懲罰
