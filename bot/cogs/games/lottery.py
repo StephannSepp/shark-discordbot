@@ -46,14 +46,14 @@ class LotteryGame(commands.Cog):
         """Check last winning number and claim the reward. {{LOTTERY_WINNING_NUMBER}}"""
         user = GameUser(inter.author.id)
         lottery = Lottery(inter.author.id)
-        description = f"第 {lottery.no - 1} 期彩票號碼: {lottery.winning_number}"
-        embed = embed_builder.information("亞特蘭提斯彩票", description)
+        description = f"第 {lottery.no - 1} 期彩券頭獎號碼: {lottery.winning_number}"
+        embed = embed_builder.information("亞特蘭提斯彩券", description)
         if lottery.tickets:
             for ticket in lottery.tickets:
-                embed.add_field(f"第 {ticket.lottery_no} 期彩券", ticket.pick_number)
+                embed.add_field(f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number)
         if lottery.last_tickets:
             for ticket in lottery.last_tickets:
-                embed.add_field(f"第 {ticket.lottery_no} 期彩券", ticket.pick_number)
+                embed.add_field(f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number)
             rewards = lottery.claim()
             if rewards > 0:
                 user.bank_transaction(coin_change_to_player=rewards)
