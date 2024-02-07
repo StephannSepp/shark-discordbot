@@ -50,6 +50,9 @@ class RoulettePlayer(BaseRoulettePlayer):
 class RouletteDealer(BaseRoulettePlayer):
     next_shot_checked = 0
 
+    def __init__(self):
+        super().__init__(BASE_LIFE + 1)
+
     def check_next_shot(self, bullets: list[RouletteShot]) -> RouletteShot | None:
         bullets_count = len(bullets)
         blank_count = countOf(bullets, RouletteShot.BLANK)
@@ -79,6 +82,8 @@ class RouletteDealer(BaseRoulettePlayer):
             confidence = 100
         else:
             confidence = round(100 / (1 + math.exp(-ratio + 50) ** 0.01))
+        if confidence < 70 and self.life < 3:
+            confidence -= 10 * (3 - self.life)
         confidence = min(max(confidence, 0), 100)
         return random.uniform(0, 100) > confidence
 
