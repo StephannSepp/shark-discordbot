@@ -113,13 +113,14 @@ class Misc(commands.Cog):
 
     @commands.slash_command(name="changelog")
     async def changelog(self, inter: CmdInter):
-        """Ping other Janshis. {{MISC_CHANGELOG}}"""
+        """Show the changelog of the current version. {{MISC_CHANGELOG}}"""
         text = (
             "# 2.6.6\n"
             "## 霰彈槍輪盤\n"
             "* 增加了兩種獎勵\n"
             "* 些微調整荷官選擇射擊對象邏輯\n"
             "* 荷官血量增加至 6\n"
+            "* 白色彈藥出現機率加倍 6\n"
             "\n"
             "## 銀行\n"
             "* 些微調整匯率算法\n"

@@ -259,7 +259,7 @@ class RouletteView(View):
             if remaining_life == self.player.max_life:
                 reward += 2400
             if self_attampt > 8 and self_shot == 0:
-                reward += 1600
+                reward += 3200
             if game_round >= 10:
                 reward += 1000
             reward = max(reward, 0)
@@ -286,14 +286,14 @@ class RouletteView(View):
                 f"{self_blank} 次向自射擊安然無恙 x 400 = {self_blank * 400:,}\n"
                 f"{shot_taken} 次被荷官開槍 x -100 = {shot_taken * -100:,}\n"
                 f"{self_shot} 次向自己開槍 x -800 = {self_shot * -800:,}\n"
-                f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n\n"
+                f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n"
                 "== 其他獎懲 ==\n"
                 f"押金返還 = 2,400\n"
             )
             if remaining_life == 5:
                 text += "全身而退 = 2,400\n"
             if self_attampt > 8 and self_shot == 0:
-                text += "天選之人 = 1,600"
+                text += "天選之人 = 3,200"
             if game_round > 9:
                 text += "長壽 = 1,000\n"
         return reward, text, win
