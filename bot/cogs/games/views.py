@@ -243,7 +243,7 @@ class RouletteView(View):
             reward -= self_shot * 1200
             reward -= shot_pop * 400
             reward -= total_shot * 50
-            if self.dealer.life == 5:
+            if self.dealer.life == self.dealer.max_life:
                 reward -= 1200
             reward = min(reward, 0)
             win = False
@@ -256,7 +256,7 @@ class RouletteView(View):
             reward -= shot_taken * 100
             reward -= self_shot * 800
             reward -= shot_pop * 200
-            if remaining_life == 5:
+            if remaining_life == self.player.max_life:
                 reward += 2400
             if self_attampt > 8 and self_shot == 0:
                 reward += 1600

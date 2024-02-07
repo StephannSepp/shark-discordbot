@@ -22,6 +22,7 @@ class RouletteShot(Enum):
 class BaseRoulettePlayer:
     def __init__(self, life: int = BASE_LIFE):
         self.life = life
+        self.max_life = life
 
     def take_shot(self, damage: int):
         self.life = max(self.life - damage, 0)
@@ -29,7 +30,7 @@ class BaseRoulettePlayer:
     @property
     def lives(self):
         text = ""
-        for i in range(BASE_LIFE):
+        for i in range(self.max_life):
             if i < self.life:
                 text += "❤️"
             else:
