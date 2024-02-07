@@ -107,19 +107,19 @@ class ExchangeRate:
             rate, trend = result
 
         if rate > BASE_EXCHANGE_RATE + 1.4:
-            normalize_modifier = 0.5 - 0.2
+            normalize_modifier = 0.5 - 0.25
         elif rate > BASE_EXCHANGE_RATE + 0.93:
-            normalize_modifier = 0.9 - 0.2
+            normalize_modifier = 0.9 - 0.25
         elif rate > BASE_EXCHANGE_RATE + 0.47:
-            normalize_modifier = 0.95 - 0.2
+            normalize_modifier = 0.95 - 0.25
         elif rate < BASE_EXCHANGE_RATE - 1.4:
-            normalize_modifier = 1.05 - 0.2
+            normalize_modifier = 1.05 - 0.25
         elif rate < BASE_EXCHANGE_RATE - 0.93:
-            normalize_modifier = 1.1 - 0.2
+            normalize_modifier = 1.1 - 0.25
         elif rate < BASE_EXCHANGE_RATE - 0.47:
-            normalize_modifier = 1.5 - 0.2
+            normalize_modifier = 1.5 - 0.25
         else:
-            normalize_modifier = 1 - 0.2
+            normalize_modifier = 1 - 0.25
         trend_modifier = math.log(
             (last_gold_mined + 1) * normalize_modifier / (recent_avg_income + 1)
         )
