@@ -293,7 +293,7 @@ class RouletteView(View):
             if remaining_life == 5:
                 text += "全身而退 = 2,400\n"
             if self_attampt > 8 and self_shot == 0:
-                text += "天選之人 = 3,200"
+                text += "天選之人 = 3,200\n"
             if game_round > 9:
                 text += "長壽 = 1,000\n"
         return reward, text, win
