@@ -228,35 +228,40 @@ class RouletteView(View):
         game_round = self.game_round
         remaining_life = self.player.life
         shot_dealer = self.player.shot_at_dealer
-        self_blank = self.player.shoot_self_attampt - self.player.shot_at_self
-        shot_taken = self.player.shot_taken_from_dealer
+        self_attampt = self.player.shoot_self_attampt
         self_shot = self.player.shot_at_self
+        self_blank = self_attampt - self_shot
+        shot_taken = self.player.shot_taken_from_dealer
         shot_pop = self.player.pop_shot
         total_shot = self.total_shot
         reward = 0
         if remaining_life == 0:
-            if self.dealer.life == 5:
-                reward -= 1200
             reward += shot_dealer * 100
             reward += self_blank * 200
             reward -= self.dealer.life * 50
             reward -= shot_taken * 400
             reward -= self_shot * 1200
-            reward -= shot_pop * 450
+            reward -= shot_pop * 400
             reward -= total_shot * 50
+            if self.dealer.life == 5:
+                reward -= 1200
             reward = min(reward, 0)
             win = False
         else:
-            if remaining_life == 5:
-                reward += 2400
             reward += 2400
-            reward += (game_round - 1) * 75
+            reward += (game_round - 1) * 50
             reward += remaining_life * 100
-            reward += shot_dealer * 250
+            reward += shot_dealer * 200
             reward += self_blank * 400
             reward -= shot_taken * 100
             reward -= self_shot * 800
             reward -= shot_pop * 200
+            if remaining_life == 5:
+                reward += 2400
+            if self_attampt > 8 and self_shot == 0:
+                reward += 1600
+            if game_round >= 10:
+                reward += 1000
             reward = max(reward, 0)
             win = True
         if remaining_life == 0:
@@ -266,25 +271,31 @@ class RouletteView(View):
                 f"{self.dealer.life} 荷官剩餘生命 x -50 = {self.dealer.life * -50:,}\n"
                 f"{shot_taken} 次被荷官開槍 x -400 = {shot_taken * -400:,}\n"
                 f"{self_shot} 次向自己開槍 x -1,200 = {self_shot * -1200:,}\n"
-                f"{shot_pop} 次退出彈藥 x -450 = {shot_pop * -450:,}\n"
+                f"{shot_pop} 次退出彈藥 x -400 = {shot_pop * -400:,}\n"
                 f"{total_shot} 彈藥費用 x -50 = {total_shot * -50:,}\n"
+                "== 其他獎懲 ==\n"
                 f"善後費用 = -2,400\n"
             )
             if self.dealer.life == 5:
-                text = "滿身瘡痍 = -1,200\n" + text
+                text += "滿身瘡痍 = -1,200\n"
         else:
             text = (
-                f"押金返還 = 2,400\n"
-                f"活過 {game_round - 1} 回合 x 75 = {(game_round - 1) * 75:,}\n"
+                f"活過 {game_round - 1} 回合 x 50 = {(game_round - 1) * 50:,}\n"
                 f"{remaining_life} 剩餘生命 x 100 = {remaining_life * 100:,}\n"
-                f"{shot_dealer} 次向荷官開槍 x 250 = {shot_dealer * 250:,}\n"
+                f"{shot_dealer} 次向荷官開槍 x 200 = {shot_dealer * 200:,}\n"
                 f"{self_blank} 次向自射擊安然無恙 x 400 = {self_blank * 400:,}\n"
                 f"{shot_taken} 次被荷官開槍 x -100 = {shot_taken * -100:,}\n"
                 f"{self_shot} 次向自己開槍 x -800 = {self_shot * -800:,}\n"
-                f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n"
+                f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n\n"
+                "== 其他獎懲 ==\n"
+                f"押金返還 = 2,400\n"
             )
             if remaining_life == 5:
-                text = "全身而退 = 2,400\n" + text
+                text += "全身而退 = 2,400\n"
+            if self_attampt > 8 and self_shot == 0:
+                text += "天選之人 = 1,600"
+            if game_round > 9:
+                text += "長壽 = 1,000\n"
         return reward, text, win
 
     def _disable_all_child(self):
