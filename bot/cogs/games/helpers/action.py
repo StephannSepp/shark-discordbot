@@ -65,6 +65,17 @@ class Mining:
             )
         return profit
 
+    def get_other_workers(self) -> list[int]:
+        with get_cursor() as cursor:
+            query = (
+                "SELECT uid FROM game.action "
+                "WHERE status = 'STARTED' AND action_type = 'MINING' "
+                "ORDER BY start_at DESC"
+            )
+            cursor.execute(query)
+            workers = [row[0] for row in cursor.fetchall()]
+        return workers
+
     def draw_progress(self) -> str | None:
         if self.action_id is None:
             self.start_at = datetime.datetime.now()
@@ -135,6 +146,17 @@ class Fishing:
                 query, {"profit": profit, "uid": self.uid, "action_id": self.action_id}
             )
         return profit
+
+    def get_other_workers(self) -> list[int]:
+        with get_cursor() as cursor:
+            query = (
+                "SELECT uid FROM game.action "
+                "WHERE status = 'STARTED' AND action_type = 'FISHING' "
+                "ORDER BY start_at DESC"
+            )
+            cursor.execute(query)
+            workers = [row[0] for row in cursor.fetchall()]
+        return workers
 
     def draw_progress(self) -> str:
         if self.action_id is None:

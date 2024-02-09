@@ -74,7 +74,13 @@ class Action(commands.Cog):
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             progress = action.draw_progress()
             embed = embed_builder.information("挖礦行動開始", progress)
-            embed.add_field("預計完成時間", timestamp)
+            embed.add_field("預計完成時間", timestamp, inline=False)
+            workers = action.get_other_workers()
+            if workers:
+                text = [f"<@{uid}>" for uid in workers[:4]]
+                if len(workers) > 4:
+                    text.append(f"...其他 {len(workers) - 4} 名礦工")
+                embed.add_field("礦坑中的其他人", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         if now <= action.start_at + datetime.timedelta(hours=action.BASE_HOUR):
@@ -83,6 +89,12 @@ class Action(commands.Cog):
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             embed = embed_builder.information("挖礦行動中", progress)
             embed.add_field("預計完成時間", timestamp)
+            workers = action.get_other_workers()
+            if workers:
+                text = [f"<@{uid}>" for uid in workers[:4]]
+                if len(workers) > 4:
+                    text.append(f"...其他 {len(workers) - 4} 名礦工")
+                embed.add_field("礦坑中的其他人", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         profit = action.end_action()
@@ -107,6 +119,12 @@ class Action(commands.Cog):
             progress = action.draw_progress()
             embed = embed_builder.information("釣魚行動開始", progress)
             embed.add_field("預計完成時間", timestamp)
+            workers = action.get_other_workers()
+            if workers:
+                text = [f"<@{uid}>" for uid in workers[:4]]
+                if len(workers) > 4:
+                    text.append(f"...其他 {len(workers) - 4} 名釣友")
+                embed.add_field("釣場中的其他人", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         if now <= action.start_at + datetime.timedelta(hours=action.BASE_HOUR):
@@ -115,10 +133,21 @@ class Action(commands.Cog):
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             embed = embed_builder.information("釣魚行動中", progress)
             embed.add_field("預計完成時間", timestamp)
+            workers = action.get_other_workers()
+            if workers:
+                text = [f"<@{uid}>" for uid in workers[:4]]
+                if len(workers) > 4:
+                    text.append(f"...其他 {len(workers) - 4} 名釣友")
+                embed.add_field("釣場中的其他人", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         profit = action.end_action()
         description = f"本次行動中獲得了金幣 {DOLLAR_SIGN}{profit:,}"
         embed = embed_builder.information("釣魚行動結束", description)
-        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{user.coin + profit:,}")
+        user_coin = (
+            f"{DOLLAR_SIGN}{user.coin + profit:,}"
+            if user.coin >= 0
+            else f"-{DOLLAR_SIGN}{abs(user.coin + profit):,}"
+        )
+        embed.add_field("金幣餘額", {user_coin})
         await inter.response.send_message(embed=embed)
