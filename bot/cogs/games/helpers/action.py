@@ -42,10 +42,11 @@ class Mining:
         self.start_at = result[1]
         self.status = ActionStatus(result[2])
 
-    def start_action(self) -> None:
+    def start_action(self, message: str) -> None:
         with get_cursor() as cursor:
             query = (
-                "INSERT INTO game.action (action_type, uid) VALUES ('MINING', %(uid)s);"
+                "INSERT INTO game.action (action_type, uid, message) VALUES "
+                "('MINING', %(uid)s, %(message)s);"
                 "UPDATE game.player SET is_mining = True WHERE uid = %(uid)s;"
             )
             cursor.execute(query, {"uid": self.uid})
@@ -65,15 +66,15 @@ class Mining:
             )
         return profit
 
-    def get_other_workers(self) -> list[int]:
+    def get_other_workers(self) -> list[tuple[int, str]]:
         with get_cursor() as cursor:
             query = (
-                "SELECT uid FROM game.action "
+                "SELECT uid, message FROM game.action "
                 "WHERE status = 'STARTED' AND action_type = 'MINING' "
                 "ORDER BY start_at DESC"
             )
             cursor.execute(query)
-            workers = [row[0] for row in cursor.fetchall()]
+            workers = [(row[0], row[1]) for row in cursor.fetchall()]
         return workers
 
     def draw_progress(self) -> str | None:
@@ -124,13 +125,14 @@ class Fishing:
         self.start_at = result[1]
         self.status = ActionStatus(result[2])
 
-    def start_action(self) -> None:
+    def start_action(self, message: str) -> None:
         with get_cursor() as cursor:
             query = (
-                "INSERT INTO game.action (action_type, uid) VALUES ('FISHING', %(uid)s)"
-                "; UPDATE game.player SET is_fishing = True WHERE uid = %(uid)s;"
+                "INSERT INTO game.action (action_type, uid, message) VALUES "
+                "('FISHING', %(uid)s, %(message)s);"
+                "UPDATE game.player SET is_fishing = True WHERE uid = %(uid)s;"
             )
-            cursor.execute(query, {"uid": self.uid})
+            cursor.execute(query, {"uid": self.uid, "message": message})
 
     def end_action(self) -> float:
         profit = max(round(random.normalvariate(384, 24)), 0)
@@ -147,15 +149,15 @@ class Fishing:
             )
         return profit
 
-    def get_other_workers(self) -> list[int]:
+    def get_other_workers(self) -> list[tuple[int, str]]:
         with get_cursor() as cursor:
             query = (
-                "SELECT uid FROM game.action "
+                "SELECT uid, message FROM game.action "
                 "WHERE status = 'STARTED' AND action_type = 'FISHING' "
                 "ORDER BY start_at DESC"
             )
             cursor.execute(query)
-            workers = [row[0] for row in cursor.fetchall()]
+            workers = [(row[0], row[1]) for row in cursor.fetchall()]
         return workers
 
     def draw_progress(self) -> str:

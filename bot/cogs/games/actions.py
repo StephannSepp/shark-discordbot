@@ -60,7 +60,7 @@ class Action(commands.Cog):
         """Action command group. {{ACTION_GROUP}}"""
 
     @action.sub_command(name="mining")
-    async def mining(self, inter: CmdInter):
+    async def mining(self, inter: CmdInter, message: str = ""):
         """Go mining gold for 7 hours. {{ACTION_MINING}}"""
         user = GameUser(inter.author.id)
         if user.is_fishing or user.is_farming:
@@ -69,7 +69,7 @@ class Action(commands.Cog):
         action = Mining(inter.author.id)
         now = datetime.datetime.utcnow()
         if not user.is_mining:
-            action.start_action()
+            action.start_action(message)
             end_time = now + datetime.timedelta(hours=action.BASE_HOUR)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             progress = action.draw_progress()
@@ -77,10 +77,13 @@ class Action(commands.Cog):
             embed.add_field("預計完成時間", timestamp, inline=False)
             workers = action.get_other_workers()
             if workers:
-                text = [f"<@{uid}>" for uid in workers[:4]]
+                text = [
+                    f"* <@{uid}>: {message}" if message else f"* <@{uid}>"
+                    for uid, message in workers[:4]
+                ]
                 if len(workers) > 4:
                     text.append(f"...其他 {len(workers) - 4} 名礦工")
-                embed.add_field("礦坑中的其他人", "\n".join(text), inline=False)
+                embed.add_field("礦坑中的礦工", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         if now <= action.start_at + datetime.timedelta(hours=action.BASE_HOUR):
@@ -91,10 +94,13 @@ class Action(commands.Cog):
             embed.add_field("預計完成時間", timestamp)
             workers = action.get_other_workers()
             if workers:
-                text = [f"<@{uid}>" for uid in workers[:4]]
+                text = [
+                    f"* <@{uid}>: {message}" if message else f"* <@{uid}>"
+                    for uid, message in workers[:4]
+                ]
                 if len(workers) > 4:
                     text.append(f"...其他 {len(workers) - 4} 名礦工")
-                embed.add_field("礦坑中的其他人", "\n".join(text), inline=False)
+                embed.add_field("礦坑中的礦工", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         profit = action.end_action()
@@ -104,7 +110,7 @@ class Action(commands.Cog):
         await inter.response.send_message(embed=embed)
 
     @action.sub_command(name="fishing")
-    async def fishing(self, inter: CmdInter):
+    async def fishing(self, inter: CmdInter, message: str = ""):
         """Go fishing and earning coins for 2 hours. {{ACTION_FISHING}}"""
         user = GameUser(inter.author.id)
         if user.is_mining or user.is_farming:
@@ -113,7 +119,7 @@ class Action(commands.Cog):
         action = Fishing(inter.author.id)
         now = datetime.datetime.utcnow()
         if not user.is_fishing:
-            action.start_action()
+            action.start_action(message)
             end_time = now + datetime.timedelta(hours=action.BASE_HOUR)
             timestamp = f"<t:{time_process.to_unix(end_time)}:F>"
             progress = action.draw_progress()
@@ -121,10 +127,13 @@ class Action(commands.Cog):
             embed.add_field("預計完成時間", timestamp)
             workers = action.get_other_workers()
             if workers:
-                text = [f"<@{uid}>" for uid in workers[:4]]
+                text = [
+                    f"* <@{uid}>: {message}" if message else f"* <@{uid}>"
+                    for uid, message in workers[:4]
+                ]
                 if len(workers) > 4:
                     text.append(f"...其他 {len(workers) - 4} 名釣友")
-                embed.add_field("釣場中的其他人", "\n".join(text), inline=False)
+                embed.add_field("釣場中的釣友", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         if now <= action.start_at + datetime.timedelta(hours=action.BASE_HOUR):
@@ -135,10 +144,13 @@ class Action(commands.Cog):
             embed.add_field("預計完成時間", timestamp)
             workers = action.get_other_workers()
             if workers:
-                text = [f"<@{uid}>" for uid in workers[:4]]
+                text = [
+                    f"* <@{uid}>: {message}" if message else f"* <@{uid}>"
+                    for uid, message in workers[:4]
+                ]
                 if len(workers) > 4:
                     text.append(f"...其他 {len(workers) - 4} 名釣友")
-                embed.add_field("釣場中的其他人", "\n".join(text), inline=False)
+                embed.add_field("釣場中的釣友", "\n".join(text), inline=False)
             await inter.response.send_message(embed=embed)
             return
         profit = action.end_action()
