@@ -98,13 +98,17 @@ class Misc(commands.Cog):
             return
         url = f"https://game.maj-soul.com/1/?room={room}"
         jp_url = f"https://game.mahjongsoul.com/?room={room}"
+        role_assign_url = (
+            "https://discord.com/channels/740908503585259553/758068566263332874"
+            "/1081556163805593641"
+        )
         embed = embed_builder.information(
             title=f"雀魂友人場 {room} {game_mode}{game_length}",
             description=f"{description}\n\n[國際版快速入口]({url})\n[日版快速入口]({jp_url})",
         )
         embed.add_field("發起人", inter.author.mention)
         await inter.response.send_message(
-            "<@&1202555563226177536>",
+            f"<@&1202555563226177536>\n想被揪的可以從 {role_assign_url} 領取身分組",
             embed=embed,
             allowed_mentions=AllowedMentions(
                 roles=[self.bot.main_guild.get_role(1202555563226177536)]
@@ -127,6 +131,9 @@ class Misc(commands.Cog):
             "\n"
             "## 霰彈槍輪盤\n"
             "* 增加天選之人、長壽兩個獎勵\n"
+            "\n"
+            "## 其他\n"
+            "* "
         )
         embed = embed_builder.information("更新日誌", description)
         await inter.response.send_message(embed=embed)
