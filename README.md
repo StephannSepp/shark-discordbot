@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.6.6](https://img.shields.io/badge/version-2.6.6-informational?style=plastic)
+![Version 2.6.7](https://img.shields.io/badge/version-2.6.7-informational?style=plastic)
 
 ## 關於我
 
@@ -15,11 +15,21 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
-*2.6.6
-	* 霰彈槍輪盤\
-		* 增加了兩種獎勵
+* 2.6.7
+	* 行動
+		* 現在行動開始時或行動進行中會顯示其他玩家的名字及數量
+	* 銀行
+		* 個人帳戶資訊中現在會顯示進行中的行動
+		* 與銀行的交易現在會被記錄
+		* 銀行每日財務狀況現在也會被記錄
+		* 修正金幣餘額負數顯示錯誤的問題
+	* 霰彈槍輪盤
+		* 增加天選之人、長壽兩個獎勵
+* 2.6.6
+	* 霰彈槍輪盤
 		* 些微調整荷官選擇射擊對象邏輯
 		* 荷官血量增加至 6
+		* 白色子彈出線機率加倍
 	* 銀行
 		* 些微調整匯率算法
 	* 其他
