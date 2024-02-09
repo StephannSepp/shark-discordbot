@@ -44,7 +44,7 @@ class Casino(commands.Cog):
             message = "你沒有足夠的金幣下賭注"
             await inter.response.send_message(message, ephemeral=True)
             return
-        user.bank_transaction(coin_change_to_player=-bet)
+        user.bank_transaction(coin_change_to_player=-bet, note="Casino consumption.")
         view = BlackjackView(user, bet)
         embed = view.build_embed()
         await inter.response.send_message(embed=embed, view=view)
@@ -66,7 +66,7 @@ class Casino(commands.Cog):
             message = f"你至少需要 {DOLLAR_SIGN}2,400 才能遊玩"
             await inter.response.send_message(message, ephemeral=True)
             return
-        user.bank_transaction(coin_change_to_player=-2400)
+        user.bank_transaction(coin_change_to_player=-2400, note="Casino consumption.")
         dealer = RouletteDealer()
         player = RoulettePlayer()
         view = RouletteView(user, player, dealer)

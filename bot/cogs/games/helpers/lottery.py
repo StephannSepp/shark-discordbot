@@ -73,7 +73,7 @@ class Lottery:
             rewards = rewards + REWARDS[reward_level]
         return rewards
 
-    def buy(self, number: str) -> None:
+    def buy(self, number: str) -> int:
         with get_cursor() as cursor:
             query = (
                 "UPDATE game.player SET coin = coin - 100 WHERE uid = %(uid)s;"
@@ -90,6 +90,21 @@ class Lottery:
                     "pick_number": number,
                 },
             )
+            query = (
+                "INSERT INTO game.bank_transaction "
+                "(uid, coin_change, txn_note) VALUES "
+                "(%(uid)s, %(coin)s, %(note)s) RETURNING txn_id;"
+            )
+            cursor.execute(
+                query,
+                {
+                    "uid": self.uid,
+                    "coin": 100,
+                    "note": "Lottery consumption.",
+                },
+            )
+            txn_id = cursor.fetchone()[0]
+        return txn_id
 
     def _get_last_winning_number(self) -> None:
         with get_cursor() as cursor:

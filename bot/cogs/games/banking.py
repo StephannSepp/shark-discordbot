@@ -50,6 +50,12 @@ class Banking(commands.Cog):
         embed.add_field("UID", user.uid, inline=False)
         embed.add_field("黃金餘額", f"{user.gold:,.1f} AU", inline=False)
         embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{user.coin:,}", inline=False)
+        if user.is_busy:
+            if user.is_mining:
+                action_type = "挖礦中"
+            if user.is_fishing:
+                action_type = "釣魚中"
+            embed.add_field("行動狀態", action_type)
         await inter.response.send_message(embed=embed)
 
     @banking.sub_command("atlantean_coin")
@@ -87,10 +93,13 @@ class Banking(commands.Cog):
         await inter.response.send_message(embed=embed)
 
     @banking.sub_command("sell_gold")
-    async def sell_gold(self, inter: CmdInter, sell_gold: float = commands.Param(gt=0)):
+    async def sell_gold(self, inter: CmdInter, sell_gold: float = None):
         """Sell gold to the bank. {{BANKING_SELL_GOLD}}"""
         user = GameUser(inter.author.id)
-        sell = round(sell_gold, 3)
+        if sell_gold is None:
+            sell = user.gold
+        else:
+            sell = round(sell_gold, 3)
         if sell <= 0:
             await inter.response.send_message("數量不可小於等於 0", ephemeral=True)
             return
@@ -99,17 +108,25 @@ class Banking(commands.Cog):
             return
         exr = ExchangeRate()
         coin = math.floor(exr.exchange_rate * sell * 0.98)
-        user.bank_transaction(-sell, coin)
+        txn_id = user.bank_transaction(-sell, coin, "Gold sales.")
         embed = embed_builder.information(
             "交易成功", f"{sell:,.1f} AU ⇛ {DOLLAR_SIGN}{coin:,}"
         )
         embed.add_field("參考匯率", f"{exr.exchange_rate:.3f}", inline=False)
         embed.add_field("黃金餘額", f"{user.gold:,.1f} AU", inline=False)
-        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{user.coin:,}", inline=False)
+        user_coin = (
+            f"{DOLLAR_SIGN}{user.coin:,}"
+            if user.coin >= 0
+            else f"-{DOLLAR_SIGN}{abs(user.coin):,}"
+        )
+        embed.add_field("金幣餘額", f"{user_coin}", inline=False)
+        embed.set_footer(text=f"TxnID: {txn_id}")
         await inter.response.send_message(embed=embed)
 
     @tasks.loop(time=datetime.time())
     async def taskloop(self):
+        bank = Bank()
+        bank.save_fin()
         exr = ExchangeRate()
         exr.update_exchange_rate()
 

@@ -30,6 +30,14 @@ class Bank:
         self.save()
         return last_gold_hold
 
+    def save_fin(self) -> None:
+        with get_cursor() as cursor:
+            query = (
+                "INSERT INTO game.bank_financial (gold, coin) "
+                "VALUES (%(gold)s, %(coin)s)"
+            )
+            cursor.execute(query, {"gold": self.gold, "coin": self.coin})
+
     def save(self) -> None:
         with get_cursor() as cursor:
             query = (

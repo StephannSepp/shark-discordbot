@@ -38,8 +38,11 @@ class GameUser:
             self.is_farming = result[5]
 
     def bank_transaction(
-        self, gold_change_to_player: float = 0, coin_change_to_player: int = 0
-    ):
+        self,
+        gold_change_to_player: float = 0,
+        coin_change_to_player: int = 0,
+        note: str = "",
+    ) -> int:
         self.gold += gold_change_to_player
         self.coin += coin_change_to_player
         with get_cursor() as cursor:
@@ -57,6 +60,22 @@ class GameUser:
                     "coin": coin_change_to_player,
                 },
             )
+            query = (
+                "INSERT INTO game.bank_transaction "
+                "(uid, gold_change, coin_change, txn_note) VALUES "
+                "(%(uid)s, %(gold)s, %(coin)s, %(note)s) RETURNING txn_id;"
+            )
+            cursor.execute(
+                query,
+                {
+                    "uid": self.uid,
+                    "gold": -gold_change_to_player,
+                    "coin": -coin_change_to_player,
+                    "note": note,
+                },
+            )
+            txn_id = cursor.fetchone()[0]
+        return txn_id
 
     def save(self) -> None:
         with get_cursor() as cursor:

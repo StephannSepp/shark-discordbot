@@ -38,8 +38,8 @@ class LotteryGame(commands.Cog):
             await inter.response.send_message(message, ephemeral=True)
             return
         number = f"{number:04}"
-        tickets.buy(number)
-        await inter.response.send_message(f"你已購買彩券號碼 {number}")
+        txn_id = tickets.buy(number)
+        await inter.response.send_message(f"你已購買彩券號碼 {number}\nTxnID: {txn_id}")
 
     @lottery.sub_command("winning_number")
     async def winning_number(self, inter: CmdInter):
@@ -50,13 +50,19 @@ class LotteryGame(commands.Cog):
         embed = embed_builder.information("亞特蘭提斯彩券", description)
         if lottery.tickets:
             for ticket in lottery.tickets:
-                embed.add_field(f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number)
+                embed.add_field(
+                    f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number
+                )
         if lottery.last_tickets:
             for ticket in lottery.last_tickets:
-                embed.add_field(f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number)
+                embed.add_field(
+                    f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number
+                )
             rewards = lottery.claim()
             if rewards > 0:
-                user.bank_transaction(coin_change_to_player=rewards)
+                user.bank_transaction(
+                    coin_change_to_player=rewards, note="Lottery rewards."
+                )
             embed.add_field("共贏得獎金", f"{DOLLAR_SIGN}{rewards:,}", inline=False)
         await inter.response.send_message(embed=embed)
 

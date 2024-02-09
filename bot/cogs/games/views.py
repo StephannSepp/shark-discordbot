@@ -46,7 +46,9 @@ class BlackjackView(View):
         if self.first_hand and player_value == 21:
             # Player got the Blackjack, disable all button.
             self._disable_all_child()
-            self.user.bank_transaction(coin_change_to_player=math.floor(self.bet * 1.5))
+            self.user.bank_transaction(
+                coin_change_to_player=math.floor(self.bet * 1.5), note="Casino consumption."
+            )
             embed.color = Colour.green()
             embed.add_field("結果", "二十一點", inline=False)
             embed.add_field(
@@ -68,7 +70,8 @@ class BlackjackView(View):
                     child.disabled = True
             if dealer_value > 21 or player_value > dealer_value:
                 self.user.bank_transaction(
-                    coin_change_to_player=math.floor(self.bet * 2)
+                    coin_change_to_player=math.floor(self.bet * 2),
+                    note="Casino consumption.",
                 )
                 embed.color = Colour.green()
                 embed.add_field("結果", "閒家(你)勝", inline=False)
@@ -80,7 +83,8 @@ class BlackjackView(View):
                 self.stop()
             elif player_value == dealer_value:
                 self.user.bank_transaction(
-                    coin_change_to_player=math.floor(self.bet * 1)
+                    coin_change_to_player=math.floor(self.bet * 1),
+                    note="Casino consumption.",
                 )
                 embed.color = Colour.yellow()
                 embed.add_field("結果", "平局", inline=False)
@@ -143,7 +147,9 @@ class BlackjackView(View):
     async def player_double(self, button: Button, inter: CmdInter):
         if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
-        self.user.bank_transaction(coin_change_to_player=-self.bet)
+        self.user.bank_transaction(
+            coin_change_to_player=-self.bet, note="Casino consumption."
+        )
         self.bet *= 2
         self.first_hand = False
         self._disable_all_child()
@@ -314,7 +320,9 @@ class RouletteView(View):
         description = "\n".join(self.game_logs) + result
         embed = embed_builder.information("霰彈槍輪盤", description)
         if self.player.life == 0 or self.dealer.life == 0:
-            self.user.bank_transaction(coin_change_to_player=reward)
+            self.user.bank_transaction(
+                coin_change_to_player=reward, note="Casino consumption."
+            )
             field_name = "勝利獎金" if win else "失敗罰金"
             if reward >= 0:
                 embed.add_field(field_name, f"A€{reward:,}")
