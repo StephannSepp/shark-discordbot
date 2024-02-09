@@ -149,5 +149,5 @@ class Action(commands.Cog):
             if user.coin >= 0
             else f"-{DOLLAR_SIGN}{abs(user.coin + profit):,}"
         )
-        embed.add_field("金幣餘額", {user_coin})
+        embed.add_field("金幣餘額", user_coin)
         await inter.response.send_message(embed=embed)
