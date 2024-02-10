@@ -49,7 +49,12 @@ class Banking(commands.Cog):
         embed = embed_builder.information("資產查詢")
         embed.add_field("UID", user.uid, inline=False)
         embed.add_field("黃金餘額", f"{user.gold:,.1f} AU", inline=False)
-        embed.add_field("金幣餘額", f"{DOLLAR_SIGN}{user.coin:,}", inline=False)
+        user_coin = (
+            f"{DOLLAR_SIGN}{user.coin:,}"
+            if user.coin >= 0
+            else f"-{DOLLAR_SIGN}{abs(user.coin):,}"
+        )
+        embed.add_field("金幣餘額", user_coin, inline=False)
         if user.is_busy:
             if user.is_mining:
                 action_type = "挖礦中"

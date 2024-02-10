@@ -49,7 +49,7 @@ class Mining:
                 "('MINING', %(uid)s, %(message)s);"
                 "UPDATE game.player SET is_mining = True WHERE uid = %(uid)s;"
             )
-            cursor.execute(query, {"uid": self.uid})
+            cursor.execute(query, {"uid": self.uid, "message": message})
 
     def end_action(self) -> float:
         profit = max(round(random.normalvariate(64, 8), 1), 0)
