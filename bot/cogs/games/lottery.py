@@ -39,7 +39,9 @@ class LotteryGame(commands.Cog):
             return
         number = f"{number:04}"
         txn_id = tickets.buy(number)
-        await inter.response.send_message(f"你已購買彩券號碼 {number}\nTxnID: {txn_id}")
+        embed = embed_builder.information("亞特蘭提斯彩券", f"你已購買彩券號碼 {number}")
+        embed.set_footer(text=f"TxnID: {txn_id}")
+        await inter.response.send_message(embed=embed)
 
     @lottery.sub_command("winning_number")
     async def winning_number(self, inter: CmdInter):
