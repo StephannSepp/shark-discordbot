@@ -245,16 +245,16 @@ class RouletteView(View):
             reward += shot_dealer * 100
             reward += self_blank * 200
             reward -= self.dealer.life * 50
-            reward -= shot_taken * 400
+            reward -= shot_taken * 300
             reward -= self_shot * 1200
             reward -= shot_pop * 400
-            reward -= total_shot * 50
+            reward -= total_shot * 30
             if self.dealer.life == self.dealer.max_life:
                 reward -= 1200
             reward = min(reward, 0)
             win = False
         else:
-            reward += 2400
+            reward += 2100
             reward += (game_round - 1) * 50
             reward += remaining_life * 100
             reward += shot_dealer * 200
@@ -275,14 +275,14 @@ class RouletteView(View):
                 f"{shot_dealer} 次向荷官開槍 x 100 = {shot_dealer * 100:,}\n"
                 f"{self_blank} 次向自射擊安然無恙 x 200 = {self_blank * 200:,}\n"
                 f"{self.dealer.life} 荷官剩餘生命 x -50 = {self.dealer.life * -50:,}\n"
-                f"{shot_taken} 次被荷官開槍 x -400 = {shot_taken * -400:,}\n"
+                f"{shot_taken} 次被荷官開槍 x -300 = {shot_taken * -300:,}\n"
                 f"{self_shot} 次向自己開槍 x -1,200 = {self_shot * -1200:,}\n"
                 f"{shot_pop} 次退出彈藥 x -400 = {shot_pop * -400:,}\n"
-                f"{total_shot} 彈藥費用 x -50 = {total_shot * -50:,}\n"
+                f"{total_shot} 彈藥費用 x -30 = {total_shot * -30:,}\n"
                 "== 其他獎懲 ==\n"
-                f"善後費用 = -2,400\n"
+                f"善後費用 = -2,100\n"
             )
-            if self.dealer.life == 5:
+            if self.dealer.life == self.dealer.max_life:
                 text += "滿身瘡痍 = -1,200\n"
         else:
             text = (
@@ -294,9 +294,9 @@ class RouletteView(View):
                 f"{self_shot} 次向自己開槍 x -800 = {self_shot * -800:,}\n"
                 f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n"
                 "== 其他獎懲 ==\n"
-                f"押金返還 = 2,400\n"
+                f"押金返還 = 2,100\n"
             )
-            if remaining_life == 5:
+            if remaining_life == self.player.max_life:
                 text += "全身而退 = 2,400\n"
             if self_attampt > 8 and self_shot == 0:
                 text += "天選之人 = 3,200\n"

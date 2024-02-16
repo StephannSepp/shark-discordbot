@@ -36,7 +36,9 @@ class Bank:
                 "INSERT INTO game.bank_financial (gold, coin) "
                 "VALUES (%(gold)s, %(coin)s)"
             )
-            cursor.execute(query, {"gold": self.gold, "coin": self.coin})
+            cursor.execute(
+                query, {"gold": (self.gold + self.reserve_gold) * 28, "coin": self.coin}
+            )
 
     def save(self) -> None:
         with get_cursor() as cursor:

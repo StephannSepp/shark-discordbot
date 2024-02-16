@@ -39,7 +39,9 @@ class LotteryGame(commands.Cog):
             return
         number = f"{number:04}"
         txn_id = tickets.buy(number)
-        embed = embed_builder.information("亞特蘭提斯彩券", f"你已購買彩券號碼 {number}")
+        embed = embed_builder.information(
+            "亞特蘭提斯彩券", f"你已購買彩券號碼 {number}"
+        )
         embed.set_footer(text=f"TxnID: {txn_id}")
         await inter.response.send_message(embed=embed)
 
@@ -48,18 +50,18 @@ class LotteryGame(commands.Cog):
         """Check last winning number and claim the reward. {{LOTTERY_WINNING_NUMBER}}"""
         user = GameUser(inter.author.id)
         lottery = Lottery(inter.author.id)
-        description = f"第 {lottery.no - 1} 期彩券頭獎號碼: {lottery.winning_number}"
+        description = (
+            f"第 {lottery.no - 1} 期彩券頭獎號碼: \n## {lottery.winning_number}"
+        )
         embed = embed_builder.information("亞特蘭提斯彩券", description)
         if lottery.tickets:
-            for ticket in lottery.tickets:
-                embed.add_field(
-                    f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number
-                )
+            text = "\n".join(f"* {t.pick_number}" for t in lottery.tickets)
+            embed.add_field(f"第 {lottery.tickets[0].lottery_no} 期擁有的彩券", text)
         if lottery.last_tickets:
-            for ticket in lottery.last_tickets:
-                embed.add_field(
-                    f"第 {ticket.lottery_no} 期擁有的彩券", ticket.pick_number
-                )
+            text = "\n".join(f"* {t.pick_number}" for t in lottery.last_tickets)
+            embed.add_field(
+                f"第 {lottery.last_tickets[0].lottery_no} 期擁有的彩券", text
+            )
             rewards = lottery.claim()
             if rewards > 0:
                 user.bank_transaction(

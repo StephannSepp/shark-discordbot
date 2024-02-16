@@ -119,18 +119,12 @@ class Misc(commands.Cog):
     async def changelog(self, inter: CmdInter):
         """Show the changelog of the current version. {{MISC_CHANGELOG}}"""
         description = (
-            "## 行動\n"
-            "* 現在行動開始時或行動進行中會顯示其他玩家的名字及數量\n"
-            "* 增加行動留言板功能, 使用`message`參數可留言\n"
-            "## 銀行\n"
-            "* 個人帳戶資訊中現在會顯示進行中的行動\n"
-            "* 與銀行的交易現在會被記錄\n"
-            "* 銀行每日財務狀況現在也會被記錄\n"
-            "* 修正金幣餘額負數顯示錯誤的問題\n"
             "## 霰彈槍輪盤\n"
-            "* 增加天選之人、長壽兩個獎勵\n"
+            "* 押金從 2,400 改為 2,100\n"
+            "* 落敗時被荷官開槍從 400 改為 300\n"
+            "* 落敗時的彈藥費用從 50 改為 30\n"
         )
-        embed = embed_builder.information("更新日誌 2.6.7", description)
+        embed = embed_builder.information("更新日誌 2.6.8", description)
         await inter.response.send_message(embed=embed)
 
 
