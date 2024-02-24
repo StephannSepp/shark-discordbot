@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from disnake import CmdInter
 from disnake.ext import commands
@@ -22,7 +23,7 @@ class LotteryGame(commands.Cog):
         """Lottery group commands. {{LOTTERY_GROUP}}"""
 
     @lottery.sub_command("buy")
-    async def buy(self, inter: CmdInter, number: commands.Range[int, 0, 9999]):
+    async def buy(self, inter: CmdInter, number: commands.Range[int, 0, 9999] = None):
         """Buy a lottery ticket for 100 coins, choose 4-digit number. {{LOTTERY_BUY}}"""
         tickets = Lottery(inter.author.id)
         user = GameUser(inter.author.id)
@@ -37,7 +38,10 @@ class LotteryGame(commands.Cog):
             message = "你沒有足夠的金幣購買彩券"
             await inter.response.send_message(message, ephemeral=True)
             return
-        number = f"{number:04}"
+        if number is None:
+            number = f"{number:04}"
+        else:
+            number = f"{random.randint(0, 9999):04}"
         txn_id = tickets.buy(number)
         embed = embed_builder.information(
             "亞特蘭提斯彩券", f"你已購買彩券號碼 {number}"
