@@ -104,7 +104,10 @@ class Action(commands.Cog):
             await inter.response.send_message(embed=embed)
             return
         profit = action.end_action()
-        description = f"本次行動中獲得了黃金 {profit:,.1f} AU"
+        description = (
+            f"## 本次行動中獲得了黃金 {profit:,.1f} AU\n"
+            "使用 `/banking sell_gold` 或 `/銀行 販賣黃金` 來販賣黃金"
+        )
         embed = embed_builder.information("挖礦行動結束", description)
         embed.add_field("黃金餘額", f"{user.gold + profit:,.1f} AU")
         await inter.response.send_message(embed=embed)
