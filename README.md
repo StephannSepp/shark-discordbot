@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.6.7](https://img.shields.io/badge/version-2.6.7-informational?style=plastic)
+![Version 2.6.9](https://img.shields.io/badge/version-2.6.9-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,16 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+* 2.6.9
+	* 彩券
+		* 增加隨機選號功能
+	* 行動
+		* 增加販賣黃金提示
+* 2.6.9
+	* 霰彈槍輪盤
+		* 押金從 2,400 改為 2,100
+		* 落敗時被荷官開槍從 400 改為 300
+		* 落敗時的彈藥費用從 50 改為 30
 * 2.6.7
 	* 行動
 		* 現在行動開始時或行動進行中會顯示其他玩家的名字及數量

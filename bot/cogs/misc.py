@@ -119,12 +119,12 @@ class Misc(commands.Cog):
     async def changelog(self, inter: CmdInter):
         """Show the changelog of the current version. {{MISC_CHANGELOG}}"""
         description = (
-            "## 霰彈槍輪盤\n"
-            "* 押金從 2,400 改為 2,100\n"
-            "* 落敗時被荷官開槍從 400 改為 300\n"
-            "* 落敗時的彈藥費用從 50 改為 30\n"
+            "## 彩券\n"
+            "* 增加隨機選號功能\n"
+            "## 行動\n"
+            "* 增加販賣黃金提示\n"
         )
-        embed = embed_builder.information("更新日誌 2.6.8", description)
+        embed = embed_builder.information("更新日誌 2.6.9", description)
         await inter.response.send_message(embed=embed)
 
 
