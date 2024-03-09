@@ -31,7 +31,16 @@ class Bank:
         return last_gold_hold
 
     def save_fin(self) -> None:
+        today = datetime.datetime.utcnow().date()
         with get_cursor() as cursor:
+            query = (
+                "SELECT fin_date FROM game.bank_financial "
+                "ORDER BY fin_date DESC LIMIT 1"
+            )
+            cursor.execute(query)
+            result = cursor.fetchone()[0]
+            if result == today:
+                return
             query = (
                 "INSERT INTO game.bank_financial (gold, coin) "
                 "VALUES (%(gold)s, %(coin)s)"
@@ -117,19 +126,19 @@ class ExchangeRate:
             rate, trend = result
 
         if rate > BASE_EXCHANGE_RATE + 1.4:
-            normalize_modifier = 0.5 - 0.25
+            normalize_modifier = 0.5 - 0.33
         elif rate > BASE_EXCHANGE_RATE + 0.93:
-            normalize_modifier = 0.9 - 0.25
+            normalize_modifier = 0.9 - 0.33
         elif rate > BASE_EXCHANGE_RATE + 0.47:
-            normalize_modifier = 0.95 - 0.25
+            normalize_modifier = 0.95 - 0.33
         elif rate < BASE_EXCHANGE_RATE - 1.4:
-            normalize_modifier = 1.05 - 0.25
+            normalize_modifier = 1.05 - 0.33
         elif rate < BASE_EXCHANGE_RATE - 0.93:
-            normalize_modifier = 1.1 - 0.25
+            normalize_modifier = 1.1 - 0.33
         elif rate < BASE_EXCHANGE_RATE - 0.47:
-            normalize_modifier = 1.5 - 0.25
+            normalize_modifier = 1.5 - 0.33
         else:
-            normalize_modifier = 1 - 0.25
+            normalize_modifier = 1 - 0.33
         trend_modifier = math.log(
             (last_gold_mined + 1) * normalize_modifier / (recent_avg_income + 1)
         )
