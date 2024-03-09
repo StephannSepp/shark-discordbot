@@ -39,9 +39,9 @@ class LotteryGame(commands.Cog):
             await inter.response.send_message(message, ephemeral=True)
             return
         if number is None:
-            number = f"{number:04}"
-        else:
             number = f"{random.randint(0, 9999):04}"
+        else:
+            number = f"{number:04}"
         txn_id = tickets.buy(number)
         embed = embed_builder.information(
             "亞特蘭提斯彩券", f"你已購買彩券號碼 {number}"
