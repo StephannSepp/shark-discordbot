@@ -37,6 +37,16 @@ class GameUser:
             self.is_fishing = result[4]
             self.is_farming = result[5]
 
+    def get_action_stats(self, action_type: str) -> dict:
+        with get_cursor() as cursor:
+            query = (
+                "SELECT count(*), COALESCE(SUM(profit), 0) FROM game.action "
+                "WHERE uid = %(uid)s AND action_type = %(action_type)s"
+            )
+            cursor.execute(query, {"uid": self.uid, "action_type": action_type})
+            result = cursor.fetchone()
+        return {"count": result[0], "profit": result[1]}
+
     def bank_transaction(
         self,
         gold_change_to_player: float = 0,

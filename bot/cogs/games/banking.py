@@ -61,6 +61,18 @@ class Banking(commands.Cog):
             if user.is_fishing:
                 action_type = "釣魚中"
             embed.add_field("行動狀態", action_type)
+        mining_stats = user.get_action_stats("MINING")
+        embed.add_field(
+            "已挖礦次數 / 總共產出金礦",
+            f"{mining_stats['count']:,} 次 / {mining_stats['profit']:,.1f} AU",
+            inline=False,
+        )
+        fishing_stats = user.get_action_stats("FISHING")
+        embed.add_field(
+            "已釣魚次數 / 總共賺得金幣",
+            f"{fishing_stats['count']:,} 次 / {DOLLAR_SIGN}{fishing_stats['profit']:,}",
+            inline=False,
+        )
         await inter.response.send_message(embed=embed)
 
     @banking.sub_command("atlantean_coin")
