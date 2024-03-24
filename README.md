@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.6.9](https://img.shields.io/badge/version-2.6.9-informational?style=plastic)
+![Version 2.7.0](https://img.shields.io/badge/version-2.7.0-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,15 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+* 2.7.0
+	* Bot
+		* 使用非同步方法存取資料庫，避免一些奇怪的阻塞問題發生
+	* 抽籤統計
+		* 過去 30 日最常抽到的幸運天使，30 日改為 90 日
+	* 管理指令
+		* 修正使用者沒有設定頭像時會發生例外錯誤
+	* 更新日誌
+		* 更新日誌現在紀錄於資料庫中
 * 2.6.9
 	* 彩券
 		* 增加隨機選號功能
