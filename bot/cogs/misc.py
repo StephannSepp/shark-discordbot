@@ -6,6 +6,8 @@ from disnake import File
 from disnake.ext import commands
 from utils import embed_builder
 
+from bot import get_cursor
+
 MahjongSoulGameMode = commands.option_enum(
     {
         "三人": "三人",
@@ -61,9 +63,10 @@ class Misc(commands.Cog):
         version_info = f"{self.bot.version} with Python {pf.python_version()}"
         system_info = f"{pf.system()}-{pf.release()}-{pf.machine()}"
         up_time_info = f"{self.bot.up_time} on {system_info}"
+        db_up_time = await self.bot.db_up_time()
         embed.add_field(name="Bot 版本", value=version_info, inline=False)
         embed.add_field(name="Bot 運行狀態", value=up_time_info, inline=False)
-        embed.add_field(name="DB 運行狀態", value=self.bot.db_up_time, inline=False)
+        embed.add_field(name="DB 運行狀態", value=db_up_time, inline=False)
         await inter.response.send_message(embed=embed)
 
     @commands.slash_command(name="kuaikuai")
@@ -118,13 +121,14 @@ class Misc(commands.Cog):
     @commands.slash_command(name="changelog")
     async def changelog(self, inter: CmdInter):
         """Show the changelog of the current version. {{MISC_CHANGELOG}}"""
-        description = (
-            "## 彩券\n"
-            "* 增加隨機選號功能\n"
-            "## 行動\n"
-            "* 增加販賣黃金提示\n"
-        )
-        embed = embed_builder.information("更新日誌 2.6.9", description)
+        async with get_cursor() as cursor:
+            query = (
+                "SELECT log_version, log_content "
+                "FROM public.changelog ORDER BY log_id LIMIT 1"
+            )
+            await cursor.execute(query)
+            result = await cursor.fetchone()
+        embed = embed_builder.information(f"更新日誌 {result[0]}", result[1])
         await inter.response.send_message(embed=embed)
 
 
