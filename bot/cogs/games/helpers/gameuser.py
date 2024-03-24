@@ -67,6 +67,7 @@ class GameUser:
             "coin": coin_change_to_player,
             "inv_gold": -gold_change_to_player,
             "inv_coin": -coin_change_to_player,
+            "note": note,
         }
         async with get_cursor() as cursor:
             query = (
