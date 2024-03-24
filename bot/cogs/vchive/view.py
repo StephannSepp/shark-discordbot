@@ -30,20 +30,27 @@ class Topic(Enum):
 
 
 class ArchiveMenu(View):
+    rowcount: int
+
     def __init__(self, channel: str = None, exclude_failed: bool = True):
         super().__init__(timeout=720)
         self.per_page = 5
         self.page = 0
-        self.rowcount = module.get_archive_rowcount(channel)
         self.channel = channel
         self.exclude_failed = exclude_failed
 
-    def build_embed(self) -> Embed:
+    @classmethod
+    async def create(cls, channel: str = None, exclude_failed: bool = True):
+        self = cls(channel, exclude_failed)
+        self.rowcount = await module.get_archive_rowcount(channel)
+        return self
+
+    async def build_embed(self) -> Embed:
         embed = embed_builder.information(
             title="直播存檔列表",
             description="請利用相同指令以 VID 參數搜尋、下載",
         )
-        archives = module.get_archives(
+        archives = await module.get_archives(
             page=self.page, channel=self.channel, exclude_failed=self.exclude_failed
         )
         for archive in archives:
@@ -76,31 +83,31 @@ class ArchiveMenu(View):
     @disnake.ui.button(emoji="⏮️", style=ButtonStyle.blurple)
     async def first_page(self, button: Button, inter: CmdInter):
         self.page = 0
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="◀️", style=ButtonStyle.secondary)
     async def prev_page(self, button: Button, inter: CmdInter):
         self.page = max(self.page - 1, 0)
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="🔄", style=ButtonStyle.success)
     async def refresh_page(self, button: Button, inter: CmdInter):
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="▶️", style=ButtonStyle.secondary)
     async def next_page(self, button: Button, inter: CmdInter):
         max_page = math.ceil(self.rowcount / self.per_page)
         self.page = min(self.page + 1, max_page)
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="⏭️", style=ButtonStyle.blurple)
     async def last_page(self, button: Button, inter: CmdInter):
         self.page = math.ceil(self.rowcount / self.per_page) - 1
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
 
@@ -109,8 +116,8 @@ class ArchiveView(View):
         super().__init__(timeout=720)
         self.vid = vid
 
-    def build_embed(self) -> Embed:
-        archive = module.archive_detail(self.vid)
+    async def build_embed(self) -> Embed:
+        archive = await module.archive_detail(self.vid)
         if archive["v_org"].lower() == "independents":
             organization = "個人勢"
         else:
@@ -135,7 +142,9 @@ class ArchiveView(View):
         if (d := archive["duration"]) is not None:
             duration = time_process.strftimedelta(timedelta(seconds=d))
             embed.add_field("直播長度", duration, inline=False)
-        embed.add_field("存檔狀態", getattr(Status, archive["status"]).value, inline=False)
+        embed.add_field(
+            "存檔狀態", getattr(Status, archive["status"]).value, inline=False
+        )
         embed.set_thumbnail(url=archive["photo"])
         return embed
 
@@ -154,15 +163,22 @@ class ArchiveView(View):
 
 
 class ChannelMenu(View):
+    rowcount: int
+
     def __init__(self):
         super().__init__(timeout=720)
         self.per_page = 7
         self.page = 0
-        self.rowcount = module.get_channel_rowcount()
 
-    def build_embed(self) -> Embed:
+    @classmethod
+    async def create(cls):
+        self = cls()
+        self.rowcount = await module.get_channel_rowcount()
+        return self
+
+    async def build_embed(self) -> Embed:
         embed = embed_builder.information(title="存檔頻道列表")
-        channels = module.get_channels(page=self.page)
+        channels = await module.get_channels(page=self.page)
         for channel in channels:
             if channel["v_org"].lower() == "independents":
                 organization = "個人勢"
@@ -189,24 +205,24 @@ class ChannelMenu(View):
     @disnake.ui.button(emoji="⏮️", style=ButtonStyle.blurple)
     async def first_page(self, button: Button, inter: CmdInter):
         self.page = 0
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="◀️", style=ButtonStyle.secondary)
     async def prev_page(self, button: Button, inter: CmdInter):
         self.page = max(self.page - 1, 0)
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="▶️", style=ButtonStyle.secondary)
     async def next_page(self, button: Button, inter: CmdInter):
         max_page = math.ceil(self.rowcount / self.per_page)
         self.page = min(self.page + 1, max_page)
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(emoji="⏭️", style=ButtonStyle.blurple)
     async def last_page(self, button: Button, inter: CmdInter):
         self.page = math.ceil(self.rowcount / self.per_page) - 1
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)

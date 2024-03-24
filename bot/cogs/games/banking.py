@@ -45,7 +45,7 @@ class Banking(commands.Cog):
     @banking.sub_command("profile")
     async def profile(self, inter: CmdInter):
         """Show bank account. {{BANKING_PROFILE}}"""
-        user = GameUser(inter.author.id)
+        user = await GameUser.fetch(inter.author.id)
         embed = embed_builder.information("資產查詢")
         embed.add_field("UID", user.uid, inline=False)
         embed.add_field("黃金餘額", f"{user.gold:,.1f} AU", inline=False)
@@ -61,13 +61,13 @@ class Banking(commands.Cog):
             if user.is_fishing:
                 action_type = "釣魚中"
             embed.add_field("行動狀態", action_type)
-        mining_stats = user.get_action_stats("MINING")
+        mining_stats = await user.get_action_stats("MINING")
         embed.add_field(
             "已挖礦次數 / 總共產出金礦",
             f"{mining_stats['count']:,} 次 / {mining_stats['profit']:,.1f} AU",
             inline=False,
         )
-        fishing_stats = user.get_action_stats("FISHING")
+        fishing_stats = await user.get_action_stats("FISHING")
         embed.add_field(
             "已釣魚次數 / 總共賺得金幣",
             f"{fishing_stats['count']:,} 次 / {DOLLAR_SIGN}{fishing_stats['profit']:,}",
@@ -78,8 +78,8 @@ class Banking(commands.Cog):
     @banking.sub_command("atlantean_coin")
     async def atlantean_coin(self, inter: CmdInter):
         """Show information about Atlantean Coins. {{BANKING_ATLANTEAN_COIN}}"""
-        exr = ExchangeRate()
-        bank = Bank()
+        exr = await ExchangeRate.create()
+        bank = await Bank.bank()
         bank_gold_discount = math.floor((bank.gold + bank.reserve_gold) * 28)
         bank_gold_percentage = bank_gold_discount / (bank.coin + bank_gold_discount)
         bank_coin_percentage = bank.coin / (bank.coin + bank_gold_discount)
@@ -103,7 +103,7 @@ class Banking(commands.Cog):
             f"{DOLLAR_SIGN}{bank_gold_discount:,}",
             inline=False,
         )
-        exr_data = exr.get_recent_exchange_rate()
+        exr_data = await exr.get_recent_exchange_rate()
         data_stream = await asyncio.to_thread(generate_line_chart, exr_data)
         file = File(data_stream, "exchange_rate.png")
         embed.set_image(file=file)
@@ -112,7 +112,7 @@ class Banking(commands.Cog):
     @banking.sub_command("sell_gold")
     async def sell_gold(self, inter: CmdInter, sell_gold: float = None):
         """Sell gold to the bank. {{BANKING_SELL_GOLD}}"""
-        user = GameUser(inter.author.id)
+        user = await GameUser.fetch(inter.author.id)
         if sell_gold is None:
             sell = user.gold
         else:
@@ -123,9 +123,9 @@ class Banking(commands.Cog):
         if sell > user.gold:
             await inter.response.send_message("你沒有足夠的黃金", ephemeral=True)
             return
-        exr = ExchangeRate()
+        exr = await ExchangeRate.create()
         coin = math.floor(exr.exchange_rate * sell * 0.98)
-        txn_id = user.bank_transaction(-sell, coin, "Gold sales.")
+        txn_id = await user.bank_transaction(-sell, coin, "Gold sales.")
         embed = embed_builder.information(
             "交易成功", f"{sell:,.1f} AU ⇛ {DOLLAR_SIGN}{coin:,}"
         )
@@ -142,10 +142,10 @@ class Banking(commands.Cog):
 
     @tasks.loop(time=datetime.time())
     async def taskloop(self):
-        bank = Bank()
-        bank.save_fin()
-        exr = ExchangeRate()
-        exr.update_exchange_rate()
+        bank = await Bank.bank()
+        await bank.save_fin()
+        exr = await ExchangeRate.create()
+        await exr.update_exchange_rate()
 
     @taskloop.before_loop
     async def before_taskloop(self):

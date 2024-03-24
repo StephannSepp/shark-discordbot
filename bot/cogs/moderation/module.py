@@ -1,7 +1,9 @@
 from bot import get_cursor
 
 
-def add_warning(user_id: int, server_id: int, moderator_id: int, reason: str) -> int:
+async def add_warning(
+    user_id: int, server_id: int, moderator_id: int, reason: str
+) -> int:
     """Insert a warning to the database.
 
     Args:
@@ -13,26 +15,24 @@ def add_warning(user_id: int, server_id: int, moderator_id: int, reason: str) ->
     Returns:
         The ID of the warning.
     """
-    with get_cursor() as cursor:
+    params = {
+        "user_id": user_id,
+        "server_id": server_id,
+        "moderator_id": moderator_id,
+        "reason": reason,
+    }
+    async with get_cursor() as cursor:
         query = (
             "INSERT INTO warns (user_id, server_id, moderator_id, reason) "
             "VALUES (%(user_id)s, %(server_id)s, %(moderator_id)s, %(reason)s) "
             "RETURNING warn_id"
         )
-        cursor.execute(
-            query,
-            {
-                "user_id": user_id,
-                "server_id": server_id,
-                "moderator_id": moderator_id,
-                "reason": reason,
-            },
-        )
-        warning_id = cursor.fetchone()[0]
+        await cursor.execute(query, params)
+        warning_id = (await cursor.fetchone())[0]
     return warning_id
 
 
-def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
+async def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
     """Delete a warning from the database.
 
     Args:
@@ -43,40 +43,32 @@ def remove_warn(server_id: int, user_id: int, warning_id: int) -> str:
     Retruns:
         The reason of the warning.
     """
-    query = (
-        "SELECT reason FROM warns "
-        "WHERE warn_id = %(id)s "
-        "AND user_id = %(user_id)s "
-        "AND server_id = %(server_id)s"
-    )
-    with get_cursor() as cursor:
-        cursor.execute(
-            query,
-            {
-                "id": warning_id,
-                "user_id": user_id,
-                "server_id": server_id,
-            },
+
+    params = {
+        "id": warning_id,
+        "user_id": user_id,
+        "server_id": server_id,
+    }
+    async with get_cursor() as cursor:
+        query = (
+            "SELECT reason FROM warns "
+            "WHERE warn_id = %(id)s "
+            "AND user_id = %(user_id)s "
+            "AND server_id = %(server_id)s"
         )
-        result = cursor.fetchone()[0]
+        await cursor.execute(query, params)
+        result = (await cursor.fetchone())[0]
         query = (
             "DELETE FROM warns "
             "WHERE warn_id = %(id)s "
             "AND user_id = %(user_id)s "
             "AND server_id = %(server_id)s"
         )
-        cursor.execute(
-            query,
-            {
-                "id": warning_id,
-                "user_id": user_id,
-                "server_id": server_id,
-            },
-        )
+        await cursor.execute(query, params)
     return result
 
 
-def list_warns(server_id: int, user_id: int) -> list:
+async def list_warns(server_id: int, user_id: int) -> list:
     """Return a list of warnings on the user.
 
     Args
@@ -91,18 +83,17 @@ def list_warns(server_id: int, user_id: int) -> list:
             4: reason           <str>
             5: warn issue time  <datetime.datetime>
     """
-    query = (
-        "SELECT warn_id, user_id, moderator_id, reason, created_at FROM warns "
-        "WHERE user_id = %(user_id)s "
-        "AND server_id = %(server_id)s"
-    )
-    with get_cursor() as cursor:
-        cursor.execute(
-            query,
-            {
-                "user_id": user_id,
-                "server_id": server_id,
-            },
+
+    params = {
+        "user_id": user_id,
+        "server_id": server_id,
+    }
+    async with get_cursor() as cursor:
+        query = (
+            "SELECT warn_id, user_id, moderator_id, reason, created_at FROM warns "
+            "WHERE user_id = %(user_id)s "
+            "AND server_id = %(server_id)s"
         )
-        result = cursor.fetchall()
+        await cursor.execute(query, params)
+        result = await cursor.fetchall()
     return result

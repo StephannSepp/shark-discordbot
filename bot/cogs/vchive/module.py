@@ -1,40 +1,31 @@
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 from datetime import datetime
 from datetime import timedelta
-from typing import Generator
+from typing import AsyncGenerator
 
 import aiohttp
 from config import Config
-from psycopg2.extensions import cursor
-from psycopg2.pool import ThreadedConnectionPool
+from psycopg import AsyncCursor
 from utils import funcs
 from utils import gen
 
 from bot import OWNERS
-
-con_pool = ThreadedConnectionPool(
-    minconn=0, maxconn=16, dsn=Config.vchive_db_url, sslmode="allow"
-)
+from bot import vchive_pool
 
 
-@contextmanager
-def get_cursor() -> Generator[cursor, None, None]:
-    con = con_pool.getconn()
-    try:
-        with con.cursor() as cur:
+@asynccontextmanager
+async def get_cursor() -> AsyncGenerator[AsyncCursor, None]:
+    await vchive_pool.open()
+    async with vchive_pool.connection() as conn:
+        conn.transaction()
+        async with conn.cursor() as cur:
             yield cur
-            con.commit()
-    except:
-        con.rollback()
-        raise
-    finally:
-        con_pool.putconn(con)
 
 
-def get_archives(
+async def get_archives(
     page: int = 0, channel: str = None, exclude_failed: bool = True
 ) -> list[dict]:
-    with get_cursor() as cursor:
+    async with get_cursor() as cursor:
         offset = page * 5
         if channel is None:
             if exclude_failed:
@@ -49,7 +40,7 @@ def get_archives(
                     "duration, topic, status, private FROM archives "
                     "ORDER BY start_at DESC LIMIT 5 OFFSET %s"
                 )
-            cursor.execute(query, (offset,))
+            await cursor.execute(query, (offset,))
         else:
             if exclude_failed:
                 query = (
@@ -64,14 +55,14 @@ def get_archives(
                     "duration, topic, status, private FROM archives "
                     "WHERE channel_name = %s ORDER BY start_at DESC LIMIT 5 OFFSET %s"
                 )
-            cursor.execute(
+            await cursor.execute(
                 query,
                 (
                     channel,
                     offset,
                 ),
             )
-        result = cursor.fetchall()
+        result = await cursor.fetchall()
     archives = []
     for archive in result:
         archives.append(
@@ -91,20 +82,20 @@ def get_archives(
     return archives
 
 
-def lookup_archives(vid: str) -> list:
-    with get_cursor() as cursor:
+async def lookup_archives(vid: str) -> list:
+    async with get_cursor() as cursor:
         vid = f"{vid}%"
         query = (
             "SELECT vid, title FROM archives "
             "WHERE LOWER(vid) LIKE LOWER(%s) ORDER BY start_at DESC LIMIT 25"
         )
-        cursor.execute(query, (vid,))
-        result = cursor.fetchall()
+        await cursor.execute(query, (vid,))
+        result = await cursor.fetchall()
     return [f"{archive[0]} - {archive[1]}" for archive in result]
 
 
-def lookup_channels(channel: str) -> list:
-    with get_cursor() as cursor:
+async def lookup_channels(channel: str) -> list:
+    async with get_cursor() as cursor:
         channel = f"%{channel}%"
         query = (
             "SELECT channel_name FROM channels "
@@ -112,21 +103,21 @@ def lookup_channels(channel: str) -> list:
             "OR LOWER(english_name) LIKE LOWER(%s) "
             "ORDER BY v_org, v_group, english_name LIMIT 25"
         )
-        cursor.execute(query, (channel, channel))
-        result = cursor.fetchall()
+        await cursor.execute(query, (channel, channel))
+        result = await cursor.fetchall()
     return [channel[0] for channel in result]
 
 
-def archive_detail(vid) -> dict:
-    with get_cursor() as cursor:
+async def archive_detail(vid) -> dict:
+    async with get_cursor() as cursor:
         query = (
             "SELECT vid, title, start_at, end_at, duration, topic, status, private, "
             "channels.channel_name, channels.channel_id, v_org, v_group, photo "
             "FROM archives, channels "
             "WHERE archives.channel_id = channels.channel_id AND vid = %s"
         )
-        cursor.execute(query, (vid,))
-        result = cursor.fetchone()
+        await cursor.execute(query, (vid,))
+        result = await cursor.fetchone()
     return {
         "vid": result[0],
         "title": result[1],
@@ -144,28 +135,28 @@ def archive_detail(vid) -> dict:
     }
 
 
-def get_archive_rowcount(channel: str = None) -> int:
-    with get_cursor() as cursor:
+async def get_archive_rowcount(channel: str = None) -> int:
+    async with get_cursor() as cursor:
         if channel is None:
             query = "SELECT COUNT(*) FROM archives"
-            cursor.execute(query)
+            await cursor.execute(query)
         else:
             query = "SELECT COUNT(*) FROM archives WHERE channel_name = %s"
-            cursor.execute(query, (channel,))
-        rowcount = cursor.fetchone()[0]
+            await cursor.execute(query, (channel,))
+        rowcount = (await cursor.fetchone())[0]
     return rowcount
 
 
-def get_channels(page: int = 0) -> list[dict]:
-    with get_cursor() as cursor:
+async def get_channels(page: int = 0) -> list[dict]:
+    async with get_cursor() as cursor:
         offset = page * 7
         query = (
             "SELECT channel_id, channel_name, english_name, v_org, "
             "v_group, yt_handle, photo FROM channels "
             "ORDER BY v_org, v_group, english_name LIMIT 7 OFFSET %s"
         )
-        cursor.execute(query, (offset,))
-        result = cursor.fetchall()
+        await cursor.execute(query, (offset,))
+        result = await cursor.fetchall()
     channels = []
     for channel in result:
         channels.append(
@@ -182,11 +173,11 @@ def get_channels(page: int = 0) -> list[dict]:
     return channels
 
 
-def get_channel_rowcount() -> int:
-    with get_cursor() as cursor:
+async def get_channel_rowcount() -> int:
+    async with get_cursor() as cursor:
         query = "SELECT COUNT(*) FROM channels"
-        cursor.execute(query)
-        rowcount = cursor.fetchone()[0]
+        await cursor.execute(query)
+        rowcount = (await cursor.fetchone())[0]
     return rowcount
 
 
@@ -203,7 +194,7 @@ async def request_holodex_channel(channel_id: str) -> dict | None:
     return None
 
 
-def insert_channel(
+async def insert_channel(
     name: str,
     id: str,
     english_name: str,
@@ -216,10 +207,10 @@ def insert_channel(
     **kwargs,
 ) -> bool:
     yt_handle = yt_handle[0]
-    with get_cursor() as cursor:
+    async with get_cursor() as cursor:
         query = "SELECT EXISTS(SELECT 1 FROM channels WHERE channel_id = %s)"
-        cursor.execute(query, (id,))
-        exist = cursor.fetchone()[0]
+        await cursor.execute(query, (id,))
+        exist = (await cursor.fetchone())[0]
         if exist:
             return False
         query = (
@@ -227,47 +218,47 @@ def insert_channel(
             "v_org, v_suborg, v_group, yt_handle, photo) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         )
-        cursor.execute(
+        await cursor.execute(
             query, (id, name, english_name, org, suborg, group, yt_handle, photo)
         )
     return True
 
 
-def delete_channel(cid: str) -> bool:
-    with get_cursor() as cursor:
+async def delete_channel(cid: str) -> bool:
+    async with get_cursor() as cursor:
         query = "DELETE FROM channels WHERE channel_id = %s"
-        cursor.execute(query, (cid,))
+        await cursor.execute(query, (cid,))
     return True
 
 
-def private_archive(vid: str) -> bool:
-    with get_cursor() as cursor:
+async def private_archive(vid: str) -> bool:
+    async with get_cursor() as cursor:
         query = "SELECT private FROM archives WHERE vid = %s"
-        cursor.execute(query, (vid,))
-        private = cursor.fetchone()[0]
+        await cursor.execute(query, (vid,))
+        private = (await cursor.fetchone())[0]
         query = "UPDATE archives SET private = %s WHERE vid = %s"
-        cursor.execute(query, (not private, vid))
+        await cursor.execute(query, (not private, vid))
     return not private
 
 
-def request_record(uid: int, vid: str, cid: str, url: str, pwd: str):
-    with get_cursor() as cursor:
+async def request_record(uid: int, vid: str, cid: str, url: str, pwd: str):
+    async with get_cursor() as cursor:
         query = (
             "INSERT INTO request_record (discord_uid, vid, channel_id, url, pwd) "
             "VALUES (%s, %s, %s, %s, %s)"
         )
-        cursor.execute(query, (uid, vid, cid, url, pwd))
+        await cursor.execute(query, (uid, vid, cid, url, pwd))
 
 
 async def get_share_link(uid: int, vid: str) -> tuple[str, str, str]:
-    with get_cursor() as cursor:
+    async with get_cursor() as cursor:
         query = (
             "SELECT channels.channel_id, channels.channel_name, english_name, title, "
             "private FROM archives, channels "
             "WHERE archives.channel_id = channels.channel_id AND vid = %s"
         )
-        cursor.execute(query, (vid,))
-        result = cursor.fetchone()
+        await cursor.execute(query, (vid,))
+        result = await cursor.fetchone()
     channel_id, channel_name, english_name, title, private = result
     if private and uid not in OWNERS:
         raise PermissionError("該存檔為私人存檔")
@@ -323,5 +314,5 @@ async def get_share_link(uid: int, vid: str) -> tuple[str, str, str]:
         async with session.post(url, data=data) as r:
             if r.status != 200:
                 raise ConnectionError("請求認證失敗")
-        request_record(uid, vid, channel_id, share_url, password)
+        await request_record(uid, vid, channel_id, share_url, password)
         return filename, share_url, password

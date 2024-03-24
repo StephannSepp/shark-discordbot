@@ -34,7 +34,7 @@ class BlackjackView(View):
         self.player_hand.append(self.cards.pop())
         self.player_hand.append(self.cards.pop())
 
-    def build_embed(self, end_of_game=False) -> Embed:
+    async def build_embed(self, end_of_game=False) -> Embed:
         player_value = self.calc_value(self.player_hand)
         dealer_value = self.calc_value(self.dealer_hand)
         description = f"莊家點數: {dealer_value}\n" f"閒家(你)點數: {player_value}\n"
@@ -46,8 +46,9 @@ class BlackjackView(View):
         if self.first_hand and player_value == 21:
             # Player got the Blackjack, disable all button.
             self._disable_all_child()
-            self.user.bank_transaction(
-                coin_change_to_player=math.floor(self.bet * 1.5), note="Casino consumption."
+            await self.user.bank_transaction(
+                coin_change_to_player=math.floor(self.bet * 1.5),
+                note="Casino consumption.",
             )
             embed.color = Colour.green()
             embed.add_field("結果", "二十一點", inline=False)
@@ -69,7 +70,7 @@ class BlackjackView(View):
                 if child.label == "雙倍下注":
                     child.disabled = True
             if dealer_value > 21 or player_value > dealer_value:
-                self.user.bank_transaction(
+                await self.user.bank_transaction(
                     coin_change_to_player=math.floor(self.bet * 2),
                     note="Casino consumption.",
                 )
@@ -82,7 +83,7 @@ class BlackjackView(View):
                 embed.add_field("結果", "莊家勝", inline=False)
                 self.stop()
             elif player_value == dealer_value:
-                self.user.bank_transaction(
+                await self.user.bank_transaction(
                     coin_change_to_player=math.floor(self.bet * 1),
                     note="Casino consumption.",
                 )
@@ -108,10 +109,10 @@ class BlackjackView(View):
                 break
         return value
 
-    def dealer_round(self) -> Embed:
+    async def dealer_round(self) -> Embed:
         while self.calc_value(self.dealer_hand) < 17:
             self.dealer_hand.append(self.cards.pop())
-        embed = self.build_embed(end_of_game=True)
+        embed = await self.build_embed(end_of_game=True)
         return embed
 
     @disnake.ui.button(label="要牌", emoji="🔼", style=ButtonStyle.green)
@@ -128,10 +129,10 @@ class BlackjackView(View):
             # Player's value reaches 21 or more, stop automatically
             self._disable_all_child()
         if self.calc_value(self.player_hand) == 21:
-            embed = self.dealer_round()
+            embed = await self.dealer_round()
         else:
             # Player busted, no need to continue.
-            embed = self.build_embed()
+            embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="停牌", emoji="⏸️", style=ButtonStyle.gray)
@@ -140,14 +141,14 @@ class BlackjackView(View):
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
         self.first_hand = False
         self._disable_all_child()
-        embed = self.dealer_round()
+        embed = await self.dealer_round()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="雙倍下注", emoji="⏫", style=ButtonStyle.blurple)
     async def player_double(self, button: Button, inter: CmdInter):
         if inter.author.id != self.user.uid:
             await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
-        self.user.bank_transaction(
+        await self.user.bank_transaction(
             coin_change_to_player=-self.bet, note="Casino consumption."
         )
         self.bet *= 2
@@ -157,9 +158,9 @@ class BlackjackView(View):
         if self.calc_value(self.player_hand) > 21:
             # Player busted, no need to continue.
             self._disable_all_child()
-            embed = self.build_embed()
+            embed = await self.build_embed()
         else:
-            embed = self.dealer_round()
+            embed = await self.dealer_round()
         await inter.response.edit_message(embed=embed, view=self)
 
 
@@ -308,7 +309,7 @@ class RouletteView(View):
         for child in self.children:
             child.disabled = True
 
-    def build_embed(self) -> Embed:
+    async def build_embed(self) -> Embed:
         result = ""
         if self.player.life == 0 or self.dealer.life == 0:
             reward, result, win = self._get_score()
@@ -320,7 +321,7 @@ class RouletteView(View):
         description = "\n".join(self.game_logs) + result
         embed = embed_builder.information("霰彈槍輪盤", description)
         if self.player.life == 0 or self.dealer.life == 0:
-            self.user.bank_transaction(
+            await self.user.bank_transaction(
                 coin_change_to_player=reward, note="Casino consumption."
             )
             field_name = "勝利獎金" if win else "失敗罰金"
@@ -366,7 +367,7 @@ class RouletteView(View):
                 f"* {inter.author.mention}朝荷官扣動了扳機, 但是一枚假彈{shot.value}"
             )
         self.dealers_turn()
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="對自己開槍", style=ButtonStyle.blurple)
@@ -396,7 +397,7 @@ class RouletteView(View):
             self.game_logs.append(
                 f"* {inter.author.mention}朝自己扣動了扳機, 是一枚假彈{shot.value}"
             )
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="退出一發彈藥", style=ButtonStyle.blurple)
@@ -432,7 +433,7 @@ class RouletteView(View):
             for child in self.children:
                 if child.label == "退出一發彈藥":
                     child.disabled = True
-        embed = self.build_embed()
+        embed = await self.build_embed()
         await inter.response.edit_message(embed=embed, view=self)
 
     def dealers_turn(self) -> bool:

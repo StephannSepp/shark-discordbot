@@ -23,7 +23,7 @@ class Casino(commands.Cog):
     @commands.cooldown(60, 3600, commands.BucketType.user)
     async def blackjack(self, inter: CmdInter, bet: int):
         """Play blackjack game. {{CASINO_BLACKJACK}}"""
-        user = GameUser(inter.author.id)
+        user = await GameUser.fetch(inter.author.id)
         if user.is_busy:
             message = "你正在行動中, 不能進行此操作"
             await inter.response.send_message(message, ephemeral=True)
@@ -44,16 +44,18 @@ class Casino(commands.Cog):
             message = "你沒有足夠的金幣下賭注"
             await inter.response.send_message(message, ephemeral=True)
             return
-        user.bank_transaction(coin_change_to_player=-bet, note="Casino consumption.")
+        await user.bank_transaction(
+            coin_change_to_player=-bet, note="Casino consumption."
+        )
         view = BlackjackView(user, bet)
-        embed = view.build_embed()
+        embed = await view.build_embed()
         await inter.response.send_message(embed=embed, view=view)
 
     @casino.sub_command(name="roulette")
     @commands.cooldown(60, 3600, commands.BucketType.user)
     async def roulette(self, inter: CmdInter):
         """Play shotgun roulette. {{CASINO_ROULETTE}}"""
-        user = GameUser(inter.author.id)
+        user = await GameUser.fetch(inter.author.id)
         if user.is_busy:
             message = "你正在行動中, 不能進行此操作"
             await inter.response.send_message(message, ephemeral=True)
@@ -66,9 +68,11 @@ class Casino(commands.Cog):
             message = f"你至少需要 {DOLLAR_SIGN}2,100 才能遊玩"
             await inter.response.send_message(message, ephemeral=True)
             return
-        user.bank_transaction(coin_change_to_player=-2100, note="Casino consumption.")
+        await user.bank_transaction(
+            coin_change_to_player=-2100, note="Casino consumption."
+        )
         dealer = RouletteDealer()
         player = RoulettePlayer()
         view = RouletteView(user, player, dealer)
-        embed = view.build_embed()
+        embed = await view.build_embed()
         await inter.response.send_message(embed=embed, view=view)

@@ -19,49 +19,56 @@ class LotteryTicket:
 class Lottery:
     winning_number: str = None
     valid_date: datetime.datetime = None
+    no: int = None
 
     def __init__(self, uid: int | None = None):
         self.tickets: list[LotteryTicket] = []
         self.last_tickets: list[LotteryTicket] = []
-        self.no = self.get_lottery_no()
-        self._get_last_winning_number()
         if uid is not None:
             self.uid = uid
-            self._get_last_lottery_tickets()
-            self._get_lottery_tickets()
 
-    def _get_lottery_tickets(self) -> None:
-        with get_cursor() as cursor:
+    @classmethod
+    async def lottery(cls, uid: int | None = None) -> "Lottery":
+        self = cls(uid)
+        self.no = self.get_lottery_no()
+        await self._get_last_winning_number()
+        if uid is not None:
+            await self._get_last_lottery_tickets()
+            await self._get_lottery_tickets()
+        return self
+
+    async def _get_lottery_tickets(self) -> None:
+        async with get_cursor() as cursor:
             query = (
                 "SELECT ticket_id, uid, lottery_no, pick_number "
                 "FROM game.lottery_ticket WHERE uid = %(uid)s "
                 "AND lottery_no = %(lottery_no)s AND claimed = False"
             )
-            cursor.execute(query, {"lottery_no": self.no, "uid": self.uid})
-            result = cursor.fetchall()
+            await cursor.execute(query, {"lottery_no": self.no, "uid": self.uid})
+            result = await cursor.fetchall()
         for row in result:
             self.tickets.append(LotteryTicket(*row))
 
-    def _get_last_lottery_tickets(self) -> None:
-        with get_cursor() as cursor:
+    async def _get_last_lottery_tickets(self) -> None:
+        async with get_cursor() as cursor:
             query = (
                 "SELECT ticket_id, uid, lottery_no, pick_number "
                 "FROM game.lottery_ticket WHERE uid = %(uid)s "
                 "AND lottery_no = %(lottery_no)s AND claimed = False"
             )
-            cursor.execute(query, {"lottery_no": self.no - 1, "uid": self.uid})
-            result = cursor.fetchall()
+            await cursor.execute(query, {"lottery_no": self.no - 1, "uid": self.uid})
+            result = await cursor.fetchall()
         for row in result:
             self.last_tickets.append(LotteryTicket(*row))
 
-    def claim(self) -> int:
-        with get_cursor() as cursor:
+    async def claim(self) -> int:
+        async with get_cursor() as cursor:
             query = (
                 "UPDATE game.lottery_ticket SET claimed = True "
                 "WHERE uid = %(uid)s AND lottery_no = %(lottery_no)s "
                 "AND claimed = False"
             )
-            cursor.execute(query, {"lottery_no": self.no - 1, "uid": self.uid})
+            await cursor.execute(query, {"lottery_no": self.no - 1, "uid": self.uid})
         rewards = 0
         for ticket in self.last_tickets:
             reward_level = 4
@@ -73,47 +80,42 @@ class Lottery:
             rewards = rewards + REWARDS[reward_level]
         return rewards
 
-    def buy(self, number: str) -> int:
-        with get_cursor() as cursor:
+    async def buy(self, number: str) -> int:
+        params = {
+            "uid": self.uid,
+            "lottery_no": self.no,
+            "pick_number": number,
+            "coin": 100,
+            "note": "Lottery consumption.",
+        }
+        async with get_cursor() as cursor:
+            query = "UPDATE game.player SET coin = coin - 100 WHERE uid = %(uid)s"
+            await cursor.execute(query, {"uid": self.uid})
+            query = "UPDATE game.bank SET coin = coin + 100"
+            await cursor.execute(query)
             query = (
-                "UPDATE game.player SET coin = coin - 100 WHERE uid = %(uid)s;"
-                "UPDATE game.bank SET coin = coin + 100;"
                 "INSERT INTO game.lottery_ticket (uid, lottery_no, "
                 "pick_number) VALUES (%(uid)s, %(lottery_no)s, "
                 "%(pick_number)s);"
             )
-            cursor.execute(
-                query,
-                {
-                    "uid": self.uid,
-                    "lottery_no": self.no,
-                    "pick_number": number,
-                },
-            )
+            await cursor.execute(query, params)
             query = (
                 "INSERT INTO game.bank_transaction "
                 "(uid, coin_change, txn_note) VALUES "
                 "(%(uid)s, %(coin)s, %(note)s) RETURNING txn_id;"
             )
-            cursor.execute(
-                query,
-                {
-                    "uid": self.uid,
-                    "coin": 100,
-                    "note": "Lottery consumption.",
-                },
-            )
-            txn_id = cursor.fetchone()[0]
+            await cursor.execute(query, params)
+            txn_id = (await cursor.fetchone())[0]
         return txn_id
 
-    def _get_last_winning_number(self) -> None:
-        with get_cursor() as cursor:
+    async def _get_last_winning_number(self) -> None:
+        async with get_cursor() as cursor:
             query = (
                 "SELECT lottery_no, valid_date, winning_number, update_time "
                 "FROM game.lottery WHERE lottery_no = %(lottery_no)s"
             )
-            cursor.execute(query, {"lottery_no": self.no - 1})
-            result = cursor.fetchone()
+            await cursor.execute(query, {"lottery_no": self.no - 1})
+            result = await cursor.fetchone()
         if result is None:
             return
         self.winning_number = result[2]
@@ -128,13 +130,14 @@ class Lottery:
         return no
 
     @staticmethod
-    def generate_winning_number() -> str:
+    async def generate_winning_number() -> str:
         no = Lottery.get_lottery_no() - 1
         winning_number = f"{random.randint(0, 9999):04}"
-        with get_cursor() as cursor:
+        params = {"lottery_no": no, "winning_number": winning_number}
+        async with get_cursor() as cursor:
             query = (
                 "INSERT INTO game.lottery (lottery_no, winning_number) "
                 "VALUES (%(lottery_no)s, %(winning_number)s)"
             )
-            cursor.execute(query, {"lottery_no": no, "winning_number": winning_number})
+            await cursor.execute(query, params)
         return winning_number

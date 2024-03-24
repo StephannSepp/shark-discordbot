@@ -3,7 +3,6 @@ from disnake import CmdInter
 from disnake import TextChannel
 from disnake import User
 from disnake.ext import commands
-
 from utils import embed_builder
 from utils import funcs
 from utils import time_process
@@ -20,7 +19,7 @@ class Moderation(commands.Cog):
     @commands.slash_command(name="mywarn")
     async def mywarn(self, inter: CmdInter):
         """查詢警告紀錄"""
-        warning_list = module.list_warns(inter.guild_id, inter.author.id)
+        warning_list = await module.list_warns(inter.guild_id, inter.author.id)
         embed = embed_builder.information(
             title="警告紀錄", description="", thumbnail=inter.author.avatar.url
         )
@@ -72,7 +71,7 @@ class Moderation(commands.Cog):
         """
         await inter.response.defer()
 
-        warning_id = module.add_warning(
+        warning_id = await module.add_warning(
             user_id=user.id,
             server_id=inter.guild_id,
             moderator_id=inter.author.id,
@@ -85,7 +84,9 @@ class Moderation(commands.Cog):
         )
         embed.add_field(name="理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
-        embed.add_field(name="短編號", value=funcs.int_b64encode(warning_id), inline=False)
+        embed.add_field(
+            name="短編號", value=funcs.int_b64encode(warning_id), inline=False
+        )
         if copy:
             await copy.send(embed=embed)
             await inter.followup.send(embed=embed)
@@ -116,7 +117,7 @@ class Moderation(commands.Cog):
             warning_id = funcs.int_b64decode(warning_id)
 
         try:
-            reason = module.remove_warn(inter.guild_id, user.id, warning_id)
+            reason = await module.remove_warn(inter.guild_id, user.id, warning_id)
         except:  # pylint: disable=bare-except
             embed = embed_builder.error(
                 title="無法執行", description="發生錯誤，請確認該警告編號及對象確實存在"
@@ -131,7 +132,9 @@ class Moderation(commands.Cog):
         )
         embed.add_field(name="警告理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
-        embed.add_field(name="短編號", value=funcs.int_b64encode(warning_id), inline=False)
+        embed.add_field(
+            name="短編號", value=funcs.int_b64encode(warning_id), inline=False
+        )
         if copy:
             await copy.send(embed=embed)
             await inter.followup.send(embed=embed)
@@ -147,7 +150,7 @@ class Moderation(commands.Cog):
         user: 對象成員
         """
 
-        warning_list = module.list_warns(inter.guild_id, user.id)
+        warning_list = await module.list_warns(inter.guild_id, user.id)
         embed = embed_builder.information(
             title="警告紀錄", description="", thumbnail=user.avatar.url
         )
@@ -200,8 +203,7 @@ class Moderation(commands.Cog):
                 member = await inter.guild.fetch_member(user.id)
             except:  # pylint: disable=bare-except
                 embed = embed_builder.error(
-                    title="無法執行",
-                    description="發生錯誤，請確認該對象確實存在"
+                    title="無法執行", description="發生錯誤，請確認該對象確實存在"
                 )
                 await inter.edit_original_response(embed=embed)
                 return
@@ -211,14 +213,15 @@ class Moderation(commands.Cog):
             or member.guild_permissions.moderate_members
         ):
             embed = embed_builder.error(
-                title="無法執行",
-                description="該成員有相同或更大的權限"
+                title="無法執行", description="該成員有相同或更大的權限"
             )
             await inter.edit_original_response(embed=embed)
             return
 
         try:
-            message = f"你在 {inter.guild.name} 被禁言\n原因：{reason}\n時長：{duration}\n"
+            message = (
+                f"你在 {inter.guild.name} 被禁言\n原因：{reason}\n時長：{duration}\n"
+            )
             if attachment is not None and attachment.content_type.startswith("image"):
                 message += "附件：\n"
                 file = await attachment.to_file()
@@ -230,7 +233,9 @@ class Moderation(commands.Cog):
         try:
             await member.timeout(duration=duration.total_seconds(), reason=reason)
         except:  # pylint: disable=bare-except
-            embed = embed_builder.error(title="無法執行", description="禁言成員時發生錯誤")
+            embed = embed_builder.error(
+                title="無法執行", description="禁言成員時發生錯誤"
+            )
             await inter.edit_original_response(embed=embed)
             return
 
@@ -277,8 +282,7 @@ class Moderation(commands.Cog):
                 member = await inter.guild.fetch_member(user.id)
             except:  # pylint: disable=bare-except
                 embed = embed_builder.error(
-                    title="無法執行",
-                    description="發生錯誤，請確認該對象確實存在"
+                    title="無法執行", description="發生錯誤，請確認該對象確實存在"
                 )
                 await inter.edit_original_response(embed=embed)
                 return
@@ -288,8 +292,7 @@ class Moderation(commands.Cog):
             or member.guild_permissions.moderate_members
         ):
             embed = embed_builder.error(
-                title="無法執行",
-                description="該成員有相同或更大的權限"
+                title="無法執行", description="該成員有相同或更大的權限"
             )
             await inter.edit_original_response(embed=embed)
             return
@@ -304,8 +307,7 @@ class Moderation(commands.Cog):
             await member.timeout(duration=None, reason=reason)
         except:  # pylint: disable=bare-except
             embed = embed_builder.error(
-                title="無法執行",
-                description="解除禁言成員時發生錯誤"
+                title="無法執行", description="解除禁言成員時發生錯誤"
             )
             await inter.edit_original_response(embed=embed)
             return
@@ -350,8 +352,7 @@ class Moderation(commands.Cog):
                 member = await inter.guild.fetch_member(user.id)
             except:  # pylint: disable=bare-except
                 embed = embed_builder.error(
-                    title="無法執行",
-                    description="發生錯誤，請確認該對象確實存在"
+                    title="無法執行", description="發生錯誤，請確認該對象確實存在"
                 )
                 await inter.edit_original_response(embed=embed)
                 return
@@ -361,8 +362,7 @@ class Moderation(commands.Cog):
             or member.guild_permissions.kick_members
         ):
             embed = embed_builder.error(
-                title="無法執行",
-                description="該成員有相同或更大的權限"
+                title="無法執行", description="該成員有相同或更大的權限"
             )
             await inter.edit_original_response(embed=embed)
             return
@@ -380,7 +380,9 @@ class Moderation(commands.Cog):
         try:
             await member.kick(reason=reason)
         except:  # pylint: disable=bare-except
-            embed = embed_builder.error(title="無法執行", description="踢出成員時發生錯誤")
+            embed = embed_builder.error(
+                title="無法執行", description="踢出成員時發生錯誤"
+            )
             await inter.edit_original_response(embed=embed)
             return
 
@@ -428,7 +430,9 @@ class Moderation(commands.Cog):
             try:
                 member = await inter.guild.fetch_member(user.id)
             except:  # pylint: disable=bare-except
-                embed = embed_builder.error(title="無法執行", description="發生錯誤，請確認該對象確實存在")
+                embed = embed_builder.error(
+                    title="無法執行", description="發生錯誤，請確認該對象確實存在"
+                )
                 await inter.edit_original_response(embed=embed)
                 return
 
@@ -448,7 +452,9 @@ class Moderation(commands.Cog):
         try:
             await inter.guild.ban(member, reason=reason)
         except:  # pylint: disable=bare-except
-            embed = embed_builder.error(title="無法執行", description="停權成員時發生錯誤")
+            embed = embed_builder.error(
+                title="無法執行", description="停權成員時發生錯誤"
+            )
             await inter.edit_original_response(embed=embed)
             return
 

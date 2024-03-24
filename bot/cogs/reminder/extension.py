@@ -4,10 +4,11 @@ import logging
 from disnake import CmdInter
 from disnake.ext import commands
 from disnake.ext import tasks
-
-from bot import get_cursor
+from utils import embed_builder
 from utils import gen
 from utils import time_process
+
+from bot import get_cursor
 
 
 class Reminder(commands.Cog):
@@ -18,14 +19,14 @@ class Reminder(commands.Cog):
         self.taskloop.start()
 
     async def cog_load(self):
-        self._fetch_next_reminder()
+        await self._fetch_next_reminder()
 
-    def _fetch_next_reminder(self):
+    async def _fetch_next_reminder(self):
         logging.info("Fetching next reminder...")
-        with get_cursor() as cursor:
+        async with get_cursor() as cursor:
             query = "SELECT * FROM reminder ORDER BY remind_at LIMIT 1"
-            cursor.execute(query)
-            result = cursor.fetchone()
+            await cursor.execute(query)
+            result = await cursor.fetchone()
 
         if result:
             self.next_reminder = {
@@ -42,12 +43,14 @@ class Reminder(commands.Cog):
             self.next_reminder = self.DEFAULT_REMINDER
             logging.info("All remind tasks done")
 
-    def _clear_remind(self, remind_id: int):
-        with get_cursor() as cursor:
+    async def _clear_remind(self, remind_id: int):
+        async with get_cursor() as cursor:
             query = "DELETE FROM reminder WHERE remind_id = %s"
-            cursor.execute(query, (remind_id,))
+            await cursor.execute(query, (remind_id,))
 
     async def _do_remind(self):
+        if self.next_reminder.get("remind_at") is None:
+            return
         if datetime.datetime.now() < self.next_reminder["remind_at"]:
             return
 
@@ -62,8 +65,8 @@ class Reminder(commands.Cog):
         channel = guild.get_channel(channel_id) or await self.bot.fetch_channel(
             channel_id
         )
-        self._clear_remind(remind_id)
-        self._fetch_next_reminder()
+        await self._clear_remind(remind_id)
+        await self._fetch_next_reminder()
         await channel.send(
             f"**<@{user_id}> 以下是你在<t:{time_in_unix}:R>要求的提醒訊息:**\n{with_message}"
         )
@@ -73,7 +76,9 @@ class Reminder(commands.Cog):
     async def remind(self, inter: CmdInter):
         pass
 
-    @remind.sub_command(name="me", description="提醒我，格式範例：2d8h5m20s，雙空格代替換行")
+    @remind.sub_command(
+        name="me", description="提醒我，格式範例：2d8h5m20s，雙空格代替換行"
+    )
     @commands.guild_only()
     async def remind_add(self, inter: CmdInter, after: str, message: str):
         try:
@@ -95,32 +100,30 @@ class Reminder(commands.Cog):
         server_id = inter.guild.id
         channel_id = inter.channel_id
 
-        with get_cursor() as cursor:
+        async with get_cursor() as cursor:
             query = "SELECT count(*) FROM reminder WHERE user_id = %s"
-            cursor.execute(query, (user_id,))
-            user_reminders = cursor.fetchone()[0]
-            if user_reminders >= 3:
-                await inter.response.send_message("你不能設定超過三個提醒")
-                return
-
+            await cursor.execute(query, (user_id,))
+            user_reminders = (await cursor.fetchone())[0]
+        if user_reminders >= 3:
+            await inter.response.send_message("你不能設定超過三個提醒")
+            return
+        params = {
+            "remind_id": remind_id,
+            "user_id": user_id,
+            "server_id": server_id,
+            "channel_id": channel_id,
+            "remind_text": message,
+            "remind_at": time_to_remind,
+            "created_at": datetime.datetime.now(),
+        }
+        async with get_cursor() as cursor:
             query = (
-                "INSERT INTO reminder VALUES (%(remind_id)s, %(user_id)s, %(server_id)s, "
+                "INSERT INTO reminder VALUES (%(remind_id)s,%(user_id)s,%(server_id)s, "
                 "%(channel_id)s, %(remind_text)s, %(remind_at)s, %(created_at)s)"
             )
-            cursor.execute(
-                query,
-                {
-                    "remind_id": remind_id,
-                    "user_id": user_id,
-                    "server_id": server_id,
-                    "channel_id": channel_id,
-                    "remind_text": message,
-                    "remind_at": time_to_remind,
-                    "created_at": datetime.datetime.now(),
-                },
-            )
+            await cursor.execute(query, params)
 
-        self._fetch_next_reminder()
+        await self._fetch_next_reminder()
         await inter.response.send_message(
             f"我會在 **<t:{timestamp}>**（<t:{timestamp}:R>）提醒你\n提醒內容:\n**{message}**"
         )
@@ -128,18 +131,21 @@ class Reminder(commands.Cog):
     @remind.sub_command("list")
     @commands.guild_only()
     async def remind_list(self, inter: CmdInter):
-        with get_cursor() as cursor:
+        async with get_cursor() as cursor:
             query = "SELECT * FROM reminder WHERE user_id = %s ORDER BY remind_at"
-            cursor.execute(query, (inter.author.id,))
-            result = cursor.fetchall()
-
-        message = [
-            f"{reminder[5]} - {reminder[4]} in <#{reminder[3]}>" for reminder in result
-        ]
+            await cursor.execute(query, (inter.author.id,))
+            result = await cursor.fetchall()
+        messages = []
+        for remind in result:
+            timestamp = time_process.to_unix(remind[5])
+            message = remind[4]
+            channel = f"<#{remind[3]}>"
+            messages.append(f"* {timestamp} - {message} in {channel}")
         if not message:
-            await inter.response.send_message("你沒有任何設定的提醒")
+            embed = embed_builder.information("提醒列表", "你沒有任何設定的提醒")
+            await inter.response.send_message(embed=embed)
             return
-
+        embed = embed_builder.information("提醒列表", "\n".join(messages))
         await inter.response.send_message("\n".join(message))
 
     @tasks.loop(seconds=10)

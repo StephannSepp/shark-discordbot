@@ -5,7 +5,6 @@ import hashlib
 from disnake import CmdInter
 from disnake.ext import commands
 from disnake.ext import tasks
-
 from utils import embed_builder
 from utils import time_process
 
@@ -78,7 +77,7 @@ class Fortune(commands.Cog):
         role = inter.guild.get_role(ROLES[result.luck])
         if role is not None and role not in inter.author.roles:
             await inter.author.add_roles(role)
-            result.record()
+            await result.record()
         await inter.edit_original_response(
             content=f"下次抽籤重置時間：<t:{reset_time_unix}> <t:{reset_time_unix}:R>",
             embed=embed,
@@ -92,16 +91,16 @@ class Fortune(commands.Cog):
         if group_by is not None:
             match group_by:
                 case "運氣":
-                    result = FortuneResult.get_stats_by("luck")
+                    result = await FortuneResult.get_stats_by("luck")
                     # ..:example:
                     # result = [('中吉', 9), ('小吉', 7), ('大吉', 5), ('大凶', 3)]
                     inline = False
                 case "幸運天使":
-                    result = FortuneResult.get_stats_by("angel")
+                    result = await FortuneResult.get_stats_by("angel")
                     # ..:example:
                     # result = [('Ayunda Risu', 5), ('Ceres Fauna', 4), ...]
                     inline = True
-            total = FortuneResult.get_total_draws()
+            total = await FortuneResult.get_total_draws()
             embed = embed_builder.information(
                 title="全域抽籤統計📊",
                 description=f"截至目前為止已經抽出了 {total} 支籤\n",
@@ -123,7 +122,7 @@ class Fortune(commands.Cog):
             # last_week_result = (('大吉', <datetime object>), ...)
             # most_common_angel_result = ('Ceres Fauna', 3)
             file = None
-            result = FortuneResult.get_by_user(inter.author.id)
+            result = await FortuneResult.get_by_user(inter.author.id)
             last_week_result, most_common_angel_result = result
             embed = embed_builder.information(
                 title="個人抽籤統計📊", description=f"以下是 {inter.author.mention} 的個人運勢統計"
@@ -139,7 +138,7 @@ class Fortune(commands.Cog):
             if most_common_angel_result:
                 common_angel, count = most_common_angel_result
                 value = f"{common_angel} - {count} 次"
-                embed.add_field(name="過去 30 日最常抽到的幸運天使", value=value, inline=False)
+                embed.add_field(name="過去 90 日最常抽到的幸運天使", value=value, inline=False)
                 url = module.get_guardian_angel_image(common_angel)
                 embed.set_thumbnail(url=url)
             await inter.response.send_message(embed=embed)
@@ -150,9 +149,6 @@ class Fortune(commands.Cog):
 
         self.pause = True
         self.today = datetime.datetime.utcnow().date()
-
-        # Clear history data
-        # FortuneResult.clear_history_data()
         # Revoke roles
         guild = self.bot.main_guild
         for _k, v in ROLES.items():

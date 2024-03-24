@@ -23,58 +23,65 @@ class Mining:
     BASE_HOUR = 7
     BASE_TIME = BASE_HOUR * 60 * 60
 
-    def __init__(self, uid: int):
+    @classmethod
+    async def mining(cls, uid: int):
+        self = cls()
         self.uid = uid
-        self._set_active_action(uid)
+        await self._set_active_action(uid)
+        return self
 
-    def _set_active_action(self, uid: int) -> None:
-        with get_cursor() as cursor:
+    async def _set_active_action(self, uid: int) -> None:
+        async with get_cursor() as cursor:
             query = (
                 "SELECT action_id, start_at, status FROM game.action "
                 "WHERE uid = %(uid)s AND action_type = 'MINING' AND status = 'STARTED' "
                 "ORDER BY start_at DESC LIMIT 1"
             )
-            cursor.execute(query, {"uid": uid})
-            result = cursor.fetchone()
+            await cursor.execute(query, {"uid": uid})
+            result = await cursor.fetchone()
         if result is None:
             return
         self.action_id = result[0]
         self.start_at = result[1]
         self.status = ActionStatus(result[2])
 
-    def start_action(self, message: str) -> None:
-        with get_cursor() as cursor:
+    async def start_action(self, message: str) -> None:
+        async with get_cursor() as cursor:
             query = (
                 "INSERT INTO game.action (action_type, uid, message) VALUES "
-                "('MINING', %(uid)s, %(message)s);"
-                "UPDATE game.player SET is_mining = True WHERE uid = %(uid)s;"
+                "('MINING', %(uid)s, %(message)s)"
             )
-            cursor.execute(query, {"uid": self.uid, "message": message})
+            await cursor.execute(query, {"uid": self.uid, "message": message})
+            query = "UPDATE game.player SET is_mining = True WHERE uid = %(uid)s"
+            await cursor.execute(query, {"uid": self.uid})
 
-    def end_action(self) -> float:
+    async def end_action(self) -> float:
         profit = max(round(random.normalvariate(64, 8), 1), 0)
-        with get_cursor() as cursor:
+        params = {"profit": profit, "uid": self.uid, "action_id": self.action_id}
+        async with get_cursor() as cursor:
             query = (
                 "UPDATE game.action SET profit = %(profit)s, "
                 "status = 'DONE', end_at = CURRENT_TIMESTAMP "
-                "WHERE uid = %(uid)s AND action_id = %(action_id)s;"
+                "WHERE uid = %(uid)s AND action_id = %(action_id)s"
+            )
+            await cursor.execute(query, params)
+            query = (
                 "UPDATE game.player SET gold = gold + %(profit)s, "
-                "is_mining = False WHERE uid = %(uid)s;"
+                "is_mining = False WHERE uid = %(uid)s"
             )
-            cursor.execute(
-                query, {"profit": profit, "uid": self.uid, "action_id": self.action_id}
-            )
+            await cursor.execute(query, params)
         return profit
 
-    def get_other_workers(self) -> list[tuple[int, str]]:
-        with get_cursor() as cursor:
+    async def get_other_workers(self) -> list[tuple[int, str]]:
+        async with get_cursor() as cursor:
             query = (
                 "SELECT uid, message FROM game.action "
                 "WHERE status = 'STARTED' AND action_type = 'MINING' "
                 "ORDER BY start_at DESC"
             )
-            cursor.execute(query)
-            workers = [(row[0], row[1]) for row in cursor.fetchall()]
+            await cursor.execute(query)
+            result = await cursor.fetchall()
+        workers = [(row[0], row[1]) for row in result]
         return workers
 
     def draw_progress(self) -> str | None:
@@ -106,58 +113,66 @@ class Fishing:
     BASE_HOUR = 2
     BASE_TIME = BASE_HOUR * 60 * 60
 
-    def __init__(self, uid: int):
+    @classmethod
+    async def fishing(cls, uid: int):
+        self = cls()
         self.uid = uid
-        self._set_active_action(uid)
+        await self._set_active_action(uid)
+        return self
 
-    def _set_active_action(self, uid: int) -> None:
-        with get_cursor() as cursor:
+    async def _set_active_action(self, uid: int) -> None:
+        async with get_cursor() as cursor:
             query = (
                 "SELECT action_id, start_at, status FROM game.action "
                 "WHERE uid = %(uid)s AND action_type = 'FISHING' "
                 "AND status = 'STARTED' ORDER BY start_at DESC LIMIT 1"
             )
-            cursor.execute(query, {"uid": uid})
-            result = cursor.fetchone()
+            await cursor.execute(query, {"uid": uid})
+            result = await cursor.fetchone()
         if result is None:
             return
         self.action_id = result[0]
         self.start_at = result[1]
         self.status = ActionStatus(result[2])
 
-    def start_action(self, message: str) -> None:
-        with get_cursor() as cursor:
+    async def start_action(self, message: str) -> None:
+        params = {"uid": self.uid, "message": message}
+        async with get_cursor() as cursor:
             query = (
                 "INSERT INTO game.action (action_type, uid, message) VALUES "
-                "('FISHING', %(uid)s, %(message)s);"
-                "UPDATE game.player SET is_fishing = True WHERE uid = %(uid)s;"
+                "('FISHING', %(uid)s, %(message)s)"
             )
-            cursor.execute(query, {"uid": self.uid, "message": message})
+            await cursor.execute(query, params)
+            query = "UPDATE game.player SET is_fishing = True WHERE uid = %(uid)s"
+            await cursor.execute(query, params)
 
-    def end_action(self) -> float:
+    async def end_action(self) -> float:
         profit = max(round(random.normalvariate(384, 24)), 0)
-        with get_cursor() as cursor:
+        params = {"profit": profit, "uid": self.uid, "action_id": self.action_id}
+        async with get_cursor() as cursor:
             query = (
                 "UPDATE game.action SET profit = %(profit)s, "
                 "status = 'DONE', end_at = CURRENT_TIMESTAMP "
-                "WHERE uid = %(uid)s AND action_id = %(action_id)s;"
+                "WHERE uid = %(uid)s AND action_id = %(action_id)s"
+            )
+            await cursor.execute(query, params)
+            query = (
                 "UPDATE game.player SET coin = coin + %(profit)s, "
                 "is_fishing = False WHERE uid = %(uid)s;"
             )
-            cursor.execute(
-                query, {"profit": profit, "uid": self.uid, "action_id": self.action_id}
-            )
+            await cursor.execute(query, params)
         return profit
 
-    def get_other_workers(self) -> list[tuple[int, str]]:
-        with get_cursor() as cursor:
+    async def get_other_workers(self) -> list[tuple[int, str]]:
+        async with get_cursor() as cursor:
             query = (
                 "SELECT uid, message FROM game.action "
                 "WHERE status = 'STARTED' AND action_type = 'FISHING' "
                 "ORDER BY start_at DESC"
             )
-            cursor.execute(query)
-            workers = [(row[0], row[1]) for row in cursor.fetchall()]
+            await cursor.execute(query)
+            result = await cursor.fetchall()
+        workers = [(row[0], row[1]) for row in result]
         return workers
 
     def draw_progress(self) -> str:
