@@ -21,7 +21,9 @@ class Moderation(commands.Cog):
         """查詢警告紀錄"""
         warning_list = await module.list_warns(inter.guild_id, inter.author.id)
         embed = embed_builder.information(
-            title="警告紀錄", description="", thumbnail=inter.author.avatar.url
+            title="警告紀錄",
+            description="",
+            thumbnail=inter.author.avatar.url if user.avatar else None,
         )
         description = f"以下為{inter.author.mention}的警告紀錄"
         if len(warning_list) == 0:
@@ -80,7 +82,7 @@ class Moderation(commands.Cog):
         embed = embed_builder.information(
             title="懲處紀錄",
             description=f"{user.mention} 被 {inter.author.mention} 警告",
-            thumbnail=user.avatar.url,
+            thumbnail=user.avatar.url if user.avatar else None,
         )
         embed.add_field(name="理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
@@ -128,7 +130,7 @@ class Moderation(commands.Cog):
         embed = embed_builder.information(
             title="移除警告",
             description=f"{user.mention} 被 {inter.author.mention} 移除了一個警告",
-            thumbnail=user.avatar.url,
+            thumbnail=user.avatar.url if user.avatar else None,
         )
         embed.add_field(name="警告理由", value=reason, inline=False)
         embed.add_field(name="警告編號", value=warning_id, inline=False)
@@ -152,7 +154,9 @@ class Moderation(commands.Cog):
 
         warning_list = await module.list_warns(inter.guild_id, user.id)
         embed = embed_builder.information(
-            title="警告紀錄", description="", thumbnail=user.avatar.url
+            title="警告紀錄",
+            description="",
+            thumbnail=user.avatar.url if user.avatar else None,
         )
         description = f"以下為{user.mention}的警告紀錄"
         if len(warning_list) == 0:
@@ -242,7 +246,7 @@ class Moderation(commands.Cog):
         embed = embed_builder.information(
             title="懲處紀錄",
             description=f"{member.mention} 被 {inter.author.mention} 禁言",
-            thumbnail=member.avatar.url,
+            thumbnail=member.avatar.url if user.avatar else None,
         )
         embed.add_field(name="理由", value=reason, inline=False)
         embed.add_field(name="時長", value=duration, inline=False)
@@ -315,7 +319,7 @@ class Moderation(commands.Cog):
         embed = embed_builder.information(
             title="成員被解除禁言",
             description=f"{member.mention} 被 {inter.author.mention} 解除禁言",
-            thumbnail=member.avatar.url,
+            thumbnail=member.avatar.url if user.avatar else None,
         )
         embed.add_field(name="理由", value=reason, inline=False)
         if copy:
@@ -389,7 +393,7 @@ class Moderation(commands.Cog):
         embed = embed_builder.information(
             title="懲處紀錄",
             description=f"{member.mention} 被 {inter.author.mention} 踢出伺服器",
-            thumbnail=member.avatar.url,
+            thumbnail=member.avatar.url if user.avatar else None,
         )
         embed.add_field(name="理由", value=reason, inline=False)
         if attachment is not None and attachment.content_type.startswith("image"):
@@ -461,7 +465,7 @@ class Moderation(commands.Cog):
         embed = embed_builder.information(
             title="懲處紀錄",
             description=f"{member.mention} 被 {inter.author.mention} 從伺服器停權",
-            thumbnail=member.avatar.url,
+            thumbnail=member.avatar.url if user.avatar else None,
         )
         embed.add_field(name="理由", value=reason, inline=False)
         if attachment is not None and attachment.content_type.startswith("image"):
