@@ -23,7 +23,7 @@ class Moderation(commands.Cog):
         embed = embed_builder.information(
             title="警告紀錄",
             description="",
-            thumbnail=inter.author.avatar.url if user.avatar else None,
+            thumbnail=inter.author.avatar.url if inter.author.avatar else None,
         )
         description = f"以下為{inter.author.mention}的警告紀錄"
         if len(warning_list) == 0:
