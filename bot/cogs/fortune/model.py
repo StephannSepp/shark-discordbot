@@ -97,7 +97,7 @@ class FortuneResult:
                 "ORDER BY draw_date DESC"
             )
             await cursor.execute(query, (user_id,))
-            last_week_result = cursor.fetchall()
+            last_week_result = await cursor.fetchall()
             query = (
                 "SELECT angel, COUNT(*) as count "
                 "FROM fortune_records "
