@@ -124,7 +124,7 @@ class Misc(commands.Cog):
         async with get_cursor() as cursor:
             query = (
                 "SELECT log_version, log_content "
-                "FROM public.changelog ORDER BY log_id LIMIT 1"
+                "FROM public.changelog ORDER BY log_id DESC LIMIT 1"
             )
             await cursor.execute(query)
             result = await cursor.fetchone()
