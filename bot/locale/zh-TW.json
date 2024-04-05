@@ -54,5 +54,7 @@
     "LOTTERY_WINNING_NUMBER_NAME": "頭獎號碼",
     "LOTTERY_WINNING_NUMBER_DESCRIPTION": "顯示上期頭獎號碼並兌換獎勵",
     "MISC_CHANGELOG_NAME": "更新日誌",
-    "MISC_CHANGELOG_DESCRIPTION": "Bot 現版本更新日誌"
+    "MISC_CHANGELOG_DESCRIPTION": "Bot 現版本更新日誌",
+    "BANKING_TOP_NAME": "資產排行榜",
+    "BANKING_TOP_DESCRIPTION": "顯示資產排行前 10 名的玩家"
 }

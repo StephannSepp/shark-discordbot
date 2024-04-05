@@ -166,3 +166,21 @@ class ExchangeRate:
             )
             await cursor.execute(query, params)
         return rate
+
+
+async def get_top_ranking(uid: int) -> list[dict]:
+    async with get_cursor() as cursor:
+        query = (
+            "WITH temp_table AS (SELECT uid, gold * ("
+            "SELECT exchange_rate FROM game.exchange_rate "
+            "ORDER BY valid_date DESC LIMIT 1) + coin AS total_assets "
+            "FROM game.player ORDER BY total_assets DESC) "
+            "SELECT * FROM (SELECT uid, total_assets, ROW_NUMBER() OVER ("
+            "ORDER BY total_assets DESC) AS pos FROM temp_table)"
+            "WHERE uid = %(uid)s OR pos <= 10"
+        )
+        await cursor.execute(query, {"uid": uid})
+        result = await cursor.fetchall()
+    return [
+        {"uid": row[0], "total_assets": row[1], "position": row[2]} for row in result
+    ]

@@ -14,6 +14,7 @@ from . import DOLLAR_SIGN
 from .helpers import Bank
 from .helpers import ExchangeRate
 from .helpers import GameUser
+from .helpers import get_top_ranking
 
 
 def generate_line_chart(data: dict) -> io.BytesIO:
@@ -138,6 +139,23 @@ class Banking(commands.Cog):
         )
         embed.add_field("金幣餘額", f"{user_coin}", inline=False)
         embed.set_footer(text=f"TxnID: {txn_id}")
+        await inter.response.send_message(embed=embed)
+
+    @banking.sub_command("top")
+    async def bank_top(self, inter: CmdInter):
+        """Show top 10 user by total assets. {{BANKING_TOP}}"""
+        result = await get_top_ranking(inter.author.id)
+        descriptions = []
+        for row in result:
+            position = row["position"]
+            uid = row["uid"]
+            assets = round(row["total_assets"])
+            if uid == inter.author.id:
+                text = f"**#{position} | <@{uid}> 總資產: {DOLLAR_SIGN}{assets:,}**"
+            else:
+                text = f"#{position} | <@{uid}> 總資產: {DOLLAR_SIGN}{assets:,}"
+            descriptions.append(text)
+        embed = embed_builder.information("資產排行榜", "\n".join(descriptions))
         await inter.response.send_message(embed=embed)
 
     @tasks.loop(time=datetime.time())
