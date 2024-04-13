@@ -90,8 +90,13 @@ class Membership(commands.Cog):
     async def check_membership(self) -> None:
         async with get_cursor() as cursor:
             query = (
+                "DELETE FROM public.membership "
+                "WHERE next_bill_date <= CURRENT_DATE - INTERVAL '7 days'"
+            )
+            await cursor.execute(query)
+            query = (
                 "SELECT member_uid FROM public.membership "
-                "WHERE next_bill_date <= CURRENT_DATE - INTERVAL '3 days' "
+                "WHERE next_bill_date = CURRENT_DATE - INTERVAL '3 days' "
                 "AND role_assigned = true"
             )
             await cursor.execute(query)
@@ -123,11 +128,6 @@ class Membership(commands.Cog):
     async def membership(self, inter: CmdInter, message: Message):
         role = self.bot.main_guild.get_role(846616775148044318)
         async with get_cursor() as cursor:
-            query = (
-                "DELETE FROM public.membership "
-                "WHERE next_bill_date <= CURRENT_DATE - INTERVAL '7 days'"
-            )
-            await cursor.execute(query)
             query = (
                 "SELECT next_bill_date FROM public.membership "
                 "WHERE member_uid = %(uid)s"
