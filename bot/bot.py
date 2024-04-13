@@ -15,7 +15,7 @@ from psycopg_pool import AsyncConnectionPool
 from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
-__version__ = "2.7.2"
+__version__ = "2.7.3"
 
 
 conn_pool = AsyncConnectionPool(conninfo=Config.database_url, open=False)
@@ -44,10 +44,6 @@ class Bot(commands.InteractionBot):
         )
         self._start_at = datetime.now()
         self.allowed_mentions = AllowedMentions(everyone=False, roles=False)
-        self.activity = disnake.Activity(
-            name="シリウスの心臓",
-            type=disnake.ActivityType.listening,
-        )
         self.conn_pool = conn_pool
         self.vchive_pool = vchive_pool
 

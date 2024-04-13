@@ -1,6 +1,6 @@
 disnake==2.9.0
 pytz
-pygsheets
 psycopg[binary]
 psycopg[pool]
 matplotlib
+python-dateutil
