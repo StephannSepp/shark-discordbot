@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.7.1](https://img.shields.io/badge/version-2.7.1-informational?style=plastic)
+![Version 2.7.3](https://img.shields.io/badge/version-2.7.3-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,17 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+* 2.7.3
+	* 會員審核
+		* 重新寫了會員審核，棄用Google sheets，改用App指令執行
+* 2.7.2
+	* 霰彈槍輪盤
+		* 向自己射擊安然無恙獎勵從 400 變更為 600
+		* 修正文本錯誤
+	* 更新日誌
+		* 修正更新日誌版本讀取錯誤
+	* 銀行
+		* 新增資產排行榜指令
 * 2.7.1
 	* 抽籤統計
 		* Bug 修復
