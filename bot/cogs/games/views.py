@@ -4,9 +4,9 @@ from collections import deque
 
 import disnake
 from disnake import ButtonStyle
-from disnake import CmdInter
 from disnake import Colour
 from disnake import Embed
+from disnake import MessageInteraction
 from disnake.ui import Button
 from disnake.ui import View
 from utils import embed_builder
@@ -33,6 +33,10 @@ class BlackjackView(View):
         self.dealer_hand.append(self.cards.pop())
         self.player_hand.append(self.cards.pop())
         self.player_hand.append(self.cards.pop())
+
+    # pylint: disable=W0237
+    async def interaction_check(self, inter: MessageInteraction) -> bool:
+        return inter.user.id == self.user.uid
 
     async def build_embed(self, end_of_game=False) -> Embed:
         player_value = self.calc_value(self.player_hand)
@@ -116,9 +120,7 @@ class BlackjackView(View):
         return embed
 
     @disnake.ui.button(label="要牌", emoji="🔼", style=ButtonStyle.green)
-    async def player_hit(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.user.uid:
-            await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
+    async def player_hit(self, button: Button, inter: MessageInteraction):
         self.first_hand = False
         # Disable double bet
         for child in self.children:
@@ -136,18 +138,14 @@ class BlackjackView(View):
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="停牌", emoji="⏸️", style=ButtonStyle.gray)
-    async def player_stop(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.user.uid:
-            await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
+    async def player_stop(self, button: Button, inter: MessageInteraction):
         self.first_hand = False
         self._disable_all_child()
         embed = await self.dealer_round()
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="雙倍下注", emoji="⏫", style=ButtonStyle.blurple)
-    async def player_double(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.user.uid:
-            await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
+    async def player_double(self, button: Button, inter: MessageInteraction):
         await self.user.bank_transaction(
             coin_change_to_player=-self.bet, note="Casino consumption."
         )
@@ -181,6 +179,10 @@ class RouletteView(View):
         self.user = user
         self.game_round = 0
         self._start_round()
+
+    # pylint: disable=W0237
+    async def interaction_check(self, inter: MessageInteraction) -> bool:
+        return inter.user.id == self.user.uid
 
     def _start_round(self) -> None:
         self.round_start = False
@@ -342,9 +344,7 @@ class RouletteView(View):
         return embed
 
     @disnake.ui.button(label="對荷官開槍", style=ButtonStyle.green)
-    async def shoot_at_dealer(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.user.uid:
-            await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
+    async def shoot_at_dealer(self, button: Button, inter: MessageInteraction):
         if not self.round_start:
             self.game_logs.pop()
             self.round_start = True
@@ -371,9 +371,7 @@ class RouletteView(View):
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="對自己開槍", style=ButtonStyle.blurple)
-    async def shoot_at_self(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.user.uid:
-            await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
+    async def shoot_at_self(self, button: Button, inter: MessageInteraction):
         if not self.round_start:
             self.game_logs.pop()
             self.round_start = True
@@ -401,9 +399,7 @@ class RouletteView(View):
         await inter.response.edit_message(embed=embed, view=self)
 
     @disnake.ui.button(label="退出一發彈藥", style=ButtonStyle.blurple)
-    async def pop_one_shot(self, button: Button, inter: CmdInter):
-        if inter.author.id != self.user.uid:
-            await inter.response.send_message("該遊戲並非您發起的", ephemeral=True)
+    async def pop_one_shot(self, button: Button, inter: MessageInteraction):
         if not self.round_start:
             self.game_logs.pop()
             self.round_start = True
