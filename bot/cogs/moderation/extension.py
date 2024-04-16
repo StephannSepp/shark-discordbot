@@ -224,10 +224,12 @@ class Moderation(commands.Cog):
 
         try:
             message = (
-                f"你在 {inter.guild.name} 被禁言\n原因：{reason}\n時長：{duration}\n"
+                f"你在 {inter.guild.name} 被禁言\n"
+                f"原因：{reason}\n"
+                f"時長：{duration}\n"
+                "[上訴 Google 表單](https://forms.gle/ovMwMkATmiVkKCtTA)"
             )
             if attachment is not None and attachment.content_type.startswith("image"):
-                message += "附件：\n"
                 file = await attachment.to_file()
             await member.send(message, file=file)
         except:  # pylint: disable=bare-except
@@ -372,9 +374,12 @@ class Moderation(commands.Cog):
             return
 
         try:
-            message = f"你被踢出 {inter.guild.name}\n原因：{reason}\n"
+            message = (
+                f"你被踢出 {inter.guild.name}\n"
+                f"原因：{reason}\n"
+                "[上訴 Google 表單](https://forms.gle/ovMwMkATmiVkKCtTA)"
+            )
             if attachment is not None and attachment.content_type.startswith("image"):
-                message += "附件：\n"
                 file = await attachment.to_file()
             await member.send(message, file=file)
         except:  # pylint: disable=bare-except
@@ -444,9 +449,12 @@ class Moderation(commands.Cog):
             member = user
 
         try:
-            message = f"你在 {inter.guild.name} 被停權\n原因：{reason}\n"
+            message = (
+                f"你在 {inter.guild.name} 被停權\n"
+                f"原因：{reason}\n"
+                "[上訴 Google 表單](https://forms.gle/ovMwMkATmiVkKCtTA)"
+            )
             if attachment is not None and attachment.content_type.startswith("image"):
-                message += "附件：\n"
                 file = await attachment.to_file()
             await member.send(message, file=file)
         except:  # pylint: disable=bare-except
