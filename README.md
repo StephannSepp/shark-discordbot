@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.7.3](https://img.shields.io/badge/version-2.7.3-informational?style=plastic)
+![Version 2.7.4](https://img.shields.io/badge/version-2.7.4-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,15 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+* 2.7.4
+	* 21點
+	* 霰彈槍輪盤
+		* 修正了「其他玩家亂入問題」
+	* 管理指令
+		* 懲罰通知私訊增加了上訴管道
+	* 手動會員驗證
+		* 修正了到期通知訊息在沒有人需要通知的情況下仍會發出的問題
+		* 美化了驗證完成通知訊息
 * 2.7.3
 	* 會員審核
 		* 重新寫了會員審核，棄用Google sheets，改用App指令執行
