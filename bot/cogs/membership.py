@@ -1,6 +1,5 @@
 import datetime
 
-from config import Config
 from dateutil.relativedelta import relativedelta
 from disnake import CmdInter
 from disnake import Message
@@ -29,7 +28,7 @@ class MembershipModal(Modal):
         ]
         super().__init__(title="會員審核", components=components)
 
-    async def callback(self, inter: ModalInteraction):
+    async def callback(self, inter: ModalInteraction):  # pylint: disable=W0221
         try:
             next_billing_date = datetime.datetime.strptime(
                 inter.text_values.get("date"), "%Y-%m-%d"
@@ -59,18 +58,22 @@ class MembershipModal(Modal):
             await cursor.execute(query, params)
         await self.message.author.add_roles(self.role)
         try:
-            await self.message.author.send(
+            description = (
                 "[CN] 您的會員證明已被驗證，現在可以使用以下會限頻道了！\n"
                 "[EN] Your proof have been verified and you can now access "
                 "to the following membership channel.\n"
                 "------------------------------------------------------\n"
                 "<#803473713369710653>\n"
                 "<#851664375319494676>\n"
-                "------------------------------------------------------\n"
-                "審核資訊/Review info\n"
-                f"下次帳單日期/Next billing date: {next_billing_date:%Y-%m-%d}\n"
-                f"審核人/Reviewer: <@{inter.author.id}>"
             )
+            embed = embed_builder.information("會員審核結果通知", description)
+            embed.add_field(
+                "下次帳單日期/Next billing date",
+                next_billing_date.strftime("%Y-%m-%d"),
+                inline=False,
+            )
+            embed.add_field("審核人/Reviewer", f"<@{inter.author.id}>")
+            await self.message.author.send(embed=embed)
         except Exception:
             status = "未通知審核結果(未開啟DM)"
         else:
@@ -101,6 +104,8 @@ class Membership(commands.Cog):
             )
             await cursor.execute(query)
             result = await cursor.fetchall()
+        if not result:
+            return
         notif_list = []
         for row in result:
             member_uid = row[0]
