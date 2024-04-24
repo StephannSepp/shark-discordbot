@@ -53,7 +53,8 @@ class MembershipModal(Modal):
                 "ON CONFLICT (member_uid) DO UPDATE SET "
                 "next_bill_date = %(date)s, "
                 "message_id = %(message_id)s, "
-                "reviewer_uid = %(reviewer_uid)s"
+                "reviewer_uid = %(reviewer_uid)s, "
+                "role_assigned = true"
             )
             await cursor.execute(query, params)
         if self.role not in self.message.author.roles:
