@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.7.4](https://img.shields.io/badge/version-2.7.4-informational?style=plastic)
+![Version 2.7.7](https://img.shields.io/badge/version-2.7.7-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,15 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+* 2.7.7
+	* 手動會員驗證
+		* 調整了下次結帳日期可以小於今日日期 - 1日
+* 2.7.6
+	* 手動會員驗證
+		* 修正了`role_assigned`沒有被更新的問題
+* 2.7.5
+	* 手動會員驗證
+		* 調整私訊邏輯，只有新給予身分組時才給予通知
 * 2.7.4
 	* 21點
 	* 霰彈槍輪盤
