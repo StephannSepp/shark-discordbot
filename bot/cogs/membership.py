@@ -36,7 +36,7 @@ class MembershipModal(Modal):
         except ValueError:
             await inter.response.send_message("日期格式錯誤", ephemeral=True)
             return
-        if next_billing_date < datetime.datetime.now():
+        if next_billing_date < datetime.datetime.now() - datetime.timedelta(days=1):
             await inter.response.send_message("日期不可小於今天日期", ephemeral=True)
             return
         params = {
