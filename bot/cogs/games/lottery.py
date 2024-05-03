@@ -4,6 +4,7 @@ import random
 from disnake import CmdInter
 from disnake.ext import commands
 from disnake.ext import tasks
+from utils import checks
 from utils import embed_builder
 
 from . import DOLLAR_SIGN
@@ -19,6 +20,7 @@ class LotteryGame(commands.Cog):
     @commands.slash_command(name="lottery")
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.user)
+    @commands.check(checks.is_on_command_channel)
     async def lottery(self, inter: CmdInter):
         """Lottery group commands. {{LOTTERY_GROUP}}"""
 

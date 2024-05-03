@@ -5,6 +5,7 @@ import hashlib
 from disnake import CmdInter
 from disnake.ext import commands
 from disnake.ext import tasks
+from utils import checks
 from utils import embed_builder
 from utils import time_process
 
@@ -31,6 +32,7 @@ class Fortune(commands.Cog):
 
     @commands.slash_command(name="fortune")
     @commands.guild_only()
+    @commands.check(checks.is_on_command_channel)
     async def fortune(self, inter: CmdInter):
         """Fortune command group. {{FORTUNE}}"""
 

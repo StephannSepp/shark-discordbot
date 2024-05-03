@@ -8,6 +8,7 @@ from disnake import File
 from disnake.ext import commands
 from disnake.ext import tasks
 from matplotlib import pyplot as plt
+from utils import checks
 from utils import embed_builder
 
 from . import DOLLAR_SIGN
@@ -40,6 +41,7 @@ class Banking(commands.Cog):
     @commands.slash_command(name="banking")
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.user)
+    @commands.check(checks.is_on_command_channel)
     async def banking(self, inter: CmdInter):
         """Banking group commands. {{BANKING_GROUP}}"""
 

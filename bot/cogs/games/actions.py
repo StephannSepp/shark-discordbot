@@ -3,6 +3,7 @@ import math
 
 from disnake import CmdInter
 from disnake.ext import commands
+from utils import checks
 from utils import embed_builder
 from utils import time_process
 
@@ -56,6 +57,7 @@ class Action(commands.Cog):
     @commands.slash_command(name="action")
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.user)
+    @commands.check(checks.is_on_command_channel)
     async def action(self, inter: CmdInter):
         """Action command group. {{ACTION_GROUP}}"""
 

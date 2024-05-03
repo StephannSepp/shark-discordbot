@@ -1,5 +1,6 @@
 from disnake import CmdInter
 from disnake.ext import commands
+from utils import checks
 
 from . import DOLLAR_SIGN
 from .helpers import GameUser
@@ -16,6 +17,7 @@ class Casino(commands.Cog):
     @commands.slash_command(name="casino")
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.user)
+    @commands.check(checks.is_on_command_channel)
     async def casino(self, inter: CmdInter):
         """Casino group commands. {{CASINO_GROUP}}"""
 
