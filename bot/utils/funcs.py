@@ -1,6 +1,9 @@
 import math
 import re
 
+from disnake import CmdInter
+from disnake.ext.commands.errors import CheckFailure
+
 VALID_CHAR = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
 
 
@@ -31,3 +34,9 @@ def add_underscore_if_digit(s):
 
 def filepath_santitize(text: str) -> str:
     return re.sub(r"^[ .]|[/<>:\"\\|?*]+|[ .]$", "_", text)
+
+
+def is_on_command_channel(inter: CmdInter):
+    if inter.channel_id != 761814788589223978:
+        raise CheckFailure("該指令僅能用於<#761814788589223978>中")
+    return True
