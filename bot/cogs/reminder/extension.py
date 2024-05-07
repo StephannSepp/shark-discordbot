@@ -1,6 +1,5 @@
 import datetime
 import logging
-from enum import Enum
 
 import pytz
 from disnake import CmdInter
@@ -11,17 +10,6 @@ from utils import gen
 from utils import time_process
 
 from bot import get_cursor
-
-
-class CommonTimezones(str, Enum):
-    EST = "US/Eastern"
-    CST = "US/Central"
-    MST = "US/Mountain"
-    PST = "US/Pacific"
-    WET = "WET"
-    CET = "CET"
-    EET = "EET"
-
 
 MAJOR_TIMEZONES = commands.option_enum(
     {
