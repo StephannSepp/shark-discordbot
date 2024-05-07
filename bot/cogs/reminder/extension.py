@@ -1,6 +1,8 @@
 import datetime
 import logging
+from enum import Enum
 
+import pytz
 from disnake import CmdInter
 from disnake.ext import commands
 from disnake.ext import tasks
@@ -9,6 +11,32 @@ from utils import gen
 from utils import time_process
 
 from bot import get_cursor
+
+
+class CommonTimezones(str, Enum):
+    EST = "US/Eastern"
+    CST = "US/Central"
+    MST = "US/Mountain"
+    PST = "US/Pacific"
+    WET = "WET"
+    CET = "CET"
+    EET = "EET"
+
+
+MAJOR_TIMEZONES = commands.option_enum(
+    {
+        "台北時間(Taipei)": "Asia/Taipei",
+        "日本標準時間(JST)": "Japan",
+        "東部標準時(EST)": "US/Eastern",
+        "太平洋標準時(PST)": "US/Pacific",
+        "中部標準時(CST)": "US/Central",
+        "山地標準時(MST)": "US/Mountain",
+        "格林威治標準時間(GMT)": "GMT",
+        "歐洲西部時間(WET)": "WET",
+        "歐洲中部時間(CET)": "CET",
+        "歐洲東部時間(EET)": "EET",
+    }
+)
 
 
 class Reminder(commands.Cog):
@@ -77,24 +105,22 @@ class Reminder(commands.Cog):
         pass
 
     @remind.sub_command(
-        name="me", description="提醒我，格式範例：2d8h5m20s，雙空格代替換行"
+        name="after",
+        description="提醒我，格式範例：2d8h5m20s，訊息以雙空格代替換行",
     )
     @commands.guild_only()
-    async def remind_add(self, inter: CmdInter, after: str, message: str):
+    async def remind_after(self, inter: CmdInter, after: str, message: str):
         try:
             duration = time_process.parse_time(after)
         except ValueError:
             await inter.response.send_message("時間格式不被接受")
             return
-
         if duration > datetime.timedelta(hours=2160):
             await inter.response.send_message("不允許設定超過 3 個月的提醒")
             return
-
+        remind_at = datetime.datetime.now() + duration
         message = message.replace("  ", "\n")
-
-        time_to_remind = datetime.datetime.now() + duration
-        timestamp = time_process.to_unix(time_to_remind)
+        timestamp = time_process.to_unix(remind_at)
         remind_id = gen.snowflake()
         user_id = inter.author.id
         server_id = inter.guild.id
@@ -113,7 +139,63 @@ class Reminder(commands.Cog):
             "server_id": server_id,
             "channel_id": channel_id,
             "remind_text": message,
-            "remind_at": time_to_remind,
+            "remind_at": remind_at,
+            "created_at": datetime.datetime.now(),
+        }
+        async with get_cursor() as cursor:
+            query = (
+                "INSERT INTO reminder VALUES (%(remind_id)s,%(user_id)s,%(server_id)s, "
+                "%(channel_id)s, %(remind_text)s, %(remind_at)s, %(created_at)s)"
+            )
+            await cursor.execute(query, params)
+
+        await self._fetch_next_reminder()
+        await inter.response.send_message(
+            f"我會在 **<t:{timestamp}>**（<t:{timestamp}:R>）提醒你\n提醒內容:\n**{message}**"
+        )
+
+    @remind.sub_command(
+        name="at",
+        description="提醒我，格式範例：YYYY-MM-DD hh:mm:ss，訊息以雙空格代替換行",
+    )
+    @commands.guild_only()
+    async def remind_at(
+        self,
+        inter: CmdInter,
+        at: str,
+        message: str,
+        timezone: MAJOR_TIMEZONES = "Asia/Taipei",
+    ):
+        try:
+            remind_at = datetime.datetime.fromisoformat(at)
+        except ValueError:
+            await inter.response.send_message("時間格式不被接受")
+            return
+        if remind_at > datetime.datetime.now() + datetime.timedelta(days=90):
+            await inter.response.send_message("不允許設定超過 3 個月的提醒")
+            return
+        remind_at = pytz.timezone(timezone).localize(remind_at).astimezone(pytz.UTC)
+        message = message.replace("  ", "\n")
+        timestamp = time_process.to_unix(remind_at)
+        remind_id = gen.snowflake()
+        user_id = inter.author.id
+        server_id = inter.guild.id
+        channel_id = inter.channel_id
+
+        async with get_cursor() as cursor:
+            query = "SELECT count(*) FROM reminder WHERE user_id = %s"
+            await cursor.execute(query, (user_id,))
+            user_reminders = (await cursor.fetchone())[0]
+        if user_reminders >= 3:
+            await inter.response.send_message("你不能設定超過三個提醒")
+            return
+        params = {
+            "remind_id": remind_id,
+            "user_id": user_id,
+            "server_id": server_id,
+            "channel_id": channel_id,
+            "remind_text": message,
+            "remind_at": remind_at,
             "created_at": datetime.datetime.now(),
         }
         async with get_cursor() as cursor:
