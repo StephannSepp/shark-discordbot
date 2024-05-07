@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.7.8](https://img.shields.io/badge/version-2.7.8-informational?style=plastic)
+![Version 2.7.9](https://img.shields.io/badge/version-2.7.9-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,11 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+* 2.8.9
+	* 提醒指令
+		* 現在提醒指令分為`remind after`與`remind at`兩種
+		* `remind after`原為`remind me`指令
+		* `remind at`接受指定時間，接受時間格式為ISO-8601格式(YYYY-MM-DD hh:mm:ss)
 * 2.8.8
 	* 抽籤指令
 	* 遊戲指令
