@@ -86,6 +86,7 @@ class MembershipModal(Modal):
         embed.add_field("會員", f"<@{self.message.author.id}>", inline=False)
         embed.add_field("下次結帳日期", f"{next_billing_date:%Y-%m-%d}", inline=False)
         embed.add_field("通知狀態", status)
+        embed.add_field("來源訊息", self.message.jump_url)
         await inter.response.send_message(embed=embed)
 
 
