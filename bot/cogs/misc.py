@@ -140,6 +140,7 @@ class Misc(commands.Cog):
 
     @commands.slash_command(name="idcard")
     async def id_card(self, inter: CmdInter):
+        """A member card for you. {{MISC_IDCARD}}"""
         avatar = inter.author.guild_avatar or inter.author.display_avatar
         name = inter.author.global_name
         since = f"{inter.author.joined_at:%Y.%m.%d}"

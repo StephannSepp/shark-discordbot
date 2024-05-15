@@ -56,5 +56,7 @@
     "MISC_CHANGELOG_NAME": "更新日誌",
     "MISC_CHANGELOG_DESCRIPTION": "Bot 現版本更新日誌",
     "BANKING_TOP_NAME": "資產排行榜",
-    "BANKING_TOP_DESCRIPTION": "顯示資產排行前 10 名的玩家"
+    "BANKING_TOP_DESCRIPTION": "顯示資產排行前 10 名的玩家",
+    "MISC_IDCARD_NAME": "群友卡",
+    "MISC_IDCARD_DESCRIPTION": "專屬的群組成員卡"
 }
