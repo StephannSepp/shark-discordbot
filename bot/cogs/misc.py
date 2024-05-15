@@ -165,6 +165,8 @@ class Misc(commands.Cog):
                 if response.status == 200:
                     buffer = BytesIO(await response.read())
         avatar_img = Image.open(buffer)
+        if avatar_img.size[0] < 250:
+            avatar_img = avatar_img.resize((250, 250))
         avatar_img.thumbnail((250, 250))
         base_card_img.paste(avatar_img, (85, 130))
         draw = ImageDraw.Draw(base_card_img)
