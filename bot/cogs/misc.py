@@ -1,9 +1,16 @@
 import platform as pf
+from io import BytesIO
 
+import aiohttp
+from barcode import Code128
+from barcode.writer import ImageWriter
 from disnake import AllowedMentions
 from disnake import CmdInter
 from disnake import File
 from disnake.ext import commands
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 from utils import embed_builder
 
 from bot import get_cursor
@@ -130,6 +137,45 @@ class Misc(commands.Cog):
             result = await cursor.fetchone()
         embed = embed_builder.information(f"更新日誌 {result[0]}", result[1])
         await inter.response.send_message(embed=embed)
+
+    @commands.slash_command(name="idcard")
+    async def id_card(self, inter: CmdInter):
+        avatar = inter.author.guild_avatar or inter.author.display_avatar
+        name = inter.author.global_name
+        since = f"{inter.author.joined_at:%Y.%m.%d}"
+        base_card_img = Image.open("static/id_card_base.png")
+        barcode = Code128(str(inter.author.id), ImageWriter(mode="RGBA"))
+        barcode_img: Image.Image = barcode.render(
+            {
+                "module_width": 0.6,
+                "module_height": 10,
+                "quiet_zone": 0.2,
+                "background": "rgba(0,0,0,0)",
+                "foreground": "white",
+                "text_distance": 10,
+            }
+        )
+        barcode_img = barcode_img.transpose(Image.Transpose.ROTATE_90)
+        barcode_img.thumbnail((250, 250))
+        barcode_img = barcode_img.crop((0, 0, 25, 250))
+        base_card_img.paste(barcode_img, (50, 130), barcode_img)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(avatar.with_format("png").url) as response:
+                if response.status == 200:
+                    buffer = BytesIO(await response.read())
+        avatar_img = Image.open(buffer)
+        avatar_img.thumbnail((250, 250))
+        base_card_img.paste(avatar_img, (85, 130))
+        draw = ImageDraw.Draw(base_card_img)
+        font = ImageFont.truetype("static/Unifontexmono-DYWdE.ttf", 42)
+        draw.text((58, 440), name, font=font)
+        draw.text((58, 550), since, font=font)
+        with BytesIO() as image_binary:
+            base_card_img.save(image_binary, "PNG")
+            image_binary.seek(0)
+            await inter.response.send_message(
+                file=File(fp=image_binary, filename=f"{inter.author.id}.png")
+            )
 
 
 def setup(bot: commands.InteractionBot):

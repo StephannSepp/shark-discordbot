@@ -15,7 +15,7 @@ from psycopg_pool import AsyncConnectionPool
 from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
-__version__ = "2.7.9"
+__version__ = "2.7.10"
 
 
 conn_pool = AsyncConnectionPool(conninfo=Config.database_url, open=False)

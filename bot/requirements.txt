@@ -4,3 +4,5 @@ psycopg[binary]
 psycopg[pool]
 matplotlib
 python-dateutil
+python-barcode
+pillow
