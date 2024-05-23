@@ -142,7 +142,7 @@ class Misc(commands.Cog):
     async def id_card(self, inter: CmdInter):
         """A member card for you. {{MISC_IDCARD}}"""
         avatar = inter.author.guild_avatar or inter.author.display_avatar
-        name = inter.author.global_name
+        name = inter.author.global_name or inter.author.display_name
         since = f"{inter.author.joined_at:%Y.%m.%d}"
         base_card_img = Image.open("static/id_card_base.png")
         barcode = Code128(str(inter.author.id), ImageWriter(mode="RGBA"))
