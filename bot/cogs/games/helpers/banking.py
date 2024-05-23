@@ -26,7 +26,7 @@ class Bank:
 
     async def gold_to_coin(self) -> float:
         last_gold_hold = self.gold
-        self.gold += round(random.normalvariate(192, 24), 1)
+        # self.gold += round(random.normalvariate(192, 24), 1)
         self.coin += math.floor(self.gold * 0.6 * BASE_EXCHANGE_RATE)
         self.reserve_gold += math.floor(self.gold * 4) / 10
         self.gold = 0

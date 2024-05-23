@@ -70,6 +70,22 @@ class Mining:
                 "is_mining = False WHERE uid = %(uid)s"
             )
             await cursor.execute(query, params)
+            query = (
+                "INSERT INTO game.bank_transaction "
+                "(uid, gold_change, txn_note) VALUES "
+                "(%(uid)s, %(gold)s, %(note)s) RETURNING txn_id;"
+            )
+            params = {
+                "uid": self.uid,
+                "gold": round(profit * 0.25, 1),
+                "note": "Mining taxes",
+            }
+            await cursor.execute(query, params)
+            query = "SELECT * FROM game.bank FOR UPDATE"
+            await cursor.execute(query)
+            query = "UPDATE game.bank SET gold = gold + %(gold)s"
+            params = {"gold": round(profit * 0.25, 1)}
+            await cursor.execute(query, params)
         return profit
 
     async def get_other_workers(self) -> list[tuple[int, str]]:
