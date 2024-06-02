@@ -1,13 +1,19 @@
+import math
 import platform as pf
 from io import BytesIO
 
 import aiohttp
+import disnake
 from barcode import Code128
 from barcode.writer import ImageWriter
 from disnake import AllowedMentions
+from disnake import ButtonStyle
 from disnake import CmdInter
+from disnake import Embed
 from disnake import File
 from disnake.ext import commands
+from disnake.ui import Button
+from disnake.ui import View
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -128,15 +134,9 @@ class Misc(commands.Cog):
     @commands.slash_command(name="changelog")
     async def changelog(self, inter: CmdInter):
         """Show the changelog of the current version. {{MISC_CHANGELOG}}"""
-        async with get_cursor() as cursor:
-            query = (
-                "SELECT log_version, log_content "
-                "FROM public.changelog ORDER BY log_id DESC LIMIT 1"
-            )
-            await cursor.execute(query)
-            result = await cursor.fetchone()
-        embed = embed_builder.information(f"更新日誌 {result[0]}", result[1])
-        await inter.response.send_message(embed=embed)
+        view = await ChangelogView.create()
+        embed = await view.build_embed()
+        await inter.response.send_message(embed=embed, view=view)
 
     @commands.slash_command(name="idcard")
     async def id_card(self, inter: CmdInter):
@@ -179,6 +179,64 @@ class Misc(commands.Cog):
             await inter.response.send_message(
                 file=File(fp=image_binary, filename=f"{inter.author.id}.png")
             )
+
+
+class ChangelogView(View):
+    rowcount: int
+
+    def __init__(self):
+        super().__init__(timeout=720)
+        self.page = 0
+
+    @classmethod
+    async def create(cls):
+        self = cls()
+        self.rowcount = await self.get_rowcount()
+        return self
+
+    async def get_rowcount(self):
+        async with get_cursor() as cursor:
+            query = "SELECT COUNT(*) FROM public.changelog"
+            await cursor.execute(query)
+            rowcount = (await cursor.fetchone())[0]
+        return rowcount
+
+    async def build_embed(self) -> Embed:
+        async with get_cursor() as cursor:
+            query = (
+                "SELECT log_version, log_content "
+                "FROM public.changelog ORDER BY log_id "
+                "DESC OFFSET %(offset)s LIMIT 1"
+            )
+            await cursor.execute(query, {"offset": self.page})
+            result = await cursor.fetchone()
+        embed = embed_builder.information(f"更新日誌 {result[0]}", result[1])
+        embed.set_footer(text=f"Page {self.page + 1} / {self.rowcount}")
+        return embed
+
+    @disnake.ui.button(emoji="⏮️", style=ButtonStyle.blurple)
+    async def first_page(self, button: Button, inter: CmdInter):
+        self.page = 0
+        embed = await self.build_embed()
+        await inter.response.edit_message(embed=embed, view=self)
+
+    @disnake.ui.button(emoji="◀️", style=ButtonStyle.secondary)
+    async def prev_page(self, button: Button, inter: CmdInter):
+        self.page = max(self.page - 1, 0)
+        embed = await self.build_embed()
+        await inter.response.edit_message(embed=embed, view=self)
+
+    @disnake.ui.button(emoji="▶️", style=ButtonStyle.secondary)
+    async def next_page(self, button: Button, inter: CmdInter):
+        self.page = min(self.page + 1, self.rowcount - 1)
+        embed = await self.build_embed()
+        await inter.response.edit_message(embed=embed, view=self)
+
+    @disnake.ui.button(emoji="⏭️", style=ButtonStyle.blurple)
+    async def last_page(self, button: Button, inter: CmdInter):
+        self.page = self.rowcount - 1
+        embed = await self.build_embed()
+        await inter.response.edit_message(embed=embed, view=self)
 
 
 def setup(bot: commands.InteractionBot):
