@@ -22,7 +22,7 @@ class Casino(commands.Cog):
         """Casino group commands. {{CASINO_GROUP}}"""
 
     @casino.sub_command(name="blackjack")
-    @commands.cooldown(60, 3600, commands.BucketType.user)
+    @commands.cooldown(30, 1800, commands.BucketType.user)
     async def blackjack(self, inter: CmdInter, bet: int):
         """Play blackjack game. {{CASINO_BLACKJACK}}"""
         user = await GameUser.fetch(inter.author.id)
@@ -54,7 +54,7 @@ class Casino(commands.Cog):
         await inter.response.send_message(embed=embed, view=view)
 
     @casino.sub_command(name="roulette")
-    @commands.cooldown(60, 3600, commands.BucketType.user)
+    @commands.cooldown(30, 1800, commands.BucketType.user)
     async def roulette(self, inter: CmdInter):
         """Play shotgun roulette. {{CASINO_ROULETTE}}"""
         user = await GameUser.fetch(inter.author.id)

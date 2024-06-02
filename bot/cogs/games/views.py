@@ -190,10 +190,10 @@ class RouletteView(View):
         self.bullets = deque(maxlen=8)
         bullets: list[RouletteShot] = []
         k = random.randint(2, 8)
-        white_round_chance = (1 - (math.exp(1 - self.game_round) ** 0.1) / 1 + 1) * 0.02
+        white_round_chance = (1 - (math.exp(3 - self.game_round) ** 0.1) / 1 + 1) * 0.1
         if random.random() < white_round_chance:
             bullets.append(RouletteShot.RANDOM)
-            if self.game_round >= 4 and k > 3:
+            if self.game_round >= 3 and k > 3:
                 bullets.append(RouletteShot.RANDOM)
         if k >= 6:
             bullets.extend(
@@ -277,9 +277,9 @@ class RouletteView(View):
             text = (
                 f"{shot_dealer} 次向荷官開槍 x 100 = {shot_dealer * 100:,}\n"
                 f"{self_blank} 次向自射擊安然無恙 x 200 = {self_blank * 200:,}\n"
-                f"{self.dealer.life} 荷官剩餘生命 x -50 = {self.dealer.life * -50:,}\n"
+                f"{self.dealer.life} 荷官剩餘生命 x -100 = {self.dealer.life * -100:,}\n"
                 f"{shot_taken} 次被荷官開槍 x -300 = {shot_taken * -300:,}\n"
-                f"{self_shot} 次向自己開槍 x -1,200 = {self_shot * -1200:,}\n"
+                f"{self_shot} 次向自己開槍 x -800 = {self_shot * -800:,}\n"
                 f"{shot_pop} 次退出彈藥 x -400 = {shot_pop * -400:,}\n"
                 f"{total_shot} 彈藥費用 x -30 = {total_shot * -30:,}\n"
                 "== 其他獎懲 ==\n"
@@ -294,7 +294,7 @@ class RouletteView(View):
                 f"{shot_dealer} 次向荷官開槍 x 200 = {shot_dealer * 200:,}\n"
                 f"{self_blank} 次向自己射擊安然無恙 x 600 = {self_blank * 600:,}\n"
                 f"{shot_taken} 次被荷官開槍 x -100 = {shot_taken * -100:,}\n"
-                f"{self_shot} 次向自己開槍 x -800 = {self_shot * -800:,}\n"
+                f"{self_shot} 次向自己開槍 x -600 = {self_shot * -600:,}\n"
                 f"{shot_pop} 次退出彈藥 x -200 = {shot_pop * -200:,}\n"
                 "== 其他獎懲 ==\n"
                 f"押金返還 = 2,100\n"
