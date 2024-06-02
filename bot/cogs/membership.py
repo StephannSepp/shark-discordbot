@@ -29,6 +29,7 @@ class MembershipModal(Modal):
         super().__init__(title="會員審核", components=components)
 
     async def callback(self, inter: ModalInteraction):  # pylint: disable=W0221
+        await inter.response.defer()
         try:
             next_billing_date = datetime.datetime.strptime(
                 inter.text_values.get("date"), "%Y-%m-%d"
@@ -87,7 +88,7 @@ class MembershipModal(Modal):
         embed.add_field("下次結帳日期", f"{next_billing_date:%Y-%m-%d}", inline=False)
         embed.add_field("通知狀態", status, inline=False)
         embed.add_field("來源訊息", self.message.jump_url, inline=False)
-        await inter.response.send_message(embed=embed)
+        await inter.edit_original_response(embed=embed)
 
 
 class Membership(commands.Cog):
