@@ -72,7 +72,7 @@ class Moderation(commands.Cog):
         copy: 如果指定了文字頻道，將會發送一個副本訊息至該頻道
         """
         await inter.response.defer()
-
+        reason = reason.replace("  ", "\n")
         warning_id = await module.add_warning(
             user_id=user.id,
             server_id=inter.guild_id,
@@ -222,6 +222,7 @@ class Moderation(commands.Cog):
             await inter.edit_original_response(embed=embed)
             return
 
+        reason = reason.replace("  ", "\n")
         try:
             message = (
                 f"你在 {inter.guild.name} 被禁言\n"
@@ -303,6 +304,7 @@ class Moderation(commands.Cog):
             await inter.edit_original_response(embed=embed)
             return
 
+        reason = reason.replace("  ", "\n")
         try:
             await member.send(f"你在 {inter.guild.name} 被解除禁言\n原因：{reason}\n")
         except:  # pylint: disable=bare-except
@@ -373,6 +375,7 @@ class Moderation(commands.Cog):
             await inter.edit_original_response(embed=embed)
             return
 
+        reason = reason.replace("  ", "\n")
         try:
             message = (
                 f"你被踢出 {inter.guild.name}\n"
@@ -444,10 +447,10 @@ class Moderation(commands.Cog):
                 )
                 await inter.edit_original_response(embed=embed)
                 return
-
         else:
             member = user
 
+        reason = reason.replace("  ", "\n")
         try:
             message = (
                 f"你在 {inter.guild.name} 被停權\n"
