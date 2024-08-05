@@ -150,16 +150,18 @@ class ArchiveView(View):
 
     @disnake.ui.button(label="下載", emoji="🔗", style=ButtonStyle.secondary)
     async def last_page(self, button: Button, inter: CmdInter):
-        await inter.response.defer()
-        m = await inter.followup.send("請求下載連結中...", ephemeral=True, wait=True)
-        try:
-            result = await module.get_share_link(inter.author.id, self.vid)
-        except Exception as exc:
-            await inter.response.send_message(exc, ephemeral=True)
-            return
+        await inter.response.send_message("暫不提供下載")
+        return
+        # await inter.response.defer()
+        # m = await inter.followup.send("請求下載連結中...", ephemeral=True, wait=True)
+        # try:
+        #     result = await module.get_share_link(inter.author.id, self.vid)
+        # except Exception as exc:
+        #     await inter.response.send_message(exc, ephemeral=True)
+        #     return
 
-        filename, url, password = result
-        await m.edit(f"{filename}\n[下載密碼: {password} (期限 3 日)](<{url}>)")
+        # filename, url, password = result
+        # await m.edit(f"{filename}\n[下載密碼: {password} (期限 3 日)](<{url}>)")
 
 
 class ChannelMenu(View):
