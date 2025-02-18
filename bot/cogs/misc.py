@@ -21,6 +21,7 @@ from utils import embed_builder
 
 from bot import get_cursor
 
+
 MahjongSoulGameMode = commands.option_enum(
     {
         "三人": "三人",
@@ -47,7 +48,7 @@ class Misc(commands.Cog):
     async def ping(self, inter: CmdInter):
         """Ping the bot."""
         await inter.response.send_message(
-            f"{round(self.bot.latency*1000)}ms", ephemeral=True
+            f"{round(self.bot.latency * 1000)}ms", ephemeral=True
         )
 
     @commands.slash_command(name="donothing", description="This function does nothing.")
@@ -177,7 +178,7 @@ class Misc(commands.Cog):
         avatar_img.thumbnail((250, 250))
         base_card_img.paste(avatar_img, (85, 130))
         draw = ImageDraw.Draw(base_card_img)
-        font = ImageFont.truetype("static/Unifontexmono-DYWdE.ttf", 42)
+        font = ImageFont.truetype("static/UnifontExMono.ttf", 42)
         draw.text((58, 440), name, font=font)
         draw.text((58, 550), since, font=font)
         with BytesIO() as image_binary:
