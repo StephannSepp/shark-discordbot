@@ -1,4 +1,4 @@
-""" A self-use discord bot. """
+"""A self-use discord bot."""
 
 import os
 from contextlib import asynccontextmanager
@@ -15,7 +15,8 @@ from psycopg_pool import AsyncConnectionPool
 from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
-__version__ = "2.7.13"
+
+__version__ = "2.7.14"
 
 
 conn_pool = AsyncConnectionPool(conninfo=Config.database_url, open=False)
