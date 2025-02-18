@@ -86,20 +86,20 @@ class Misc(commands.Cog):
     async def kuaikuai(self, inter: CmdInter):
         """Digital Kuai Kaui makes the bot behave well. {{KUAIKUAI}}"""
         file = File(
-            "static/kuaikuai_20240901C3.png", filename="kuaikuai_20231220A4.png"
+            "static/kuaikuai_20250716C6.png", filename="kuaikuai_20250716C6.png"
         )
         embed = embed_builder.information(
             title="乖乖註冊證明",
             description="祈求 BOT 運作穩定。",
         )
         embed.add_field(
-            name="數位版保存期限",
-            value="<t:1752595200:D> <t:1752595200:R>",
+            name="Server實體版保存期限",
+            value="<t:1741881600:D> <t:1741881600:R>",
             inline=False,
         )
         embed.add_field(
-            name="Server實體版保存期限",
-            value="<t:1741881600:D> <t:1741881600:R>",
+            name="數位版保存期限",
+            value="<t:1752595200:D> <t:1752595200:R>",
             inline=False,
         )
         embed.set_image(file=file)

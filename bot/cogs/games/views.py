@@ -466,7 +466,7 @@ class RouletteView(View):
             damage, shot = self._fire_once()
             if damage == 2:
                 self.game_logs.append(
-                    f"* 荷官朝把自己的頭給打爆了, 是枚獨彈頭{shot.value}"
+                    f"* 荷官把自己的頭給打爆了, 是枚獨彈頭{shot.value}"
                 )
                 self.dealer.take_shot(damage)
             elif damage == 1:
