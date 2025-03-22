@@ -3,7 +3,7 @@
 
 ![Built-with Python 3.10](https://img.shields.io/badge/Python-3.10-informational?style=plastic&logo=python)
 ![Disnake 2.9.0](https://img.shields.io/badge/disnake-2.9.0-informational?style=plastic)
-![Version 2.7.9](https://img.shields.io/badge/version-2.7.9-informational?style=plastic)
+![Version 2.8.15](https://img.shields.io/badge/version-2.8.15-informational?style=plastic)
 
 ## 關於我
 
@@ -15,6 +15,8 @@
 不是那隻迷因鯊魚、也不是亞特蘭提斯的後裔，只是在亞特蘭提斯的打工BOT。
 
 ## Changelog
+* 2.8.15
+	* 修正小 Bug
 * 2.8.14
 	* 新增討論串釘選功能
 * 2.8.13

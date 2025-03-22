@@ -68,7 +68,7 @@ class Vchive(commands.Cog):
     async def all_channel(self, inter: CmdInter):
         """Show all channels being monitored. {{VCHIVE_CHANNEL_ALL}}"""
         view = await ChannelMenu.create()
-        embed = view.build_embed()
+        embed = await view.build_embed()
         await inter.response.send_message(embed=embed, view=view, delete_after=720)
 
     @channel.sub_command(name="add")
