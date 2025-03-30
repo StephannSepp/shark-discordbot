@@ -1,8 +1,10 @@
 import random
+from datetime import datetime
 
 from disnake import Colour
-
+from static import aprilfool
 from static import hololive_talent
+
 
 RESULTS = ["大凶", "凶", "小吉", "中吉", "大吉"]
 LUCKY_COLORS = ["綠", "藍", "紫", "金", "橘", "紅", "黃"]
@@ -29,11 +31,18 @@ def get_lucky_number(seed: int) -> int:
 
 def get_guardian_angel(seed: int) -> str:
     random.seed(seed)
-    name, url = random.choice(list(hololive_talent.talent.items()))
+    today = datetime.utcnow().date()
+    if today.month == 4 and today.day == 1:
+        name, url = random.choice(list(aprilfool.talent.items()))
+    else:
+        name, url = random.choice(list(hololive_talent.talent.items()))
     return name, url
 
 
 def get_guardian_angel_image(angel: str) -> str:
+    today = datetime.utcnow().date()
+    if today.month == 4 and today.day == 1:
+        return aprilfool.talent.get(angel)
     return hololive_talent.talent.get(angel)
 
 
