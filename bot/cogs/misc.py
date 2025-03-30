@@ -95,7 +95,7 @@ class Misc(commands.Cog):
         )
         embed.add_field(
             name="Server實體版保存期限",
-            value="<t:1741881600:D> <t:1741881600:R>",
+            value="<t:1763654400:D> <t:1763654400:R>",
             inline=False,
         )
         embed.add_field(
