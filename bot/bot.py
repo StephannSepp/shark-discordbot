@@ -16,7 +16,7 @@ from utils.time_process import parse_time
 from utils.time_process import strftimedelta
 
 
-__version__ = "2.7.15"
+__version__ = "2.7.16"
 
 
 conn_pool = AsyncConnectionPool(conninfo=Config.database_url, open=False)
