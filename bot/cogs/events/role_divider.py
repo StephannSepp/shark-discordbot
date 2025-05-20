@@ -1,8 +1,8 @@
+from config import Config
+from disnake import Guild
 from disnake import Member
 from disnake import utils
 from disnake.ext import commands
-
-from config import Config
 
 
 class RoleDivider(commands.Cog):
@@ -36,29 +36,47 @@ class RoleDivider(commands.Cog):
         else:
             await after.remove_roles(self.spcl_role_divider)
 
-    def is_mod(self, member: Member):
+    def get_roles(self, guild: Guild) -> None:
         if self.mod_role_divider is None:
-            self.mod_role_divider = utils.get(member.guild.roles, id=795159043656253470)
-
-        return member.top_role > self.mod_role_divider
-
-    def has_sup_role(self, member: Member):
+            self.mod_role_divider = utils.get(guild.roles, id=795159043656253470)
         if self.sup_role_divider is None:
-            self.sup_role_divider = utils.get(
-                member.guild.roles, id=1065553075135324210
-            )
+            self.sup_role_divider = utils.get(guild.roles, id=1065553075135324210)
+        if self.spcl_role_divider is None:
+            self.spcl_role_divider = utils.get(guild.roles, id=795159399756857344)
 
+    def is_mod(self, member: Member) -> bool:
+        self.get_roles(member.guild)
         for role in member.roles:
+            if role == self.mod_role_divider:
+                continue
+            if role == self.sup_role_divider:
+                continue
+            if role == self.spcl_role_divider:
+                continue
+            if role > self.mod_role_divider:
+                return True
+
+    def has_sup_role(self, member: Member) -> bool:
+        self.get_roles(member.guild)
+        for role in member.roles:
+            if role == self.mod_role_divider:
+                continue
+            if role == self.sup_role_divider:
+                continue
+            if role == self.spcl_role_divider:
+                continue
             if self.sup_role_divider < role < self.mod_role_divider:
                 return True
 
-    def has_spcl_role(self, member: Member):
-        if self.spcl_role_divider is None:
-            self.spcl_role_divider = utils.get(
-                member.guild.roles, id=795159399756857344
-            )
-
+    def has_spcl_role(self, member: Member) -> bool:
+        self.get_roles(member.guild)
         for role in member.roles:
+            if role == self.mod_role_divider:
+                continue
+            if role == self.sup_role_divider:
+                continue
+            if role == self.spcl_role_divider:
+                continue
             if self.spcl_role_divider < role < self.sup_role_divider:
                 return True
 
